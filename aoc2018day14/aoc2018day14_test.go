@@ -42,3 +42,26 @@ func TestPartOneLen(t *testing.T) {
 		})
 	}
 }
+
+func TestPartTwo(t *testing.T) {
+	cases := []struct {
+		search string
+		want   int
+	}{
+		{"51589", 9},
+		{"01245", 5},
+		{"92510", 18},
+		{"59414", 2018},
+		{"101", 2},
+		{"371", 0},
+		{"074501", 20288091},
+	}
+	for _, c := range cases {
+		t.Run(fmt.Sprintf("(%q)", c.search), func(t *testing.T) {
+			got := PartTwo(c.search)
+			if got != c.want {
+				t.Errorf("PartTwo(%q) == %d, want %d", c.search, got, c.want)
+			}
+		})
+	}
+}
