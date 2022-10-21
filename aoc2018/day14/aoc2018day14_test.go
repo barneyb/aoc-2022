@@ -1,4 +1,4 @@
-package aoc2018day14
+package day14
 
 import (
 	"fmt"
