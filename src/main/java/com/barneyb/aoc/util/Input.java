@@ -9,7 +9,10 @@ public final class Input {
     }
 
     public static String forProblem(Class<?> clazz) {
-        var res = clazz.getResource(clazz.getSimpleName() + ".txt");
+        var res = clazz.getResource("input.txt");
+        if (res == null) {
+            res = clazz.getResource(clazz.getSimpleName() + ".txt");
+        }
         if (res == null) {
             throw new RuntimeException("No input for " + clazz.getName() + " was found");
         }
