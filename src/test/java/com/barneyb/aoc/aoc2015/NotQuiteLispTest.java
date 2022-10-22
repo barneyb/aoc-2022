@@ -7,32 +7,42 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class NotQuiteLispTest {
 
     @Test
-    void exampleOne() {
+    void partOneExampleOne() {
         assertEquals(0, new NotQuiteLisp("(())").endFloor());
         assertEquals(0, new NotQuiteLisp("()()").endFloor());
     }
 
     @Test
-    void exampleTwo() {
+    void partOneExampleTwo() {
         assertEquals(3, new NotQuiteLisp("(((").endFloor());
         assertEquals(3, new NotQuiteLisp("(()(()(").endFloor());
     }
 
     @Test
-    void exampleThree() {
+    void partOneExampleThree() {
         assertEquals(3, new NotQuiteLisp("))(((((").endFloor());
     }
 
     @Test
-    void exampleFour() {
+    void partOneExampleFour() {
         assertEquals(-1, new NotQuiteLisp("())").endFloor());
         assertEquals(-1, new NotQuiteLisp("))(").endFloor());
     }
 
     @Test
-    void exampleFive() {
+    void partOneExampleFive() {
         assertEquals(-3, new NotQuiteLisp(")))").endFloor());
         assertEquals(-3, new NotQuiteLisp(")())())").endFloor());
+    }
+
+    @Test
+    void partTwoExampleOne() {
+        assertEquals(1, new NotQuiteLisp(")").basementPosition());
+    }
+
+    @Test
+    void partTwoExampleTwo() {
+        assertEquals(5, new NotQuiteLisp("()())").basementPosition());
     }
 
 }
