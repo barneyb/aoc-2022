@@ -1,4 +1,4 @@
-package com.barneyb.aoc.aoc2015;
+package com.barneyb.aoc.aoc2015.day02;
 
 import org.junit.jupiter.api.Test;
 
