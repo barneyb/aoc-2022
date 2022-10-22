@@ -1,6 +1,8 @@
 package com.barneyb.aoc.aoc2015;
 
 import com.barneyb.aoc.util.Solver;
+import lombok.Getter;
+import lombok.val;
 
 /**
  * Solver for AoC 2015 day 1. API:
@@ -13,15 +15,18 @@ import com.barneyb.aoc.util.Solver;
  */
 public class NotQuiteLisp {
 
+    @Getter
     private final int endFloor;
+
+    @Getter
     private final int basementPosition;
 
     public NotQuiteLisp(String input) {
         input = input.trim();
-        int f = 0;
-        int basement = -1;
-        for (int i = 0; i < input.length(); i++) {
-            var c = input.charAt(i);
+        var f = 0;
+        var basement = -1;
+        for (var i = 0; i < input.length(); i++) {
+            val c = input.charAt(i);
             switch (c) {
                 case '(':
                     f += 1;
@@ -38,14 +43,6 @@ public class NotQuiteLisp {
         }
         endFloor = f;
         basementPosition = basement + 1; // one-indexed positions
-    }
-
-    public int getEndFloor() {
-        return endFloor;
-    }
-
-    public int getBasementPosition() {
-        return basementPosition;
     }
 
     public static void main(String[] args) {

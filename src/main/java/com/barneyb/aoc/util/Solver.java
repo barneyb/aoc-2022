@@ -1,5 +1,7 @@
 package com.barneyb.aoc.util;
 
+import lombok.val;
+
 import java.util.function.Function;
 
 public final class Solver {
@@ -13,12 +15,12 @@ public final class Solver {
                                    Function<T, ?> partTwo
     ) {
         try {
-            var constructor = clazz.getConstructor(String.class);
-            var start = System.currentTimeMillis();
-            T solver = constructor.newInstance(Input.forProblem(clazz));
+            val constructor = clazz.getConstructor(String.class);
+            val start = System.currentTimeMillis();
+            val solver = constructor.newInstance(Input.forProblem(clazz));
             System.out.printf("Part One   : %s%n", partOne.apply(solver));
             System.out.printf("Part Two   : %s%n", partTwo.apply(solver));
-            var elapsed = System.currentTimeMillis() - start;
+            val elapsed = System.currentTimeMillis() - start;
             System.out.printf("Total Time : %,d ms", elapsed);
         } catch (Exception e) {
             throw e instanceof RuntimeException
