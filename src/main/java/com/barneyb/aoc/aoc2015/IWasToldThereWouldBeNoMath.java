@@ -1,6 +1,7 @@
 package com.barneyb.aoc.aoc2015;
 
-import com.barneyb.aoc.util.Pair;
+import com.barneyb.aoc.util.IntPair;
+import com.barneyb.aoc.util.Parse;
 import com.barneyb.aoc.util.Solver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -24,18 +25,15 @@ public class IWasToldThereWouldBeNoMath {
     private final int ribbonNeeded;
 
     public IWasToldThereWouldBeNoMath(String input) {
-        input = input.trim();
-        val pair = input.lines().map(spec -> {
-            val dims = spec.split("x");
-            return new Present(
-                    Integer.parseInt(dims[0]),
-                    Integer.parseInt(dims[1]),
-                    Integer.parseInt(dims[2]));
-        }).reduce(
-                new Pair<>(0, 0),
-                (r, p) -> new Pair<>(r.getFirst() + p.getPaperNeeded(), r.getSecond() + p.getRibbonNeeded()),
-                (a, b) -> new Pair<>(a.getFirst() + b.getFirst(), a.getSecond() + b.getSecond())
-        );
+        val pair = input.trim()
+                .lines()
+                .map(spec ->
+                        spec.split("x"))
+                .map(Parse::ints)
+                .map(Present::new)
+                .map(p ->
+                        new IntPair(p.getPaperNeeded(), p.getRibbonNeeded()))
+                .reduce(IntPair.zero(), IntPair::sum);
         paperNeeded = pair.getFirst();
         ribbonNeeded = pair.getSecond();
     }
@@ -44,18 +42,29 @@ public class IWasToldThereWouldBeNoMath {
     private static class Present {
         final int w, h, l;
 
+        Present(int[] dims) {
+            w = dims[0];
+            h = dims[1];
+            l = dims[2];
+        }
+
         int getSurfaceArea() {
             return 2 * l * w + 2 * w * h + 2 * h * l;
         }
 
-        int getAreaOfSmallestFace() {
+        IntPair getSmallestFace() {
             if (w <= l && h <= l) {
-                return w * h;
+                return new IntPair(w, h);
             } else if (w <= h) {
-                return w * l;
+                return new IntPair(w, l);
             } else {
-                return h * l;
+                return new IntPair(h, l);
             }
+        }
+
+        int getAreaOfSmallestFace() {
+            val f = getSmallestFace();
+            return f.getFirst() * f.getSecond();
         }
 
         int getPaperNeeded() {
@@ -66,18 +75,13 @@ public class IWasToldThereWouldBeNoMath {
             return w * h * l;
         }
 
-        int getPerimiterOfSmallestFace() {
-            if (w <= l && h <= l) {
-                return 2 * w + 2 * h;
-            } else if (w <= h) {
-                return 2 * w + 2 * l;
-            } else {
-                return 2 * h + 2 * l;
-            }
+        int getPerimeterOfSmallestFace() {
+            val f = getSmallestFace();
+            return 2 * (f.getFirst() + f.getSecond());
         }
 
         int getRibbonNeeded() {
-            return getPerimiterOfSmallestFace() + getVolume();
+            return getPerimeterOfSmallestFace() + getVolume();
         }
     }
 
