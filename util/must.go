@@ -1,8 +1,8 @@
 package util
 
 func Must[T any](v T, e error) T {
-	if e == nil {
-		return v
+	if e != nil {
+		panic(e)
 	}
-	panic(e)
+	return v
 }
