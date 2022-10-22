@@ -1,8 +1,9 @@
 package runningsum
 
 import (
-	"github.com/barneyb/aoc-2022/util"
 	"testing"
+
+	"github.com/barneyb/aoc-2022/util"
 )
 
 func Test(t *testing.T) {
@@ -18,7 +19,7 @@ func Test(t *testing.T) {
 	for _, c := range cases {
 		got := RunningSum(c.in)
 		if !util.Equal(got, c.want) {
-			t.Errorf("RunningSum(%d) == %d, want %d", c.in, got, c.want)
+			t.Errorf("gave %d, want %d", got, c.want)
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package day07
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -27,7 +28,25 @@ func TestPartOne(t *testing.T) {
 		t.Run(c.want, func(t *testing.T) {
 			got := PartOne(c.in, c.n)
 			if got != c.want {
-				t.Errorf("PartOne gave %q, want %q", got, c.want)
+				t.Errorf("gave %q, want %q", got, c.want)
+			}
+		})
+	}
+}
+
+func TestPartTwo(t *testing.T) {
+	tests := []struct {
+		in         string
+		n, w, want int
+	}{
+		{exampleOne, 6, 2, 15},
+		{input_txt, 26, 5, 936},
+	}
+	for _, c := range tests {
+		t.Run(fmt.Sprintf("%d,%d", c.n, c.w), func(t *testing.T) {
+			got := PartTwo(c.in, c.n, c.w)
+			if got != c.want {
+				t.Errorf("gave %d, want %d", got, c.want)
 			}
 		})
 	}

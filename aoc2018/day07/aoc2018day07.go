@@ -61,7 +61,16 @@ func (g graph) orderedTopoSort() []int {
 	return order
 }
 
+func (g graph) V() int {
+	return len(g)
+}
+
 func PartOne(input string, n int) string {
+	G := parse(input, n)
+	return renderNodeList(G.orderedTopoSort())
+}
+
+func parse(input string, n int) graph {
 	G := make(graph, n)
 	for _, line := range strings.Split(strings.TrimSpace(input), "\n") {
 		var as, bs string
@@ -72,7 +81,7 @@ func PartOne(input string, n int) string {
 		b, _ := utf8.DecodeRuneInString(bs)
 		G.addEdge(idx(a), idx(b))
 	}
-	return renderNodeList(G.orderedTopoSort())
+	return G
 }
 
 func idx(r rune) int {
@@ -89,4 +98,9 @@ func renderNodeList(ns []int) string {
 		result = utf8.AppendRune(result, lbl(n))
 	}
 	return string(result)
+}
+
+func PartTwo(input string, n int, w int) int {
+	G := parse(input, n)
+	return G.V()
 }

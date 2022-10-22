@@ -20,7 +20,7 @@ func TestPartOne(t *testing.T) {
 		t.Run(c.n, func(t *testing.T) {
 			got := PartOne(c.n)
 			if got != c.want {
-				t.Errorf("PartOne(%q) == %q, want %q", c.n, got, c.want)
+				t.Errorf("gave %q, want %q", got, c.want)
 			}
 		})
 	}
@@ -40,7 +40,7 @@ func TestPartOneLen(t *testing.T) {
 		t.Run(fmt.Sprintf("%s,%d", c.n, c.l), func(t *testing.T) {
 			got := PartOneLen(c.n, c.l)
 			if got != c.want {
-				t.Errorf("PartOneLen(%q, %d) == %q, want %q", c.n, c.l, got, c.want)
+				t.Errorf("gave %q, want %q", got, c.want)
 			}
 		})
 	}
@@ -63,7 +63,7 @@ func TestPartTwo(t *testing.T) {
 		t.Run(c.search, func(t *testing.T) {
 			got := PartTwo(c.search)
 			if got != c.want {
-				t.Errorf("PartTwo(%q) == %d, want %d", c.search, got, c.want)
+				t.Errorf("gave %d, want %d", got, c.want)
 			}
 		})
 	}
