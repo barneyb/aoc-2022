@@ -1,9 +1,16 @@
 package day14
 
 import (
+	_ "embed"
 	"strconv"
+	"strings"
 	"unicode/utf8"
+
+	"github.com/barneyb/aoc-2022/util"
 )
+
+//go:embed input.txt
+var input_txt string
 
 const empty = -1
 
@@ -72,11 +79,12 @@ func (b *board) endsWith(needle []int) bool {
 	return true
 }
 
-func PartOne(n int) string {
-	return PartOneLen(n, 10)
+func PartOne(input string) string {
+	return PartOneLen(input, 10)
 }
 
-func PartOneLen(n, l int) string {
+func PartOneLen(input string, l int) string {
+	n := util.Must(strconv.Atoi(strings.TrimSpace(input)))
 	b := newBoard()
 	for b.len() < n+l {
 		b.tick()
@@ -88,9 +96,10 @@ func PartOneLen(n, l int) string {
 	return result
 }
 
-func PartTwo(search string) int {
-	nums := make([]int, utf8.RuneCountInString(search))
-	for i, r := range search {
+func PartTwo(input string) int {
+	input = strings.TrimSpace(input)
+	nums := make([]int, utf8.RuneCountInString(input))
+	for i, r := range input {
 		nums[i] = int(r - '0')
 	}
 	for b := newBoard(); true; b.tick() {
