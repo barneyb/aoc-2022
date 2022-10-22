@@ -1,14 +1,14 @@
 package com.barneyb.aoc.aoc2015;
 
-import com.barneyb.aoc.util.Input;
+import com.barneyb.aoc.util.Solver;
 
 /**
  * Solver for AoC 2015 day 1. API:
  *
  * <pre>
  * {@link #NotQuiteLisp(String)}
- * int {@link #endFloor()}
- * int {@link #basementPosition()}
+ * int {@link #getEndFloor()}
+ * int {@link #getBasementPosition()}
  * </pre>
  */
 public class NotQuiteLisp {
@@ -16,7 +16,7 @@ public class NotQuiteLisp {
     private final int endFloor;
     private final int basementPosition;
 
-    NotQuiteLisp(String input) {
+    public NotQuiteLisp(String input) {
         input = input.trim();
         int f = 0;
         int basement = -1;
@@ -37,21 +37,22 @@ public class NotQuiteLisp {
             }
         }
         endFloor = f;
-        basementPosition = basement + 1; // one-indexed
+        basementPosition = basement + 1; // one-indexed positions
     }
 
-    int endFloor() {
+    public int getEndFloor() {
         return endFloor;
     }
 
-    int basementPosition() {
+    public int getBasementPosition() {
         return basementPosition;
     }
 
     public static void main(String[] args) {
-        var solver = new NotQuiteLisp(Input.forProblem(NotQuiteLisp.class));
-        System.out.println(solver.endFloor());
-        System.out.println(solver.basementPosition());
+        Solver.execute(
+                NotQuiteLisp.class,
+                NotQuiteLisp::getEndFloor,
+                NotQuiteLisp::getBasementPosition);
     }
 
 }
