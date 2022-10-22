@@ -39,6 +39,28 @@ func (g graph) topoSort() []int {
 	return order
 }
 
+func (g graph) orderedTopoSort() []int {
+	visited := make([]bool, len(g))
+	order := make([]int, 0, len(g))
+	for len(order) < len(visited) {
+	node:
+		for u := range g {
+			if visited[u] {
+				continue
+			}
+			for _, v := range g[u] {
+				if !visited[v] {
+					continue node
+				}
+			}
+			visited[u] = true
+			order = append(order, u)
+			break
+		}
+	}
+	return order
+}
+
 func PartOne(input string, n int) string {
 	G := make(graph, n)
 	for _, line := range strings.Split(strings.TrimSpace(input), "\n") {
@@ -50,7 +72,7 @@ func PartOne(input string, n int) string {
 		b, _ := utf8.DecodeRuneInString(bs)
 		G.addEdge(int(a-'A'), int(b-'A'))
 	}
-	return renderNodeList(G.topoSort())
+	return renderNodeList(G.orderedTopoSort())
 }
 
 func renderNodeList(ns []int) string {

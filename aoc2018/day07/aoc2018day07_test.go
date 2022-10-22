@@ -21,6 +21,7 @@ func TestPartOne(t *testing.T) {
 		want string
 	}{
 		{exampleOne, 6, "CABDFE"},
+		{input_txt, 26, "LAPFCRGHVZOTKWENBXIMSUDJQY"},
 	}
 	for _, c := range tests {
 		t.Run(c.want, func(t *testing.T) {
