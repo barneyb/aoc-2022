@@ -12,30 +12,44 @@ import java.security.MessageDigest;
  *
  * <pre>
  * {@link #TheIdealStockingStuffer(String)}
- * int {@link #getNumber()}
+ * int {@link #getFiveZeroNumber()}
+ * int {@link #getSixZeroNumber()}
  * </pre>
  */
 public class TheIdealStockingStuffer {
 
     @Getter
-    private final int number;
+    private final int fiveZeroNumber;
+
+    @Getter
+    private final int sixZeroNumber;
 
     @SneakyThrows
     public TheIdealStockingStuffer(String input) {
         input = input.trim();
-        val md = MessageDigest.getInstance("MD5");
+        val baseMd = MessageDigest.getInstance("MD5");
+        baseMd.update(input.getBytes());
+        int fiveZeros = 0;
         for (var i = 1; ; i++) {
-            md.update((input + i).getBytes());
+            val md = (MessageDigest) baseMd.clone();
+            md.update(("" + i).getBytes());
             val b = md.digest();
-            if (b[0] == 0 && b[1] == 0 && (b[2] & 0xF0) == 0) {
-                number = i;
-                return;
+            if (b[0] == 0 && b[1] == 0) {
+                if (fiveZeros == 0 && (b[2] & 0xF0) == 0) {
+                    fiveZeros = i;
+                }
+                if (b[2] == 0) {
+                    fiveZeroNumber = fiveZeros;
+                    sixZeroNumber = i;
+                    return;
+                }
             }
         }
     }
 
     public static void main(String[] args) {
         Solver.execute(TheIdealStockingStuffer.class,
-                TheIdealStockingStuffer::getNumber);
+                TheIdealStockingStuffer::getFiveZeroNumber,
+                TheIdealStockingStuffer::getSixZeroNumber);
     }
 }

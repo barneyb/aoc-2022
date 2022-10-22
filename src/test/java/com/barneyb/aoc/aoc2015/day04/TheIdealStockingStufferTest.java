@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TheIdealStockingStufferTest {
 
     private void number(int expected, String key) {
-        assertEquals(expected, new TheIdealStockingStuffer(key).getNumber());
+        assertEquals(expected, new TheIdealStockingStuffer(key).getFiveZeroNumber());
     }
 
     @Test
