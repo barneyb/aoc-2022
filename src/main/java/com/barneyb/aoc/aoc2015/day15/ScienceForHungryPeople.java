@@ -11,29 +11,36 @@ import java.util.stream.Collectors;
  *
  * <pre>
  * {@link #ScienceForHungryPeople(String)}
- * int {@link #getHighestTotalScore()}
+ * int {@link #getBestScore()}
+ * int {@link #getBestCalorieConstrainedScore()}
  * </pre>
  */
 public class ScienceForHungryPeople {
 
     @Getter
-    private final int highestTotalScore;
+    private final int bestScore;
+
+    @Getter
+    private final int bestCalorieConstrainedScore;
 
     public ScienceForHungryPeople(String input) {
         val ingredients = input.trim()
                 .lines()
                 .map(Ingredient::parse)
                 .collect(Collectors.toList());
-        highestTotalScore = new Searcher(ingredients)
+        val searcher = new Searcher(ingredients);
+        bestScore = searcher
                 .getBestIngredient()
                 .getScore();
-        System.out.printf("constructs: %,d, adds: %,d, mults: %,d%n",
-                Ingredient.constructs, Ingredient.sums, Ingredient.times);
+        bestCalorieConstrainedScore = searcher
+                .getBestCalorieConstrainedIngredient()
+                .getScore();
     }
 
     public static void main(String[] args) {
         Solver.execute(ScienceForHungryPeople.class,
-                ScienceForHungryPeople::getHighestTotalScore);
+                ScienceForHungryPeople::getBestScore,
+                ScienceForHungryPeople::getBestCalorieConstrainedScore);
     }
 
 }

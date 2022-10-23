@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 @Value
 class Ingredient {
 
-    public static int constructs, sums, times;
-
     public static final Ingredient NOTHING = new Ingredient(new int[]{0, 0, 0, 0, 0});
 
     private static final Pattern RE_SPLITTER = Pattern.compile("[,: ]+[a-z ]+");
@@ -33,7 +31,6 @@ class Ingredient {
     int score;
 
     Ingredient(int[] properties) {
-        constructs++;
         this.properties = Arrays.copyOf(properties, properties.length);
         var score = 1;
         for (var i = 0; i < 4; i++) {
@@ -48,7 +45,6 @@ class Ingredient {
     }
 
     Ingredient sum(Ingredient other) {
-        sums++;
         val props = Arrays.copyOf(this.properties, this.properties.length);
         for (var i = 0; i < props.length; i++) {
             props[i] += other.properties[i];
@@ -57,11 +53,14 @@ class Ingredient {
     }
 
     Ingredient times(int n) {
-        times++;
         val props = Arrays.copyOf(this.properties, this.properties.length);
         for (var i = 0; i < props.length; i++) {
             props[i] *= n;
         }
         return new Ingredient(props);
+    }
+
+    public int getCalories() {
+        return this.properties[4];
     }
 }
