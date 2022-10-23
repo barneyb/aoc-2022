@@ -1,9 +1,9 @@
 package com.barneyb.aoc.util;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class Pair<F, S> {
-    final F first;
-    final S second;
+    F first;
+    S second;
 }

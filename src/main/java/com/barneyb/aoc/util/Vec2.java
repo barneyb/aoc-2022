@@ -1,11 +1,11 @@
 package com.barneyb.aoc.util;
 
-import lombok.Data;
+import lombok.Value;
 
 @SuppressWarnings("unused")
-@Data
+@Value
 public class Vec2 {
-    final int x, y;
+    int x, y;
 
     public static Vec2 origin() {
         return new Vec2(0, 0);

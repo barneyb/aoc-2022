@@ -1,11 +1,11 @@
 package com.barneyb.aoc.util;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class IntPair {
-    final int first;
-    final int second;
+    int first;
+    int second;
 
     public static IntPair zero() {
         return new IntPair(0, 0);
