@@ -17,4 +17,9 @@ class DuelingGeneratorsTest {
         assertEquals(588, new DuelingGenerators(65, 8921).getPairsInFortyMillion());
     }
 
+    @Test
+    void partTwo() {
+        assertEquals(309, new DuelingGenerators(65, 8921).getFilteredPairsInFiveMillion());
+    }
+
 }
