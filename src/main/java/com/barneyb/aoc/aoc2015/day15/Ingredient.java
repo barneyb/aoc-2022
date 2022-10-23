@@ -10,14 +10,13 @@ import java.util.regex.Pattern;
 @Value
 class Ingredient {
 
-    public static int parses, constructs, sums, times;
+    public static int constructs, sums, times;
 
     public static final Ingredient NOTHING = new Ingredient(new int[]{0, 0, 0, 0, 0});
 
     private static final Pattern RE_SPLITTER = Pattern.compile("[,: ]+[a-z ]+");
 
     static Ingredient parse(String spec) {
-        parses++;
         val s = new Scanner(spec.trim())
                 .useDelimiter(RE_SPLITTER);
         s.next(); // ignore name

@@ -4,7 +4,6 @@ import com.barneyb.aoc.util.Solver;
 import lombok.Getter;
 import lombok.val;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -25,24 +24,11 @@ public class ScienceForHungryPeople {
                 .lines()
                 .map(Ingredient::parse)
                 .collect(Collectors.toList());
-        highestTotalScore = scoreOfBest(Ingredient.NOTHING, ingredients, 100);
-        System.out.printf("parses: %d, constructs: %d, sums: %d, times: %d%n",
-                Ingredient.parses, Ingredient.constructs, Ingredient.sums, Ingredient.times);
-    }
-
-    private int scoreOfBest(Ingredient basis, List<Ingredient> ingredients, int picking) {
-        if (ingredients.size() == 1) {
-            return basis.sum(ingredients.get(0).times(picking)).getScore();
-        }
-        int best = -1;
-        for (var i = 0; i < picking; i++) {
-            val ing = basis.sum(ingredients.get(0).times(i));
-            val score = scoreOfBest(ing, ingredients.subList(1, ingredients.size()), picking - i);
-            if (best < score) {
-                best = score;
-            }
-        }
-        return best;
+        highestTotalScore = new Searcher(ingredients)
+                .getBestIngredient()
+                .getScore();
+        System.out.printf("constructs: %,d, adds: %,d, mults: %,d%n",
+                Ingredient.constructs, Ingredient.sums, Ingredient.times);
     }
 
     public static void main(String[] args) {
