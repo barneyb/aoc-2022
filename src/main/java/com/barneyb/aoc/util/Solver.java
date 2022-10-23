@@ -21,9 +21,10 @@ public final class Solver {
                                    Function<T, ?> partTwo
     ) {
         try {
+            val input = Input.forProblem(clazz);
             val constructor = clazz.getConstructor(String.class);
             val start = System.currentTimeMillis();
-            val solver = constructor.newInstance(Input.forProblem(clazz));
+            val solver = constructor.newInstance(input);
             System.out.printf("Part One   : %s%n", partOne.apply(solver));
             if (partTwo != null)
                 System.out.printf("Part Two   : %s%n", partTwo.apply(solver));
