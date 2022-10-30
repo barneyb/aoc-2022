@@ -18,6 +18,14 @@ public class NoMatterHowYouSliceIt {
     @Value
     private static class Claim {
         int id, x, y, w, h;
+
+        boolean intersects(Claim c) {
+            if (x + w < c.x) return false; // left of c
+            if (x > c.x + c.w) return false; // right of c
+            if (y + h < c.y) return false; // above c
+            if (y > c.y + c.h) return false; // below c
+            return true;
+        }
     }
 
     public static void main(String[] args) {
@@ -41,6 +49,16 @@ public class NoMatterHowYouSliceIt {
                 .stream()
                 .filter(k -> hist.get(k) > 1)
                 .count());
+        outer:
+        for (val a : claims) {
+            for (val b : claims) {
+                if (a != b && a.intersects(b)) {
+                    continue outer;
+                }
+            }
+            System.out.println(a);
+            break;
+        }
     }
 
 }
