@@ -2,9 +2,22 @@ package com.barneyb.aoc.util;
 
 import lombok.Value;
 
+import java.util.Comparator;
+
 @SuppressWarnings("unused")
 @Value
 public class Vec2 {
+
+    /**
+     * Note that this uses "graphic" coordinates, not "math" coordinates. That
+     * is, "rightward" is positive-x and "downward" is positive-y. Math treats
+     * "upward" as positive-y.
+     */
+    public static Comparator<Vec2> READING_ORDER = (Vec2 o1, Vec2 o2) ->
+            o1.getY() != o2.getY()
+                    ? o1.getY() - o2.getY()
+                    : o1.getX() - o2.getX();
+
     int x, y;
 
     public static Vec2 origin() {
