@@ -78,4 +78,11 @@ public class Vec2 {
         return new Vec2(x - delta, y);
     }
 
+    public int getManhattanDistance() {
+        return getManhattanDistance(origin());
+    }
+
+    public int getManhattanDistance(Vec2 dest) {
+        return Math.abs(x - dest.x) + Math.abs(y - dest.y);
+    }
 }
