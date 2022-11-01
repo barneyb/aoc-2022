@@ -3,7 +3,6 @@ package com.barneyb.aoc.aoc2019.day10;
 import com.barneyb.aoc.util.Chars;
 import com.barneyb.aoc.util.Solver;
 import com.barneyb.aoc.util.Vec2;
-import lombok.Getter;
 import lombok.val;
 
 import java.util.Collection;
@@ -11,19 +10,19 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import static com.barneyb.aoc.util.With.with;
+
 public class MonitoringStation {
 
-    @Getter
-    private final long maxDetectedAsteroids;
+    private final Asteroid station;
 
     public MonitoringStation(String input) {
         val asteroids = parse(input);
         //noinspection OptionalGetWithoutIsPresent
-        val base = asteroids.stream()
+        this.station = asteroids.stream()
                 .max(Comparator.comparingInt(Asteroid::getDetectedCount))
                 .get();
-        System.out.println(base);
-        maxDetectedAsteroids = base.getDetectedCount();
+        System.out.println(station);
     }
 
     private static Collection<Asteroid> parse(String input) {
@@ -45,8 +44,18 @@ public class MonitoringStation {
                 .collect(Collectors.toList());
     }
 
+    public int getMaxDetectedAsteroids() {
+        return station.getDetectedCount();
+    }
+
+    public Vec2 getNthVaporized(int n) {
+        return station.getNthVaporized(n);
+    }
+
     public static void main(String[] args) {
         Solver.execute(MonitoringStation.class,
-                MonitoringStation::getMaxDetectedAsteroids);
+                MonitoringStation::getMaxDetectedAsteroids,
+                m -> with(m.getNthVaporized(200), a ->
+                        a.getX() * 100 + a.getY()));
     }
 }

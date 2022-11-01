@@ -1,5 +1,6 @@
 package com.barneyb.aoc.aoc2019.day10;
 
+import com.barneyb.aoc.util.Vec2;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,8 +42,11 @@ class MonitoringStationTest {
 
     @Test
     void exampleSix() {
-        assertEquals(210, new MonitoringStation(EXAMPLE_SIX)
-                .getMaxDetectedAsteroids());
+        var station = new MonitoringStation(EXAMPLE_SIX);
+        assertEquals(210, station.getMaxDetectedAsteroids());
+        assertEquals(new Vec2(11, 12), station.getNthVaporized(1));
+        assertEquals(new Vec2(12, 8), station.getNthVaporized(10));
+        assertEquals(new Vec2(8, 2), station.getNthVaporized(200));
     }
 
 }
