@@ -1,4 +1,4 @@
-package com.barneyb.aoc.aoc2016.day1;
+package com.barneyb.aoc.aoc2016.day01;
 
 import com.barneyb.aoc.util.Dir;
 import com.barneyb.aoc.util.Solver;

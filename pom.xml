@@ -4,6 +4,7 @@
     <artifactId>aoc-2022</artifactId>
     <version>1</version>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -25,6 +26,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>aoc-2022</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>

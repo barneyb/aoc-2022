@@ -1,8 +1,9 @@
 package com.barneyb.aoc.aoc2018.day03;
 
 import com.barneyb.aoc.util.Hist;
-import com.barneyb.aoc.util.Input;
+import com.barneyb.aoc.util.Solver;
 import com.barneyb.aoc.util.Vec2;
+import lombok.Getter;
 import lombok.Value;
 import lombok.val;
 
@@ -28,8 +29,14 @@ public class NoMatterHowYouSliceIt {
         }
     }
 
-    public static void main(String[] args) {
-        val claims = Input.forProblem(NoMatterHowYouSliceIt.class)
+    @Getter
+    private final long overlappingInches;
+
+    @Getter
+    private int isolatedClaimId;
+
+    public NoMatterHowYouSliceIt(String input) {
+        val claims = input
                 .trim()
                 .lines()
                 .map(line -> {
@@ -45,10 +52,10 @@ public class NoMatterHowYouSliceIt {
                 }
             }
         }
-        System.out.println(hist.keySet()
+        overlappingInches = hist.keySet()
                 .stream()
                 .filter(k -> hist.get(k) > 1)
-                .count());
+                .count();
         outer:
         for (val a : claims) {
             for (val b : claims) {
@@ -56,9 +63,15 @@ public class NoMatterHowYouSliceIt {
                     continue outer;
                 }
             }
-            System.out.println(a);
+            isolatedClaimId = a.id;
             break;
         }
+    }
+
+    public static void main(String[] args) {
+        Solver.execute(NoMatterHowYouSliceIt.class,
+                NoMatterHowYouSliceIt::getOverlappingInches,
+                NoMatterHowYouSliceIt::getIsolatedClaimId);
     }
 
 }
