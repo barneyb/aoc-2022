@@ -24,15 +24,15 @@ public class AMazeOfTwistyLittleCubicles {
         visited = new HashMap<>();
     }
 
-    public int getStepsToGoal(Vec2 goal) {
+    public int getStepsTo(Vec2 goal) {
         if (!visited.containsKey(goal)) {
             stepsToGoal(goal, START, 0);
         }
-        return visited.get(goal);
+        return visited.getOrDefault(goal, -1);
     }
 
     public int getStepsToGoal() {
-        return getStepsToGoal(GOAL);
+        return getStepsTo(GOAL);
     }
 
     private void stepsToGoal(Vec2 goal, Vec2 pos, int soFar) {
@@ -49,6 +49,20 @@ public class AMazeOfTwistyLittleCubicles {
         stepsToGoal(goal, pos.west(), soFar + 1);
     }
 
+    public long getCubesWithin(int steps) {
+        Vec2 goal;
+        for (int y = 0; ; y++) {
+            goal = new Vec2(steps, y);
+            if (isOpen(goal)) break;
+        }
+        getStepsTo(goal);
+        return visited.keySet().stream().filter(k -> visited.get(k) <= steps).count();
+    }
+
+    public long getCubesWithinFiftySteps() {
+        return getCubesWithin(50);
+    }
+
     private boolean isOpen(Vec2 pos) {
         int x = pos.getX(), y = pos.getY();
         int n = x * x + 3 * x + 2 * x * y + y + y * y + magic;
@@ -58,7 +72,8 @@ public class AMazeOfTwistyLittleCubicles {
 
     public static void main(String[] args) {
         Solver.execute(AMazeOfTwistyLittleCubicles.class,
-                AMazeOfTwistyLittleCubicles::getStepsToGoal);
+                AMazeOfTwistyLittleCubicles::getStepsToGoal,
+                AMazeOfTwistyLittleCubicles::getCubesWithinFiftySteps);
     }
 
 }
