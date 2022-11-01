@@ -12,10 +12,37 @@ class MonitoringStationTest {
             "....#\n" +
             "...##";
 
+    public static final String EXAMPLE_SIX = ".#..##.###...#######\n" +
+            "##.############..##.\n" +
+            ".#.######.########.#\n" +
+            ".###.#######.####.#.\n" +
+            "#####.##.#.##.###.##\n" +
+            "..#####..#.#########\n" +
+            "####################\n" +
+            "#.####....###.#.#.##\n" +
+            "##.#################\n" +
+            "#####.##.###..####..\n" +
+            "..######..##.#######\n" +
+            "####.##.####...##..#\n" +
+            ".#####..#.######.###\n" +
+            "##...#.##########...\n" +
+            "#.##########.#######\n" +
+            ".####.#.###.###.#.##\n" +
+            "....##.##.###..#####\n" +
+            ".#.#.###########.###\n" +
+            "#.#.#.#####.####.###\n" +
+            "###.##.####.##.#..##";
+
     @Test
     void exampleOne() {
         assertEquals(8, new MonitoringStation(EXAMPLE_ONE)
-                .getMaxVisibleAsteroids());
+                .getMaxDetectedAsteroids());
+    }
+
+    @Test
+    void exampleSix() {
+        assertEquals(210, new MonitoringStation(EXAMPLE_SIX)
+                .getMaxDetectedAsteroids());
     }
 
 }

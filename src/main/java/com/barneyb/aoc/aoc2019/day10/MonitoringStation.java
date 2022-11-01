@@ -6,32 +6,32 @@ import com.barneyb.aoc.util.Vec2;
 import lombok.Getter;
 import lombok.val;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MonitoringStation {
 
     @Getter
-    private final long maxVisibleAsteroids;
+    private final long maxDetectedAsteroids;
 
     public MonitoringStation(String input) {
         val asteroids = parse(input);
-        maxVisibleAsteroids = asteroids.stream()
-                .mapToLong(base -> asteroids.stream()
-                        .filter(a -> a != base)
-                        .map(a -> Math.atan2(a.getY() - base.getY(), a.getX() - base.getX()))
-                        .distinct()
-                        .count())
-                .max()
-                .orElse(-1);
+        //noinspection OptionalGetWithoutIsPresent
+        val base = asteroids.stream()
+                .max(Comparator.comparingInt(Asteroid::getDetectedCount))
+                .get();
+        System.out.println(base);
+        maxDetectedAsteroids = base.getDetectedCount();
     }
 
-    private static Set<Vec2> parse(String input) {
-        val asteroids = new HashSet<Vec2>();
+    private static Collection<Asteroid> parse(String input) {
+        val field = new HashSet<Vec2>();
         int x = 0, y = 0;
         for (val c : new Chars(input.trim())) {
             if (c == '#') {
-                asteroids.add(new Vec2(x, y));
+                field.add(new Vec2(x, y));
             }
             if (c == '\n') {
                 y++;
@@ -40,11 +40,13 @@ public class MonitoringStation {
                 x++;
             }
         }
-        return asteroids;
+        return field.stream()
+                .map(p -> new Asteroid(p, field))
+                .collect(Collectors.toList());
     }
 
     public static void main(String[] args) {
         Solver.execute(MonitoringStation.class,
-                MonitoringStation::getMaxVisibleAsteroids);
+                MonitoringStation::getMaxDetectedAsteroids);
     }
 }
