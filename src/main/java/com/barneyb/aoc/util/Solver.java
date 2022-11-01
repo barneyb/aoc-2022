@@ -51,7 +51,7 @@ public final class Solver {
         if (partTwo != null)
             System.out.printf("Part Two   : %s%n", partTwo.apply(solver));
         val elapsed = System.currentTimeMillis() - start;
-        System.out.printf("Total Time : %,d ms", elapsed);
+        System.out.printf("Total Time : %,d ms%n", elapsed);
     }
 
 }
