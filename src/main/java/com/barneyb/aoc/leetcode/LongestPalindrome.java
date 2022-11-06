@@ -105,28 +105,37 @@ public class LongestPalindrome {
     /**
      * <pre>
      * = barney =======================================================================
-     * abccccdd in ~123 ns (~15.38n)
-     * 1,000 letters in ~7,079 ns (~7.08n)
-     * 10,000 letters in ~69,479 ns (~6.95n)
+     * abccccdd in ~155 ns (~19.38n)
+     * 1,000 letters in ~5,640 ns (~5.64n)
+     * 10,000 letters in ~77,533 ns (~7.75n)
+     * n=29,592 in ~257,007 ns (~8.69n)
      * failed 'hamlet_act1': Index -33 out of bounds for length 64
+     * n=149,633 in ~1,069,022 ns (~7.14n)
      * failed 'hamlet': Index 65214 out of bounds for length 64
-     * failed 'ulysses': Index 65214 out of bounds for length 64
+     * n=1,197,444 in ~8,089,382 ns (~6.76n)
+     * failed 'ulysses': null
      * ================================================================================
      * = barney (array copy) ==========================================================
-     * abccccdd in ~124 ns (~15.50n)
-     * 1,000 letters in ~1,788 ns (~1.79n)
-     * 10,000 letters in ~58,427 ns (~5.84n)
+     * abccccdd in ~153 ns (~19.13n)
+     * 1,000 letters in ~1,435 ns (~1.44n)
+     * 10,000 letters in ~35,721 ns (~3.57n)
+     * n=29,592 in ~141,626 ns (~4.79n)
      * failed 'hamlet_act1': Index -33 out of bounds for length 64
+     * n=149,633 in ~696,330 ns (~4.65n)
      * failed 'hamlet': Index 65214 out of bounds for length 64
-     * failed 'ulysses': Index 65214 out of bounds for length 64
+     * n=1,197,444 in ~5,680,029 ns (~4.74n)
+     * failed 'ulysses': null
      * ================================================================================
      * = brenna =======================================================================
-     * abccccdd in ~477 ns (~59.63n)
-     * 1,000 letters in ~15,957 ns (~15.96n)
-     * 10,000 letters in ~144,224 ns (~14.42n)
-     * hamlet_act1 in ~586,785 ns (~15.06n)
-     * hamlet in ~2,825,864 ns (~14.00n)
-     * ulysses in ~21,293,322 ns (~13.54n)
+     * abccccdd in ~363 ns (~45.38n)
+     * 1,000 letters in ~14,412 ns (~14.41n)
+     * 10,000 letters in ~141,717 ns (~14.17n)
+     * n=29,592 in ~435,521 ns (~14.72n)
+     * hamlet_act1 in ~619,118 ns (~15.89n)
+     * n=149,633 in ~2,167,142 ns (~14.48n)
+     * hamlet in ~2,990,763 ns (~14.82n)
+     * n=1,197,444 in ~17,052,630 ns (~14.24n)
+     * ulysses in ~22,926,902 ns (~14.58n)
      * ================================================================================
      * </pre>
      */
@@ -150,11 +159,18 @@ public class LongestPalindrome {
         thinger(solution, "abccccdd", "abccccdd", 7, 100000);
         thinger(solution, "1,000 letters", thousand, 969, 10000);
         thinger(solution, "10,000 letters", tenThousand, 9975, 1000);
+        thinger(solution, hamlet_act1, 29569, 1000);
         thinger(solution, "hamlet_act1", hamlet_act1, 38935, 1000);
+        thinger(solution, hamlet, 149613, 1000);
         thinger(solution, "hamlet", hamlet, 201815, 1000);
+        thinger(solution, ulysses, 1197415, 100);
         thinger(solution, "ulysses", ulysses, 1572199, 100);
         System.out.println("=".repeat(80));
+    }
 
+    private static void thinger(Function<String, Integer> solution, String str, int expected, int iterations) {
+        str = str.replaceAll("[^a-zA-Z]+", "");
+        thinger(solution, String.format("n=%,d", str.length()), str, expected, iterations);
     }
 
     private static void thinger(Function<String, Integer> solution, String label, String str, int expected, int iterations) {
