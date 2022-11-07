@@ -1,6 +1,6 @@
 package com.barneyb.aoc.aoc2015.day15;
 
-import com.barneyb.aoc.util.Pair;
+import com.barneyb.util.Pair;
 import lombok.Getter;
 import lombok.val;
 

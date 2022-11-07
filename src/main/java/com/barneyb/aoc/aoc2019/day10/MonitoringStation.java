@@ -1,8 +1,8 @@
 package com.barneyb.aoc.aoc2019.day10;
 
-import com.barneyb.aoc.util.Chars;
 import com.barneyb.aoc.util.Solver;
-import com.barneyb.aoc.util.Vec2;
+import com.barneyb.util.Chars;
+import com.barneyb.util.Vec2;
 import lombok.val;
 
 import java.util.Collection;
@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
-import static com.barneyb.aoc.util.With.with;
+import static com.barneyb.util.With.with;
 
 public class MonitoringStation {
 

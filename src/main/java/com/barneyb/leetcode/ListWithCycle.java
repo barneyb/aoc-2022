@@ -1,9 +1,9 @@
-package com.barneyb.aoc.leetcode;
+package com.barneyb.leetcode;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
 
-import static com.barneyb.aoc.util.With.with;
+import static com.barneyb.util.With.with;
 
 public class ListWithCycle {
 

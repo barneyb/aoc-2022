@@ -1,4 +1,4 @@
-package com.barneyb.aoc.util;
+package com.barneyb.util;
 
 import java.util.HashMap;
 import java.util.Map;

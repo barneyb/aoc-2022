@@ -1,7 +1,7 @@
 package com.barneyb.aoc.aoc2015.day02;
 
-import com.barneyb.aoc.util.IntPair;
-import com.barneyb.aoc.util.Parse;
+import com.barneyb.util.IntPair;
+import com.barneyb.util.Parse;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 

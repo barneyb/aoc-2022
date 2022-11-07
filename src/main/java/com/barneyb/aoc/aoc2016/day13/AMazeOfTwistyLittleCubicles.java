@@ -1,7 +1,7 @@
 package com.barneyb.aoc.aoc2016.day13;
 
 import com.barneyb.aoc.util.Solver;
-import com.barneyb.aoc.util.Vec2;
+import com.barneyb.util.Vec2;
 
 import java.util.HashMap;
 import java.util.Map;

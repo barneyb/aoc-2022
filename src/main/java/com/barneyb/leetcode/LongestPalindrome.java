@@ -1,4 +1,4 @@
-package com.barneyb.aoc.leetcode;
+package com.barneyb.leetcode;
 
 /*
 Given a string s which consists of lowercase or uppercase letters,
@@ -19,7 +19,7 @@ Output: 1
 Explanation: The longest palindrome that can be built is "a", whose length is 1.
 */
 
-import com.barneyb.aoc.util.Chars;
+import com.barneyb.util.Chars;
 import lombok.val;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.Random;
 import java.util.function.Function;
 
 import static com.barneyb.aoc.util.Input.asString;
-import static com.barneyb.aoc.util.Timing.benchNanos;
+import static com.barneyb.util.Timing.benchNanos;
 
 public class LongestPalindrome {
 

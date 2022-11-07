@@ -1,4 +1,4 @@
-package com.barneyb.aoc.leetcode;
+package com.barneyb.leetcode;
 
 import java.util.Collection;
 import java.util.List;

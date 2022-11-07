@@ -1,5 +1,6 @@
 package com.barneyb.aoc.util;
 
+import com.barneyb.util.Ratio;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

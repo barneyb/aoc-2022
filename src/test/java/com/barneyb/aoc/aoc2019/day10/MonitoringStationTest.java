@@ -1,6 +1,6 @@
 package com.barneyb.aoc.aoc2019.day10;
 
-import com.barneyb.aoc.util.Vec2;
+import com.barneyb.util.Vec2;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

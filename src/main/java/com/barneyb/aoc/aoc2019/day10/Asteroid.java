@@ -1,12 +1,12 @@
 package com.barneyb.aoc.aoc2019.day10;
 
-import com.barneyb.aoc.util.Vec2;
+import com.barneyb.util.Vec2;
 import lombok.val;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.barneyb.aoc.util.With.with;
+import static com.barneyb.util.With.with;
 
 public class Asteroid {
 

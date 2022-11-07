@@ -1,4 +1,4 @@
-package com.barneyb.aoc.pry;
+package com.barneyb.pry;
 
 import lombok.val;
 

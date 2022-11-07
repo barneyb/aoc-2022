@@ -1,8 +1,8 @@
 package com.barneyb.aoc.aoc2016.day01;
 
-import com.barneyb.aoc.util.Dir;
 import com.barneyb.aoc.util.Solver;
-import com.barneyb.aoc.util.Vec2;
+import com.barneyb.util.Dir;
+import com.barneyb.util.Vec2;
 import lombok.Value;
 import lombok.val;
 

@@ -1,8 +1,8 @@
 package com.barneyb.aoc.aoc2018.day03;
 
-import com.barneyb.aoc.util.Hist;
 import com.barneyb.aoc.util.Solver;
-import com.barneyb.aoc.util.Vec2;
+import com.barneyb.util.Hist;
+import com.barneyb.util.Vec2;
 import lombok.Getter;
 import lombok.Value;
 import lombok.val;
