@@ -7,6 +7,10 @@ public class Ratio {
     int numerator;
     int denominator;
 
+    public static Ratio mixed(int integer, int numerator, int denominator) {
+        return new Ratio(integer * denominator + numerator, denominator);
+    }
+
     public Ratio sum(Ratio other) {
         return denominator == other.denominator ?
                 new Ratio(
@@ -41,4 +45,11 @@ public class Ratio {
         return reduce().equals(o.reduce());
     }
 
+    public int getInteger() {
+        return numerator / denominator;
+    }
+
+    public int getProperNumerator() {
+        return numerator % denominator;
+    }
 }

@@ -1,12 +1,21 @@
 package com.barneyb.aoc.util;
 
 import com.barneyb.util.Ratio;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RatioTest {
+
+    @Test
+    void mixed() {
+        val r = Ratio.mixed(2, 5, 4);
+        assertEquals(new Ratio(13, 4), r);
+        assertEquals(3, r.getInteger());
+        assertEquals(1, r.getProperNumerator());
+    }
 
     @Test
     void reduce() {
