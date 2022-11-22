@@ -13,10 +13,10 @@ public class Vec2 {
      * is, "rightward" is positive-x and "downward" is positive-y. Math treats
      * "upward" as positive-y.
      */
-    public static Comparator<Vec2> READING_ORDER = (Vec2 o1, Vec2 o2) ->
-            o1.getY() != o2.getY()
-                    ? o1.getY() - o2.getY()
-                    : o1.getX() - o2.getX();
+    public static Comparator<Vec2> READING_ORDER = (a, b) ->
+            a.y != b.y
+                    ? a.y - b.y
+                    : a.x - b.x;
 
     int x, y;
 

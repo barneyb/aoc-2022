@@ -42,9 +42,9 @@ public final class Solver {
         execute(input -> input, partOne, partTwo);
     }
 
-    private static <T> void execute(Function<String, T> initialize,
-                                    Function<T, ?> partOne,
-                                    Function<T, ?> partTwo) {
+    public static <T> void execute(Function<String, T> initialize,
+                                   Function<T, ?> partOne,
+                                   Function<T, ?> partTwo) {
         System.out.println(labelForClass(partOne.getClass()));
         val input = Input.forProblem(partOne.getClass());
         val solver = initialize.apply(input);
