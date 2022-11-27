@@ -12,11 +12,27 @@ import java.util.stream.Stream;
 
 public class Battlefield {
 
-    public static final int ATTACK_POWER = 3;
-
     private final Set<Vec2> field = new HashSet<>();
     private final Map<Vec2, Unit> goblins = new HashMap<>();
     private final Map<Vec2, Unit> elves = new HashMap<>();
+
+    public Battlefield() {
+    }
+
+    public Battlefield(Battlefield basis) {
+        field.addAll(basis.field);
+        basis.goblins.forEach((p, u) ->
+                goblins.put(p, new Unit(u)));
+        basis.elves.forEach((p, u) ->
+                elves.put(p, new Unit(u)));
+    }
+
+    @Override
+    protected Battlefield clone() throws CloneNotSupportedException {
+        val clone = (Battlefield) super.clone();
+        clone.field.addAll(field);
+        return clone;
+    }
 
     public void addSpace(int x, int y) {
         field.add(new Vec2(x, y));
@@ -54,6 +70,10 @@ public class Battlefield {
         if (goblins.isEmpty()) return elves.values();
         if (elves.isEmpty()) return goblins.values();
         throw new IllegalStateException("The battle continues!");
+    }
+
+    public Species getVictoriousSpecies() {
+        return getVictors().iterator().next().species;
     }
 
     private Stream<Vec2> adjacentPositions(Vec2 p) {
@@ -123,7 +143,7 @@ public class Battlefield {
                         ))
                 .ifPresent(p -> {
                     val e = t.enemies.get(p);
-                    e.setHitPoints(e.getHitPoints() - ATTACK_POWER);
+                    e.setHitPoints(e.getHitPoints() - t.unit.attackPower);
                     if (e.isDead()) {
                         t.enemies.remove(p);
                     }

@@ -1,7 +1,6 @@
 package com.barneyb.aoc.aoc2019.day10;
 
 import com.barneyb.aoc.util.Solver;
-import com.barneyb.util.Chars;
 import com.barneyb.util.Vec2;
 import lombok.val;
 
@@ -28,7 +27,7 @@ public class MonitoringStation {
     private static Collection<Asteroid> parse(String input) {
         val field = new HashSet<Vec2>();
         int x = 0, y = 0;
-        for (val c : new Chars(input.trim())) {
+        for (val c : input.trim().toCharArray()) {
             if (c == '#') {
                 field.add(new Vec2(x, y));
             }

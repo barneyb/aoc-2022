@@ -19,7 +19,6 @@ Output: 1
 Explanation: The longest palindrome that can be built is "a", whose length is 1.
 */
 
-import com.barneyb.util.Chars;
 import lombok.val;
 
 import java.util.HashMap;
@@ -45,7 +44,7 @@ public class LongestPalindrome {
         int pairCount = 0;
         int singleCount = 0;
         boolean[] singles = new boolean[64];
-        for (char c : new Chars(str)) {
+        for (char c : str.toCharArray()) {
             int idx = c - 'A';
             singles[idx] = !singles[idx];
             if (singles[idx]) {

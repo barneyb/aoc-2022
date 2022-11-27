@@ -55,9 +55,8 @@ public class BeverageBandits {
                 "#.G...G.#\n" +
                 "#.....G.#\n" +
                 "#########")));
-        Solver.execute(BeverageBandits::parse,
-                BeverageBandits::partOne,
-                null);
+        Solver.execute(in -> partOne(parse(in)),
+                in -> partTwo(parse(in)));
     }
 
     private static int partOne(Battlefield battlefield) {
@@ -65,11 +64,25 @@ public class BeverageBandits {
         while (battlefield.doRound()) {
             round++;
         }
-        System.out.printf("After round %d:%n%s%n", round, print(battlefield));
+//        System.out.printf("After round %d:%n%s%n", round, print(battlefield));
         return (round) * battlefield.getVictors()
                 .stream()
                 .mapToInt(Unit::getHitPoints)
                 .sum();
+    }
+
+    private static int partTwo(Battlefield battlefield) {
+        for (var power = 4; ; power++) {
+            val bf = new Battlefield(battlefield);
+            val elfCount = bf.getElves().size();
+            for (Unit e : bf.getElves().values()) {
+                e.setAttackPower(power);
+            }
+            val outcome = partOne(bf);
+            if (Species.ELF == bf.getVictoriousSpecies() && elfCount == bf.getElves().size()) {
+                return outcome;
+            }
+        }
     }
 
     private static Battlefield parse(String input) {
@@ -93,6 +106,7 @@ public class BeverageBandits {
         return field;
     }
 
+    @SuppressWarnings("unused")
     private static String print(Battlefield field) {
         var spaces = field.getSpaces();
         int width = 0, height = 0;
