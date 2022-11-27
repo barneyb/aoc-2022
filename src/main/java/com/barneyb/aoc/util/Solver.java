@@ -25,10 +25,10 @@ public final class Solver {
             try {
                 return clazz.getConstructor(input.getClass())
                         .newInstance(input);
+            } catch (RuntimeException e) {
+                throw e;
             } catch (Exception e) {
-                throw e instanceof RuntimeException
-                        ? (RuntimeException) e
-                        : new RuntimeException(e);
+                throw new RuntimeException(e);
             }
         }, partOne, partTwo);
     }
@@ -47,11 +47,14 @@ public final class Solver {
                                     Function<T, ?> partTwo) {
         System.out.println(labelForClass(partOne.getClass()));
         val input = Input.forProblem(partOne.getClass());
-        val solver = initialize.apply(input);
         val start = System.currentTimeMillis();
-        System.out.printf("Part One   : %s%n", partOne.apply(solver));
+        System.out.printf("Part One   : %s%n", initialize
+                .andThen(partOne)
+                .apply(input));
         if (partTwo != null)
-            System.out.printf("Part Two   : %s%n", partTwo.apply(solver));
+            System.out.printf("Part Two   : %s%n", initialize
+                    .andThen(partTwo)
+                    .apply(input));
         val elapsed = System.currentTimeMillis() - start;
         System.out.printf("Total Time : %,d ms%n", elapsed);
     }

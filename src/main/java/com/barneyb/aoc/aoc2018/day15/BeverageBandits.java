@@ -55,7 +55,8 @@ public class BeverageBandits {
                 "#.G...G.#\n" +
                 "#.....G.#\n" +
                 "#########")));
-        Solver.execute(in -> partOne(parse(in)),
+        Solver.execute(
+                in -> partOne(parse(in)),
                 in -> partTwo(parse(in)));
     }
 
