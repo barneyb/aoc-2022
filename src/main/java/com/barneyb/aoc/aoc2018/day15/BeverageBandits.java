@@ -11,56 +11,16 @@ import java.util.ArrayList;
 public class BeverageBandits {
 
     public static void main(String[] args) {
-        System.out.println(BeverageBandits.partOne(parse("#######\n" +
-                "#.G...#\n" +
-                "#...EG#\n" +
-                "#.#.#G#\n" +
-                "#..G#E#\n" +
-                "#.....#\n" +
-                "#######")));
-        System.out.println(BeverageBandits.partOne(parse("#######\n" +
-                "#G..#E#\n" +
-                "#E#E.E#\n" +
-                "#G.##.#\n" +
-                "#...#E#\n" +
-                "#...E.#\n" +
-                "#######")));
-        System.out.println(BeverageBandits.partOne(parse("#######\n" +
-                "#E..EG#\n" +
-                "#.#G.E#\n" +
-                "#E.##E#\n" +
-                "#G..#.#\n" +
-                "#..E#.#\n" +
-                "#######")));
-        System.out.println(BeverageBandits.partOne(parse("#######\n" +
-                "#E.G#.#\n" +
-                "#.#G..#\n" +
-                "#G.#.G#\n" +
-                "#G..#.#\n" +
-                "#...E.#\n" +
-                "#######")));
-        System.out.println(BeverageBandits.partOne(parse("#######\n" +
-                "#.E...#\n" +
-                "#.#..G#\n" +
-                "#.###.#\n" +
-                "#E#G#G#\n" +
-                "#...#G#\n" +
-                "#######")));
-        System.out.println(BeverageBandits.partOne(parse("#########\n" +
-                "#G......#\n" +
-                "#.E.#...#\n" +
-                "#..##..G#\n" +
-                "#...##..#\n" +
-                "#...#...#\n" +
-                "#.G...G.#\n" +
-                "#.....G.#\n" +
-                "#########")));
         Solver.execute(
-                in -> partOne(parse(in)),
-                in -> partTwo(parse(in)));
+                BeverageBandits::partOne,
+                BeverageBandits::partTwo);
     }
 
-    private static int partOne(Battlefield battlefield) {
+    public static int partOne(String input) {
+        return partOne(parse(input));
+    }
+
+    public static int partOne(Battlefield battlefield) {
         var round = 0;
         while (battlefield.doRound()) {
             round++;
@@ -72,7 +32,12 @@ public class BeverageBandits {
                 .sum();
     }
 
-    private static int partTwo(Battlefield battlefield) {
+    public static int partTwo(String input) {
+        return partTwo(parse(input));
+    }
+
+    public static int partTwo(Battlefield battlefield) {
+        var hasWon = false;
         for (var power = 4; ; power++) {
             val bf = new Battlefield(battlefield);
             val elfCount = bf.getElves().size();
@@ -80,8 +45,14 @@ public class BeverageBandits {
                 e.setAttackPower(power);
             }
             val outcome = partOne(bf);
-            if (Species.ELF == bf.getVictoriousSpecies() && elfCount == bf.getElves().size()) {
-                return outcome;
+            if (Species.ELF == bf.getVictoriousSpecies()) {
+                if (elfCount == bf.getElves().size()) {
+                    System.out.println("Perfect elven victory w/ " + power + " attack.");
+                    return outcome;
+                } else if (!hasWon) {
+                    System.out.println("Elven victory w/ " + power + " attack.");
+                }
+                hasWon = true;
             }
         }
     }
@@ -109,7 +80,7 @@ public class BeverageBandits {
 
     @SuppressWarnings("unused")
     private static String print(Battlefield field) {
-        var spaces = field.getSpaces();
+        val spaces = field.getSpaces();
         int width = 0, height = 0;
         for (val s : spaces) {
             width = Math.max(width, s.getX());
