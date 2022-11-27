@@ -8,14 +8,30 @@ public enum Dir {
 
     public static Dir parse(int c) {
         switch (c) {
+            case 'n':
+            case 'N':
+            case 'u':
+            case 'U':
             case '^':
                 return NORTH;
+            case 's':
+            case 'S':
+            case 'd':
+            case 'D':
             case 'v':
                 return SOUTH;
-            case '<':
-                return WEST;
+            case 'e':
+            case 'E':
+            case 'r':
+            case 'R':
             case '>':
                 return EAST;
+            case 'w':
+            case 'W':
+            case 'l':
+            case 'L':
+            case '<':
+                return WEST;
         }
         throw new IllegalArgumentException("Unrecognized direction literal: " + c);
     }
