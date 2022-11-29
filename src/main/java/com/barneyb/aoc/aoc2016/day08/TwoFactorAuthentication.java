@@ -23,6 +23,7 @@ public class TwoFactorAuthentication {
     private static final Pattern RE_ROW = Pattern.compile("rotate row y=(\\d+) by (\\d+)");
 
     int partOne;
+    String partTwo;
 
     public TwoFactorAuthentication(String input) {
         val pixels = input.lines()
@@ -33,6 +34,16 @@ public class TwoFactorAuthentication {
                     throw new UnsupportedOperationException("no!");
                 });
         partOne = pixels.size();
+        val sb = new StringBuilder();
+        for (int y = 0; y < HEIGHT; y++) {
+            sb.append('\n');
+            for (int x = 0; x < WIDTH; x++) {
+                sb.append(pixels.contains(new Vec2(x, y))
+                        ? '#'
+                        : ' ');
+            }
+        }
+        partTwo = sb.toString();
     }
 
     private static Function<HashSet<Vec2>, HashSet<Vec2>> parse(String line) {
@@ -81,7 +92,8 @@ public class TwoFactorAuthentication {
 
     public static void main(String[] args) {
         Solver.execute(TwoFactorAuthentication.class,
-                TwoFactorAuthentication::getPartOne);
+                TwoFactorAuthentication::getPartOne,
+                TwoFactorAuthentication::getPartTwo);
     }
 
 }
