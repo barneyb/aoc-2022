@@ -6,7 +6,7 @@ fun main() {
     Solver.execute(
         ::parse,
         { safeTileCount(it, 40) },
-        BooleanArray::size
+        { safeTileCount(it, 400000) },
     )
 }
 
