@@ -28,16 +28,16 @@ internal data class State(
     }
 
     fun up() =
-        State(x, y - 1, passcode, path + "U")
+        copy(y = y - 1, path = path + "U")
 
     fun down() =
-        State(x, y + 1, passcode, path + "D")
+        copy(y = y + 1, path = path + "D")
 
     fun left() =
-        State(x - 1, y, passcode, path + "L")
+        copy(x = x - 1, path = path + "L")
 
     fun right() =
-        State(x + 1, y, passcode, path + "R")
+        copy(x = x + 1, path = path + "R")
 }
 
 fun shortestPath(passcode: String): String {
