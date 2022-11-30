@@ -1,9 +1,9 @@
 package com.barneyb.aoc.aoc2016.day17
 
 import com.barneyb.aoc.util.Solver
-import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.*
+import kotlin.experimental.and
 
 const val WIDTH = 4
 const val HEIGHT = 4
@@ -77,21 +77,27 @@ internal fun adjacent(
     curr: State,
 ): Collection<State> {
     val result = mutableListOf<State>()
-    val doors = hash(curr.passcode, curr.path)
+    val doors = doors(curr.passcode, curr.path)
     //@formatter:off
-    if (curr.y > 1      && doors[0] >= 'b') result.add(curr.up())
-    if (curr.y < HEIGHT && doors[1] >= 'b') result.add(curr.down())
-    if (curr.x > 1      && doors[2] >= 'b') result.add(curr.left())
-    if (curr.x < WIDTH  && doors[3] >= 'b') result.add(curr.right())
+    if (doors[0] && curr.y > 1     ) result.add(curr.up())
+    if (doors[1] && curr.y < HEIGHT) result.add(curr.down())
+    if (doors[2] && curr.x > 1     ) result.add(curr.left())
+    if (doors[3] && curr.x < WIDTH ) result.add(curr.right())
     //@formatter:on
     return result
 }
 
-internal fun hash(passcode: String, path: String = ""): String {
+internal fun doors(passcode: String, path: String = ""): BooleanArray {
     val digest = MessageDigest.getInstance("MD5")
     digest.update(passcode.toByteArray())
-    if (path.isNotEmpty()) digest.update(path.toByteArray())
-    return BigInteger(1, digest.digest())
-        .toString(16)
-        .padStart(32, '0')
+    digest.update(path.toByteArray())
+    val bytes = digest.digest()
+    return booleanArrayOf(
+        //@formatter:off
+        bytes[0].rotateRight(4) and 0xf >= 0xb,
+        bytes[0]                         and 0xf >= 0xb,
+        bytes[1].rotateRight(4) and 0xf >= 0xb,
+        bytes[1]                         and 0xf >= 0xb,
+        //@formatter:on
+    )
 }

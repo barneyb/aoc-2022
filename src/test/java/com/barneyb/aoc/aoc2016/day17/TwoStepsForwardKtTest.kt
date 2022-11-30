@@ -21,11 +21,20 @@ internal class TwoStepsForwardKtTest {
     }
 
     @Test
-    fun hashing() {
+    fun doorChecks() {
         assertAll(
-            { assertEquals("ced9", hash("hijkl").slice(0..3)) },
-            { assertEquals("5745", hash("hijklDR").slice(0..3)) },
-            { assertEquals("5745", hash("hijkl", "DR").slice(0..3)) })
+            {
+                assertArrayEquals(
+                    booleanArrayOf(true, true, true, false),
+                    doors("hijkl")
+                )
+            },
+            {
+                assertArrayEquals(
+                    booleanArrayOf(false, false, false, false),
+                    doors("hijkl", "DR")
+                )
+            })
     }
 
     @Test
@@ -34,13 +43,6 @@ internal class TwoStepsForwardKtTest {
         val adj = adjacent(start)
         assertEquals(1, adj.size)
         assertEquals(start.down(), adj.first())
-    }
-
-    @Test
-    fun adjacentExampleThree() {
-        val curr = State(x = 1, y = 2, "ulqzkmiv", "DRURDRUDDLLDLUU")
-        val adj = adjacent(curr)
-        assertTrue(adj.contains(curr.right()))
     }
 
 }
