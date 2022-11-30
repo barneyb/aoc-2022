@@ -1,5 +1,6 @@
 package com.barneyb.aoc.util;
 
+import kotlin.reflect.KCallable;
 import lombok.val;
 
 import java.io.*;
@@ -30,6 +31,11 @@ public final class Input {
         return asString(res);
     }
 
+    @SuppressWarnings("unused") // useful for playing w/o Solver
+    public static String forProblem(KCallable<?> fun) {
+        return forProblem(fun.getClass());
+    }
+
     public static String asString(String resourcePath) {
         val res = Thread.currentThread()
                 .getContextClassLoader()
@@ -53,6 +59,5 @@ public final class Input {
         }
         return sb.toString();
     }
-
 
 }
