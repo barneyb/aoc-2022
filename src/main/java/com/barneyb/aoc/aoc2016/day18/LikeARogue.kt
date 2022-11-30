@@ -4,36 +4,46 @@ import com.barneyb.aoc.util.Solver
 
 fun main() {
     Solver.execute(
-        String::trim,
+        ::parse,
         { safeTileCount(it, 40) },
-        String::length
+        BooleanArray::size
     )
 }
 
-internal fun safeTileCount(start: CharSequence, rows: Int): Int {
+internal fun parse(input: String) =
+    input.trim().let {
+        val arr = BooleanArray(it.length)
+        for (i in it.indices) {
+            if (input[i] == '^') arr[i] = true
+        }
+        arr
+    }
+
+internal fun safeTileCount(start: String, rows: Int) =
+    safeTileCount(parse(start), rows)
+
+internal fun safeTileCount(start: BooleanArray, rows: Int): Int {
     var count = 0
     var curr = start
-    var next: StringBuilder
-    var left: Char
-    var center: Char
-    var right: Char
+    var next: BooleanArray
+    var left: Boolean
+    var center: Boolean
+    var right: Boolean
     for (r in 1..rows) {
-        next = StringBuilder(curr.length)
+        next = BooleanArray(curr.size)
         for (i in curr.indices) {
             center = curr[i]
-            if (center == '.') count++
-            left = if (i == 0) '.' else curr[i - 1]
-            right = if (i == curr.length - 1) '.' else curr[i + 1]
-            if (left == '^' && center == '^' && right != '^')
-                next.append('^')
-            else if (left != '^' && center == '^' && right == '^')
-                next.append('^')
-            else if (left == '^' && center != '^' && right != '^')
-                next.append('^')
-            else if (left != '^' && center != '^' && right == '^')
-                next.append('^')
-            else
-                next.append('.')
+            if (!center) count++
+            left = i > 0 && curr[i - 1]
+            right = i < curr.size - 1 && curr[i + 1]
+            if (left && center && !right)
+                next[i] = true
+            else if (!left && center && right)
+                next[i] = true
+            else if (left && !center && !right)
+                next[i] = true
+            else if (!left && !center && right)
+                next[i] = true
         }
         curr = next
     }
