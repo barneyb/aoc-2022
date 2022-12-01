@@ -1,5 +1,6 @@
 package com.barneyb.aoc.util;
 
+import com.barneyb.util.Timing;
 import lombok.val;
 
 import java.util.function.Function;
@@ -11,6 +12,10 @@ public final class Solver {
         throw new UnsupportedOperationException("really?");
     }
 
+    public static <T> void execute(Function<String, T> init) {
+        execute(init, null, null);
+    }
+
     public static <T> void execute(Function<String, T> init,
                                    Function<T, ?> partOne) {
         execute(init, partOne, null);
@@ -19,15 +24,20 @@ public final class Solver {
     public static <T> void execute(Function<String, T> init,
                                    Function<T, ?> partOne,
                                    Function<T, ?> partTwo) {
-        System.out.println(labelForClass(partOne.getClass()));
-        val input = Input.forProblem(partOne.getClass());
-        val start = System.currentTimeMillis();
-        val solver = init.apply(input);
-        System.out.printf("Part One   : %s%n", partOne.apply(solver));
-        if (partTwo != null)
-            System.out.printf("Part Two   : %s%n", partTwo.apply(solver));
-        val elapsed = System.currentTimeMillis() - start;
-        System.out.printf("Total Time : %,d ms%n", elapsed);
+        System.out.println(labelForClass(init.getClass()));
+        val input = Input.forProblem(init.getClass());
+        val result = Timing.inMillis(() -> {
+            val parsed = init.apply(input);
+            if (partOne == null) {
+                System.out.printf("Parsed     : %s%n", parsed);
+            } else {
+                System.out.printf("Part One   : %s%n", partOne.apply(parsed));
+                if (partTwo != null)
+                    System.out.printf("Part Two   : %s%n", partTwo.apply(parsed));
+            }
+            return null;
+        });
+        System.out.printf("Total Time : %,d ms%n", result.getElapsed());
     }
 
     private static String labelForClass(Class<?> cls) {
