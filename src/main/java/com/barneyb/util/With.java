@@ -12,11 +12,13 @@ public final class With {
         return work.apply(obj);
     }
 
-    public static <T, R> Pair<R, Long> withMillis(T obj, Function<T, R> work) {
+    @SuppressWarnings("unused")
+    public static <T, R> Timing.With<R> withMillis(T obj, Function<T, R> work) {
         return Timing.inMillis(() -> work.apply(obj));
     }
 
-    public static <T, R> Pair<R, Long> withNanos(T obj, Function<T, R> work) {
+    @SuppressWarnings("unused")
+    public static <T, R> Timing.With<R> withNanos(T obj, Function<T, R> work) {
         return Timing.inNanos(() -> work.apply(obj));
     }
 

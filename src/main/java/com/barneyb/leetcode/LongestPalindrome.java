@@ -31,6 +31,7 @@ import static com.barneyb.util.Timing.benchNanos;
 
 public class LongestPalindrome {
 
+    @SuppressWarnings("unused")
     private static String stringOfLetters(int length) {
         var r = new Random();
         var sb = new StringBuilder();
@@ -181,6 +182,6 @@ public class LongestPalindrome {
         }
         val r = benchNanos(iterations, () ->
                 solution.apply(str));
-        System.out.printf("%s in ~%,d ns (~%.2fn)%n", label, r.getSecond(), 1.0 * r.getSecond() / str.length());
+        System.out.printf("%s in ~%,d ns (~%.2fn)%n", label, r.getElapsed(), 1.0 * r.getElapsed() / str.length());
     }
 }
