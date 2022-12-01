@@ -6,13 +6,13 @@ import java.util.*
 fun main() {
     Solver.execute(
         ::parse,
-        PriorityQueue<Long>::peek,
+        PriorityQueue<*>::peek,
         { pq -> pq.remove() + pq.remove() + pq.peek() }
     )
 }
 
 internal fun parse(input: String): PriorityQueue<Long> =
-    PriorityQueue(Comparator.naturalOrder<Long?>().reversed()).apply {
+    PriorityQueue(Comparator.naturalOrder<Long>().reversed()).apply {
         input.trim()
             .split("\n\n")
             .forEach() {
