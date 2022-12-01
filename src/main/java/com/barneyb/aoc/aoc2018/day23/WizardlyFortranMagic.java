@@ -18,7 +18,7 @@ public class WizardlyFortranMagic {
     private static Pattern RE_BOT = Pattern.compile("pos=<(-?\\d+),(-?\\d+),(-?\\d+)>, r=(\\d+)");
 
     public static void main(String[] args) {
-        Solver.execute(WizardlyFortranMagic.class,
+        Solver.execute(WizardlyFortranMagic::new,
                 WizardlyFortranMagic::getPartOne,
                 WizardlyFortranMagic::getPartTwo);
     }

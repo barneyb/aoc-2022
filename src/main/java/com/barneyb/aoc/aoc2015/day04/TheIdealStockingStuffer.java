@@ -48,7 +48,7 @@ public class TheIdealStockingStuffer {
     }
 
     public static void main(String[] args) {
-        Solver.execute(TheIdealStockingStuffer.class,
+        Solver.execute(TheIdealStockingStuffer::new,
                 TheIdealStockingStuffer::getFiveZeroNumber,
                 TheIdealStockingStuffer::getSixZeroNumber);
     }

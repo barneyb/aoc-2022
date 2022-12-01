@@ -34,7 +34,7 @@ public class IWasToldThereWouldBeNoMath {
     }
 
     public static void main(String[] args) {
-        Solver.execute(IWasToldThereWouldBeNoMath.class,
+        Solver.execute(IWasToldThereWouldBeNoMath::new,
                 IWasToldThereWouldBeNoMath::getPaperNeeded,
                 IWasToldThereWouldBeNoMath::getRibbonNeeded);
     }

@@ -69,7 +69,7 @@ public class NoMatterHowYouSliceIt {
     }
 
     public static void main(String[] args) {
-        Solver.execute(NoMatterHowYouSliceIt.class,
+        Solver.execute(NoMatterHowYouSliceIt::new,
                 NoMatterHowYouSliceIt::getOverlappingInches,
                 NoMatterHowYouSliceIt::getIsolatedClaimId);
     }

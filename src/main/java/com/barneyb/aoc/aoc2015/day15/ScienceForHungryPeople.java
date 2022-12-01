@@ -38,7 +38,7 @@ public class ScienceForHungryPeople {
     }
 
     public static void main(String[] args) {
-        Solver.execute(ScienceForHungryPeople.class,
+        Solver.execute(ScienceForHungryPeople::new,
                 ScienceForHungryPeople::getBestScore,
                 ScienceForHungryPeople::getBestCalorieConstrainedScore);
     }

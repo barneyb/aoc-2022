@@ -91,7 +91,7 @@ public class TwoFactorAuthentication {
     }
 
     public static void main(String[] args) {
-        Solver.execute(TwoFactorAuthentication.class,
+        Solver.execute(TwoFactorAuthentication::new,
                 TwoFactorAuthentication::getPartOne,
                 TwoFactorAuthentication::getPartTwo);
     }

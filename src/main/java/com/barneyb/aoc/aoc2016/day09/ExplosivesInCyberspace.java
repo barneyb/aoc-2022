@@ -3,6 +3,8 @@ package com.barneyb.aoc.aoc2016.day09;
 import com.barneyb.aoc.util.Solver;
 import lombok.val;
 
+import java.util.function.Function;
+
 public class ExplosivesInCyberspace {
 
     static long len(String input) {
@@ -57,6 +59,7 @@ public class ExplosivesInCyberspace {
 
     public static void main(String[] args) {
         Solver.execute(
+                Function.identity(),
                 ExplosivesInCyberspace::len,
                 ExplosivesInCyberspace::len2);
     }

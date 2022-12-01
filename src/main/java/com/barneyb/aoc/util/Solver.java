@@ -11,50 +11,21 @@ public final class Solver {
         throw new UnsupportedOperationException("really?");
     }
 
-    public static <T> void execute(Class<T> clazz,
-                                   Function<T, ?> partOne
-    ) {
-        execute(clazz, partOne, null);
+    public static <T> void execute(Function<String, T> init,
+                                   Function<T, ?> partOne) {
+        execute(init, partOne, null);
     }
 
-    public static <T> void execute(Class<T> clazz,
-                                   Function<T, ?> partOne,
-                                   Function<T, ?> partTwo
-    ) {
-        execute(input -> {
-            try {
-                return clazz.getConstructor(input.getClass())
-                        .newInstance(input);
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }, partOne, partTwo);
-    }
-
-    public static void execute(Function<String, ?> partOne) {
-        execute(partOne, null);
-    }
-
-    public static void execute(Function<String, ?> partOne,
-                               Function<String, ?> partTwo) {
-        execute(input -> input, partOne, partTwo);
-    }
-
-    public static <T> void execute(Function<String, T> initialize,
+    public static <T> void execute(Function<String, T> init,
                                    Function<T, ?> partOne,
                                    Function<T, ?> partTwo) {
         System.out.println(labelForClass(partOne.getClass()));
         val input = Input.forProblem(partOne.getClass());
         val start = System.currentTimeMillis();
-        System.out.printf("Part One   : %s%n", initialize
-                .andThen(partOne)
-                .apply(input));
+        val solver = init.apply(input);
+        System.out.printf("Part One   : %s%n", partOne.apply(solver));
         if (partTwo != null)
-            System.out.printf("Part Two   : %s%n", initialize
-                    .andThen(partTwo)
-                    .apply(input));
+            System.out.printf("Part Two   : %s%n", partTwo.apply(solver));
         val elapsed = System.currentTimeMillis() - start;
         System.out.printf("Total Time : %,d ms%n", elapsed);
     }

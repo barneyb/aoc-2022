@@ -6,12 +6,14 @@ import lombok.Value;
 import lombok.val;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 @Value
 public class BeverageBandits {
 
     public static void main(String[] args) {
         Solver.execute(
+                Function.identity(), // mutable state needs reparse
                 BeverageBandits::partOne,
                 BeverageBandits::partTwo);
     }

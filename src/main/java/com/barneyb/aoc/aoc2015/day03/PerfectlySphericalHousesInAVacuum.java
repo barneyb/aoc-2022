@@ -52,7 +52,7 @@ public class PerfectlySphericalHousesInAVacuum {
     }
 
     public static void main(String[] args) {
-        Solver.execute(PerfectlySphericalHousesInAVacuum.class,
+        Solver.execute(PerfectlySphericalHousesInAVacuum::new,
                 PerfectlySphericalHousesInAVacuum::getSoloUniqueHousesVisited,
                 PerfectlySphericalHousesInAVacuum::getPairedUniqueHousesVisited);
     }

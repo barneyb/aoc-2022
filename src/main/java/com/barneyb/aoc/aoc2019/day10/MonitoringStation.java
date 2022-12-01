@@ -52,7 +52,7 @@ public class MonitoringStation {
     }
 
     public static void main(String[] args) {
-        Solver.execute(MonitoringStation.class,
+        Solver.execute(MonitoringStation::new,
                 MonitoringStation::getMaxDetectedAsteroids,
                 m -> with(m.getNthVaporized(200), a ->
                         a.getX() * 100 + a.getY()));

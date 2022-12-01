@@ -47,7 +47,7 @@ public class NotQuiteLisp {
 
     public static void main(String[] args) {
         Solver.execute(
-                NotQuiteLisp.class,
+                NotQuiteLisp::new,
                 NotQuiteLisp::getEndFloor,
                 NotQuiteLisp::getBasementPosition);
     }

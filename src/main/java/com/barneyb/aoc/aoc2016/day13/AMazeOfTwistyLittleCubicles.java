@@ -71,7 +71,7 @@ public class AMazeOfTwistyLittleCubicles {
     }
 
     public static void main(String[] args) {
-        Solver.execute(AMazeOfTwistyLittleCubicles.class,
+        Solver.execute(AMazeOfTwistyLittleCubicles::new,
                 AMazeOfTwistyLittleCubicles::getStepsToGoal,
                 AMazeOfTwistyLittleCubicles::getCubesWithinFiftySteps);
     }

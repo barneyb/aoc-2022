@@ -41,7 +41,7 @@ public class ExperimentalEmergencyTeleportation {
     }
 
     public static void main(String[] args) {
-        Solver.execute(ExperimentalEmergencyTeleportation.class,
+        Solver.execute(ExperimentalEmergencyTeleportation::new,
                 ExperimentalEmergencyTeleportation::getPartOne,
                 ExperimentalEmergencyTeleportation::getPartTwo);
     }

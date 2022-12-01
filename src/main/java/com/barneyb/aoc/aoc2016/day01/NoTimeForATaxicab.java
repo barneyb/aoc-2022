@@ -7,11 +7,13 @@ import lombok.Value;
 import lombok.val;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 public class NoTimeForATaxicab {
 
     public static void main(String[] args) {
-        Solver.execute(NoTimeForATaxicab::partOne);
+        Solver.execute(Function.identity(),
+                NoTimeForATaxicab::partOne);
     }
 
     @Value

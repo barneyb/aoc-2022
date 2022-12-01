@@ -69,7 +69,7 @@ public class DuelingGenerators {
     }
 
     public static void main(String[] args) {
-        Solver.execute(DuelingGenerators.class,
+        Solver.execute(DuelingGenerators::new,
                 DuelingGenerators::getPairsInFortyMillion,
                 DuelingGenerators::getFilteredPairsInFiveMillion);
     }
