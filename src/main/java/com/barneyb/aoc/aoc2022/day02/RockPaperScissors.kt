@@ -5,8 +5,8 @@ import com.barneyb.aoc.util.Solver
 fun main() {
     Solver.execute(
         ::parse,
-        ::partOne,
-        ::partTwo,
+        partOne,
+        partTwo,
     )
 }
 
@@ -14,34 +14,34 @@ internal fun parse(input: String) =
     input.trim()
         .lines()
 
-internal fun partOne(rounds: List<String>) =
-    rounds.map {
-        when (it) {
-            "A X" -> 4
-            "B X" -> 1
-            "C X" -> 7
-            "A Y" -> 8
-            "B Y" -> 5
-            "C Y" -> 2
-            "A Z" -> 3
-            "B Z" -> 9
-            "C Z" -> 6
-            else -> throw IllegalArgumentException("No '$it' play?!")
-        }
-    }.sum()
+private val tableOne: Map<String, Int> = mapOf(
+    "A X" to 4,
+    "B X" to 1,
+    "C X" to 7,
+    "A Y" to 8,
+    "B Y" to 5,
+    "C Y" to 2,
+    "A Z" to 3,
+    "B Z" to 9,
+    "C Z" to 6,
+)
 
-internal fun partTwo(rounds: List<String>) =
-    rounds.map {
-        when (it) {
-            "A X" -> 3
-            "B X" -> 1
-            "C X" -> 2
-            "A Y" -> 4
-            "B Y" -> 5
-            "C Y" -> 6
-            "A Z" -> 8
-            "B Z" -> 9
-            "C Z" -> 7
-            else -> throw IllegalArgumentException("No '$it' play?!")
-        }
-    }.sum()
+private val tableTwo: Map<String, Int> = mapOf(
+    "A X" to 3,
+    "B X" to 1,
+    "C X" to 2,
+    "A Y" to 4,
+    "B Y" to 5,
+    "C Y" to 6,
+    "A Z" to 8,
+    "B Z" to 9,
+    "C Z" to 7,
+)
+
+internal fun part(table: Map<String, Int>) =
+    fun(rounds: List<String>) =
+        rounds.sumOf(table::getValue)
+
+internal val partOne = part(tableOne)
+
+internal val partTwo = part(tableTwo)
