@@ -13,60 +13,35 @@ fun main() {
 internal fun parse(input: String) =
     input.trim()
         .lines()
-        .map { Pair(it.first(), it.last()) }
 
-internal fun partOne(rounds: List<Pair<Char, Char>>) =
-    rounds.map { (e, m) ->
-        when (m) {
-            'X' -> 1 + when (e) {
-                'A' -> 3
-                'B' -> 0
-                'C' -> 6
-                else -> throw IllegalArgumentException("No '$e' play?!")
-            }
-
-            'Y' -> 2 + when (e) {
-                'A' -> 6
-                'B' -> 3
-                'C' -> 0
-                else -> throw IllegalArgumentException("No '$e' play?!")
-            }
-
-            'Z' -> 3 + when (e) {
-                'A' -> 0
-                'B' -> 6
-                'C' -> 3
-                else -> throw IllegalArgumentException("No '$e' play?!")
-            }
-
-            else -> throw IllegalArgumentException("No '$m' play?!")
+internal fun partOne(rounds: List<String>) =
+    rounds.map {
+        when (it) {
+            "A X" -> 4
+            "B X" -> 1
+            "C X" -> 7
+            "A Y" -> 8
+            "B Y" -> 5
+            "C Y" -> 2
+            "A Z" -> 3
+            "B Z" -> 9
+            "C Z" -> 6
+            else -> throw IllegalArgumentException("No '$it' play?!")
         }
     }.sum()
 
-internal fun partTwo(rounds: List<Pair<Char, Char>>) =
-    rounds.map { (e, m) ->
-        when (m) {
-            'X' -> when (e) {
-                'A' -> 3
-                'B' -> 1
-                'C' -> 2
-                else -> throw IllegalArgumentException("No '$e' play?!")
-            }
-
-            'Y' -> 3 + when (e) {
-                'A' -> 1
-                'B' -> 2
-                'C' -> 3
-                else -> throw IllegalArgumentException("No '$e' play?!")
-            }
-
-            'Z' -> 6 + when (e) {
-                'A' -> 2
-                'B' -> 3
-                'C' -> 1
-                else -> throw IllegalArgumentException("No '$e' play?!")
-            }
-
-            else -> throw IllegalArgumentException("No '$m' play?!")
+internal fun partTwo(rounds: List<String>) =
+    rounds.map {
+        when (it) {
+            "A X" -> 3
+            "B X" -> 1
+            "C X" -> 2
+            "A Y" -> 4
+            "B Y" -> 5
+            "C Y" -> 6
+            "A Z" -> 8
+            "B Z" -> 9
+            "C Z" -> 7
+            else -> throw IllegalArgumentException("No '$it' play?!")
         }
     }.sum()
