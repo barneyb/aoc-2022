@@ -7,6 +7,7 @@ fun main() {
     Solver.execute(
         ::parse,
         Prog::name,
+        ::correction,
     )
 }
 
@@ -14,7 +15,10 @@ internal data class Prog(
     val name: String,
     val weight: Int,
     val tower: Collection<Prog> = emptyList(),
-)
+) {
+    val totalWeight: Int = weight + tower.sumOf(Prog::totalWeight)
+    val balanced = tower.distinctBy { it.totalWeight }.size == 1
+}
 
 internal data class Record(
     val name: String,
@@ -66,5 +70,17 @@ internal fun parse(input: String): Prog {
     while (q.isNotEmpty()) {
         addNonLeaf(q.remove())
     }
+    assert(trees.size == 1) { "More than one base found?!" }
     return trees.values.first()
 }
+
+internal fun correction(p: Prog): Int =
+    if (!p.balanced && p.tower.all(Prog::balanced)) {
+        val weights = p.tower.groupBy(Prog::totalWeight)
+        assert(weights.size == 2) { "There's more than one error?!" }
+        val erroneous = weights.keys.first { weights[it]?.size == 1 }
+        val expected = weights.keys.first { it != erroneous }
+        weights[erroneous]!!.first().weight + (expected - erroneous)
+    } else {
+        p.tower.firstNotNullOf(::correction)
+    }
