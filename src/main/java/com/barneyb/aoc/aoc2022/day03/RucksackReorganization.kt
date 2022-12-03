@@ -5,17 +5,19 @@ import com.barneyb.aoc.util.Solver
 fun main() {
     Solver.execute(
         ::parse,
-        ::partOne
+        ::partOne,
+        ::partTwo,
     )
 }
 
 internal data class Rucksack(
-    val left: List<Int>,
-    val right: List<Int>,
+    val left: Set<Int>,
+    val right: Set<Int>,
 ) {
-    val intersection = left.find {
-        right.binarySearch(it) >= 0
-    }!!
+    val intersection = left.intersect(right).first()
+
+    fun contains(n: Int) =
+        left.contains(n) || right.contains(n)
 }
 
 internal fun parse(input: String) =
@@ -30,11 +32,29 @@ internal fun parse(input: String) =
         }
         (priorities.size / 2).let { mid ->
             Rucksack(
-                priorities.subList(0, mid).sorted(),
-                priorities.subList(mid, priorities.size).sorted(),
+                HashSet(priorities.subList(0, mid)),
+                HashSet(priorities.subList(mid, priorities.size)),
             )
         }
     }
 
 internal fun partOne(sacks: Collection<Rucksack>) =
     sacks.sumOf(Rucksack::intersection)
+
+internal fun partTwo(sacks: Collection<Rucksack>): Int {
+    assert(sacks.size % 3 == 0) {
+        "Non-multiple of three (${sacks.size}) number of elves?!"
+    }
+    return sacks.windowed(3, 3).sumOf(::badge)
+}
+
+internal fun badge(sacks: List<Rucksack>): Int {
+    val first = sacks.first()
+    val rest = sacks.subList(1, sacks.size)
+    for (n in (first.left + first.right)) {
+        if (rest.all { it.contains(n) }) {
+            return n
+        }
+    }
+    throw IllegalArgumentException("No shared item found?!")
+}

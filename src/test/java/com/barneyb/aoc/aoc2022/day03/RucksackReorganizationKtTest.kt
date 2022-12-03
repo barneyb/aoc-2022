@@ -15,16 +15,17 @@ class RucksackReorganizationKtTest {
     @Test
     fun parse() {
         val r = parse("vJrwpWtwJgWrhcsFMMfFFhFp").first()
-        assertEquals(12, r.left.size)
-        assertEquals(12, r.right.size)
-        assertEquals(7/*g*/, r.left.first())
-        assertEquals(49/*W*/, r.left.last())
         assertEquals(16/*p*/, r.intersection)
     }
 
     @Test
     fun exampleOne() {
         assertEquals(157, partOne(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun partTwoExampleOne() {
+        assertEquals(70, partTwo(parse(EXAMPLE_ONE)))
     }
 
 }
