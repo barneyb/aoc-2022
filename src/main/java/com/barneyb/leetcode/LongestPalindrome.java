@@ -27,7 +27,7 @@ import java.util.Random;
 import java.util.function.Function;
 
 import static com.barneyb.aoc.util.Input.asString;
-import static com.barneyb.util.Timing.benchNanos;
+import static com.barneyb.util.Timing.benchmark;
 
 public class LongestPalindrome {
 
@@ -180,8 +180,8 @@ public class LongestPalindrome {
             System.out.printf("failed '%s': %s%n", label, e.getMessage());
             return;
         }
-        val r = benchNanos(iterations, () ->
+        val r = benchmark(iterations, () ->
                 solution.apply(str));
-        System.out.printf("%s in ~%,d ns (~%.2fn)%n", label, r.getElapsed(), 1.0 * r.getElapsed() / str.length());
+        System.out.printf("%s in ~%s (~%.2fn)%n", label, r.toDurationString(), 1.0 * r.getElapsed() / str.length());
     }
 }

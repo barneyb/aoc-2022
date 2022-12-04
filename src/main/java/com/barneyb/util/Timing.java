@@ -3,6 +3,7 @@ package com.barneyb.util;
 import lombok.Value;
 import lombok.val;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 public class Timing {
@@ -11,55 +12,88 @@ public class Timing {
     public static class With<R> {
         R result;
         long elapsed;
+        TimeUnit unit;
+
+        public With<R> humanize() {
+            for (val u : TimeUnit.values()) {
+                val e = u.convert(elapsed, unit);
+                if (e < 10_000) {
+                    return new With<>(result, e, u);
+                }
+            }
+            return this;
+        }
+
+        public String toDurationString() {
+            return toDurationString(1);
+        }
+
+        public String toDurationString(int width) {
+            return String.format("%," + width + "d %s", elapsed, labelForUnit());
+        }
+
+        private String labelForUnit() {
+            switch (unit) {
+                case NANOSECONDS:
+                    return "ns";
+                case MICROSECONDS:
+                    return "μs";
+                case MILLISECONDS:
+                    return "ms";
+                case SECONDS:
+                    return "sec";
+                case MINUTES:
+                    return "min";
+                case HOURS:
+                    return "hrs";
+                case DAYS:
+                    return "days";
+                default:
+                    throw new IllegalArgumentException("Unknown '" + unit + "' TimeUnit");
+            }
+        }
     }
 
-    public static <R> With<R> inMillis(Supplier<R> work) {
-        var start = System.currentTimeMillis();
-        var result = work.get();
-        var end = System.currentTimeMillis();
-        return new With<>(result, end - start);
+    public static <R> With<R> timed(Supplier<R> work) {
+        return timed(work, TimeUnit.NANOSECONDS);
     }
 
-    public static <R> With<R> inNanos(Supplier<R> work) {
-        var start = System.nanoTime();
-        var result = work.get();
-        var end = System.nanoTime();
-        return new With<>(result, end - start);
+    public static <R> With<R> timed(Supplier<R> work, TimeUnit unit) {
+        val start = System.nanoTime();
+        val result = work.get();
+        val elapsed = System.nanoTime() - start;
+        return new With<>(
+                result,
+                unit == TimeUnit.NANOSECONDS
+                        ? elapsed
+                        : unit.convert(elapsed, TimeUnit.NANOSECONDS),
+                unit);
     }
 
-    @SuppressWarnings("unused")
-    public static <R> With<R> benchMillis(int iterations, Supplier<R> work) {
-        val r = benchmark(iterations, () -> inMillis(work));
-        printBenchmark(iterations, r, "ms");
-        return r;
-    }
+    private static int ITERATION_WIDTH = 6;
 
-    @SuppressWarnings("unused")
-    public static <R> With<R> benchNanos(int iterations, Supplier<R> work) {
-        val r = benchmark(iterations, () -> inNanos(work));
-        printBenchmark(iterations, r, "ns");
-        return r;
-    }
-
-    private static <R> void printBenchmark(int iterations, With<R> r, String unit) {
-        System.err.printf("Benchmark(%,6d): %,9d %s%n", iterations, r.elapsed, unit);
-    }
-
-    private static <R> With<R> benchmark(int iterations, Supplier<With<R>> work) {
+    public static <R> With<R> benchmark(int iterations, Supplier<R> work) {
         if (iterations < 2) {
             throw new IllegalArgumentException("Benchmarking makes no sense with fewer than two iterations");
         }
         // warm up
-        val result = work.get().result;
+        var first = work.get();
         for (int i = iterations / 100; i > 0; i--) {
             work.get();
         }
         // benchmark
         long total = 0;
         for (int i = iterations; i > 0; i--) {
-            total += work.get().elapsed;
+            total += timed(work, TimeUnit.NANOSECONDS).elapsed;
         }
-        return new With<>(result, total / iterations);
+        var r = new With<R>(first, total / iterations, TimeUnit.NANOSECONDS)
+                .humanize();
+        val itr = String.format("%,d", iterations);
+        if (itr.length() > ITERATION_WIDTH) {
+            ITERATION_WIDTH = itr.length();
+        }
+        System.err.printf("Benchmark(%" + ITERATION_WIDTH + "s): %s%n", itr, r.humanize().toDurationString(6));
+        return r;
     }
 
 }

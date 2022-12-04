@@ -27,18 +27,18 @@ public final class Solver {
         val func = partOne == null ? init : partOne;
         System.out.println(labelForClass(func.getClass()));
         val input = Input.forProblem(func.getClass());
-        val result = Timing.inMillis(() -> {
+        val result = Timing.timed(() -> {
             val parsed = init.apply(input);
             if (partOne == null) {
-                System.out.printf("Parsed     : %s%n", parsed);
+                System.out.printf("%-10s : %s%n", "Parsed", parsed);
             } else {
-                System.out.printf("Part One   : %s%n", partOne.apply(parsed));
+                System.out.printf("%-10s : %s%n", "Part One", partOne.apply(parsed));
                 if (partTwo != null)
-                    System.out.printf("Part Two   : %s%n", partTwo.apply(parsed));
+                    System.out.printf("%-10s : %s%n", "Part Two", partTwo.apply(parsed));
             }
             return null;
-        });
-        System.out.printf("Total Time : %,d ms%n", result.getElapsed());
+        }).humanize();
+        System.out.printf("%-10s : %s%n", "Total Time", result.toDurationString());
     }
 
     private static String labelForClass(Class<?> cls) {
