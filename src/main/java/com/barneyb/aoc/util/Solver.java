@@ -45,7 +45,7 @@ public final class Solver {
         var name = cls.getName();
         val m = Pattern.compile("com\\.barneyb\\.aoc\\.aoc(\\d{4})\\.day(\\d{2})\\.([a-zA-Z0-9_]+)(\\$.+)?").matcher(name);
         if (m.matches()) {
-            return m.group(3) +
+            return CharSequenceKt.camelToTitle(m.group(3)) +
                     " - " +
                     m.group(1) +
                     " day " +

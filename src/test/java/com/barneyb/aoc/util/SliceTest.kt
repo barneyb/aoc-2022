@@ -1,7 +1,6 @@
 package com.barneyb.aoc.util
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
 class SliceTest {
@@ -25,18 +24,6 @@ class SliceTest {
                 it.trim().trim().toString(),
                 "double-trim '$it'"
             )
-        }
-    }
-
-    @Test
-    fun toInt() {
-        assertEquals(0, Slice("0").toInt())
-        assertEquals(1, Slice("1").toInt())
-        assertEquals(12, Slice("12").toInt())
-        assertEquals(12300, Slice("12300").toInt())
-        assertEquals(-42, Slice("-42").toInt())
-        assertThrows(NumberFormatException::class.java) {
-            Slice("cow").toInt()
         }
     }
 
