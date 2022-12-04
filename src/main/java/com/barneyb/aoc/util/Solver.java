@@ -24,8 +24,9 @@ public final class Solver {
     public static <T> void execute(Function<String, T> init,
                                    Function<T, ?> partOne,
                                    Function<T, ?> partTwo) {
-        System.out.println(labelForClass(init.getClass()));
-        val input = Input.forProblem(init.getClass());
+        val func = partOne == null ? init : partOne;
+        System.out.println(labelForClass(func.getClass()));
+        val input = Input.forProblem(func.getClass());
         val result = Timing.inMillis(() -> {
             val parsed = init.apply(input);
             if (partOne == null) {
