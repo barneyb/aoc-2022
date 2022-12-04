@@ -1,8 +1,6 @@
 package com.barneyb.aoc.aoc2022.day04
 
-import com.barneyb.aoc.util.Solver
-import com.barneyb.aoc.util.fullyContains
-import com.barneyb.aoc.util.overlaps
+import com.barneyb.aoc.util.*
 
 fun main() {
     Solver.execute(
@@ -26,22 +24,25 @@ fun countOverlapping(pairs: PairsOfAssignments) =
     }
 
 internal fun parse(input: String) =
-    input.trim().lines().map(::parsePair)
+    input.toSlice()
+        .trim()
+        .lines()
+        .map(::parsePair)
 
-internal fun parsePair(str: String) =
+internal fun parsePair(str: CharSequence) =
     //2-3,4-5
     str.indexOf(',').let { idx ->
         Pair(
-            parseAssignment(str.substring(0, idx)),
-            parseAssignment(str.substring(idx + 1, str.length))
+            parseAssignment(str.subSequence(0, idx)),
+            parseAssignment(str.subSequence(idx + 1, str.length))
         )
     }
 
-internal fun parseAssignment(str: String) =
+internal fun parseAssignment(str: CharSequence) =
     //2-3
     str.indexOf('-').let { idx ->
         Assignment(
-            str.substring(0, idx).toInt(),
-            str.substring(idx + 1, str.length).toInt()
+            str.subSequence(0, idx).toInt(),
+            str.subSequence(idx + 1, str.length).toInt()
         )
     }
