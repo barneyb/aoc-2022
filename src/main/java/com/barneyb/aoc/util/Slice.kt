@@ -15,6 +15,10 @@ class Slice(
     override val length
         get() = end - start
 
+    @Suppress("MemberVisibilityCanBePrivate") // "override" Kotlin's extension method
+    fun isEmpty() =
+        start == end
+
     override fun get(index: Int) =
         arr[start + index]
 
@@ -44,11 +48,12 @@ class Slice(
         String(arr, start, length)
 
     fun trim(): Slice {
+        if (isEmpty()) return this
         var s = start
-        while (arr[s].isWhitespace()) s++
-        var e = end
-        while (arr[e - 1].isWhitespace()) e--
-        return Slice(arr, s, e)
+        var e = end - 1
+        while (s < e && arr[s].isWhitespace()) s++
+        while (e >= s && arr[e].isWhitespace()) e--
+        return Slice(arr, s, e + 1)
     }
 
     fun lines() =

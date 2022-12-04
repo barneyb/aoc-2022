@@ -28,6 +28,14 @@ class SliceTest {
     }
 
     @Test
+    fun trimDegenerates() {
+        assertEquals("", Slice("").trim().toString())
+        assertEquals("", Slice("      ").trim().toString())
+        assertEquals("", Slice(" \n\t\r ").trim().toString())
+        assertEquals("", Slice("   hai ").subSequence(1, 2).trim().toString())
+    }
+
+    @Test
     fun hash() {
         listOf(
             "",
