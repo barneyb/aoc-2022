@@ -3,11 +3,14 @@ package com.barneyb.aoc.aoc2019.day14
 import com.barneyb.aoc.util.Solver
 
 fun main() {
-    Solver.execute(
+    Solver.benchmark(
         ::parse,
-        { requiredOre(it, Reactant(1, ELEMENT_FUEL)) },
+        { requiredOreForFuel(it, 1) },
+        { fuelFromOre(it, ONE_TRILLION) }
     )
 }
+
+internal const val ONE_TRILLION = 1_000_000_000_000
 
 internal const val ELEMENT_ORE = "ORE"
 internal const val ELEMENT_FUEL = "FUEL"
@@ -57,9 +60,9 @@ internal fun parse(input: String): Recipes =
         .map(Reaction::parse)
         .associateBy { it.result.element }
 
-internal fun requiredOre(recipes: Recipes, goal: Reactant): Long {
+internal fun requiredOreForFuel(recipes: Recipes, neededFuel: Long): Long {
     val pool = mutableMapOf<Element, Long>()
-    val needed = mutableMapOf(goal.element to goal.quantity)
+    val needed = mutableMapOf(ELEMENT_FUEL to neededFuel)
     while (true) {
         val el = needed.keys.firstOrNull { it != ELEMENT_ORE }
             ?: return needed[ELEMENT_ORE]!! // done!
@@ -82,4 +85,16 @@ internal fun requiredOre(recipes: Recipes, goal: Reactant): Long {
         }
         pool.merge(el, extra, Long::plus)
     }
+}
+
+internal fun fuelFromOre(recipes: Recipes, availOre: Long): Long {
+    var fuel = 1L
+    var ore = requiredOreForFuel(recipes, fuel)
+    while (ore < availOre) {
+        val inc = (availOre - ore) * fuel / ore
+        if (inc == 0L) break
+        fuel += inc
+        ore = requiredOreForFuel(recipes, fuel)
+    }
+    return fuel
 }
