@@ -6,7 +6,7 @@ class Slice(
     private val arr: CharArray,
     private val start: Int,
     private val end: Int
-) : CharSequence {
+) : CharSequence, Iterable<Char> {
 
     constructor(arr: CharArray) : this(arr, 0, arr.size)
 
@@ -43,6 +43,22 @@ class Slice(
             result = 31 * result + arr[i].code
         return result
     }
+
+    override fun iterator() =
+        object : Iterator<Char> {
+            var curr = start
+            val end = this@Slice.end
+
+            override fun hasNext() =
+                curr < end
+
+            override fun next() =
+                if (hasNext())
+                    arr[curr++]
+                else
+                    throw NoSuchElementException()
+
+        }
 
     override fun toString() =
         String(arr, start, length)

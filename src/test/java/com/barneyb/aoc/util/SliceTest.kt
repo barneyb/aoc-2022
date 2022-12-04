@@ -1,7 +1,8 @@
 package com.barneyb.aoc.util
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class SliceTest {
 
@@ -61,6 +62,22 @@ class SliceTest {
             Slice("cow"),
             Slice("a cow, yo!").subSequence(2, 5)
         )
+    }
+
+    @Test
+    fun iterator() {
+        assertFalse(Slice("").iterator().hasNext())
+        assertThrows<NoSuchElementException> {
+            Slice("").iterator().next()
+        }
+        assertTrue(Slice(" ").iterator().hasNext())
+        val itr = Slice("cow").iterator()
+        assertTrue(itr.hasNext())
+        assertEquals('c', itr.next())
+        assertEquals('o', itr.next())
+        assertTrue(itr.hasNext())
+        assertEquals('w', itr.next())
+        assertFalse(itr.hasNext())
     }
 
 }
