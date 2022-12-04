@@ -29,12 +29,20 @@ public class Timing {
 
     @SuppressWarnings("unused")
     public static <R> With<R> benchMillis(int iterations, Supplier<R> work) {
-        return benchmark(iterations, () -> inMillis(work));
+        val r = benchmark(iterations, () -> inMillis(work));
+        printBenchmark(iterations, r, "ms");
+        return r;
     }
 
     @SuppressWarnings("unused")
     public static <R> With<R> benchNanos(int iterations, Supplier<R> work) {
-        return benchmark(iterations, () -> inNanos(work));
+        val r = benchmark(iterations, () -> inNanos(work));
+        printBenchmark(iterations, r, "ns");
+        return r;
+    }
+
+    private static <R> void printBenchmark(int iterations, With<R> r, String unit) {
+        System.err.printf("Benchmark(%,6d): %,9d %s%n", iterations, r.elapsed, unit);
     }
 
     private static <R> With<R> benchmark(int iterations, Supplier<With<R>> work) {
