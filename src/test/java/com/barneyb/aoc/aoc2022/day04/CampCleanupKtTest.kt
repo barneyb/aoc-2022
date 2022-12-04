@@ -29,4 +29,30 @@ class CampCleanupKtTest {
     fun exampleOne() {
         assertEquals(2, countContained(parse(EXAMPLE_ONE)))
     }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(4, countOverlapping(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun overlaps() {
+        assertEquals(
+            6, countOverlapping(
+                parse(
+                    "1-2,4-5\n" + // before
+                            "3-5,1-3\n" + // overlap start
+                            "1-5,2-3\n" + // contained
+                            "1-3,2-4\n" + // overlap end
+                            "1-2,4-5\n" + // after
+                            // reverse order
+                            "4-5,1-2\n" +
+                            "1-3,3-5\n" +
+                            "2-3,1-5\n" +
+                            "2-4,1-3\n" +
+                            "4-5,1-2\n"
+                )
+            )
+        )
+    }
 }

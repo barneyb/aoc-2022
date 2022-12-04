@@ -1,23 +1,28 @@
 package com.barneyb.aoc.aoc2022.day04
 
 import com.barneyb.aoc.util.Solver
+import com.barneyb.aoc.util.fullyContains
+import com.barneyb.aoc.util.overlaps
 
 fun main() {
     Solver.execute(
         ::parse,
-        ::countContained
+        ::countContained,
+        ::countOverlapping
     )
 }
 
 typealias Assignment = IntRange
 typealias PairsOfAssignments = List<Pair<Assignment, Assignment>>
 
-private fun IntRange.fullyContains(other: IntRange): Boolean =
-    other.first >= first && other.last <= last
-
 fun countContained(pairs: PairsOfAssignments) =
     pairs.count { (a, b) ->
         a.fullyContains(b) || b.fullyContains(a)
+    }
+
+fun countOverlapping(pairs: PairsOfAssignments) =
+    pairs.count { (a, b) ->
+        a.overlaps(b)
     }
 
 internal fun parse(input: String) =
