@@ -42,16 +42,14 @@ public class Timing {
             throw new IllegalArgumentException("Benchmarking makes no sense with fewer than two iterations");
         }
         // warm up
-        for (int i = Math.max(1, iterations / 100); i > 0; i--) {
+        val result = work.get().result;
+        for (int i = iterations / 100; i > 0; i--) {
             work.get();
         }
         // benchmark
         long total = 0;
-        R result = null;
         for (int i = iterations; i > 0; i--) {
-            val r = work.get();
-            result = r.result;
-            total += r.elapsed;
+            total += work.get().elapsed;
         }
         return new With<>(result, total / iterations);
     }
