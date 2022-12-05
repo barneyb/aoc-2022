@@ -85,7 +85,8 @@ package $PACKAGE
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-private const val EXAMPLE_ONE = "\n"
+private const val EXAMPLE_ONE = """
+"""
 
 class ${CAMEL}KtTest {
 
