@@ -1,0 +1,28 @@
+.stacks {
+    display: flex;
+    gap: 1em;
+    position: absolute;
+    bottom: 1em;
+    left: 1em;
+}
+
+.stacks section {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 0.1em;
+    min-width: 3em;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+.stacks section article {
+    width: 100%;
+    text-align: center;
+}
+
+.status {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+}
