@@ -3,6 +3,9 @@ package com.barneyb.aoc.util
 fun CharSequence.toInt() =
     Integer.parseInt(this, 0, length, 10)
 
+fun CharSequence.toLong() =
+    java.lang.Long.parseLong(this, 0, length, 10)
+
 fun CharSequence.camelToTitle() =
     this
         // strip kotlin suffixes

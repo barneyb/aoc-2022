@@ -106,7 +106,7 @@ You look fabulous, by the way. Very healthy.
 EOF
 
 git add .
-idea --line 10 "SRC_FILE"
+idea --line 12 "$SRC_FILE"
 
 if [[ $SCRIPT = .* ]]; then
   rm "$SCRIPT"
