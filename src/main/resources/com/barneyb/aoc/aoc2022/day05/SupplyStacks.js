@@ -1,4 +1,4 @@
-function setup(input) {
+function parse(input) {
     const idx = input.indexOf("\n\n");
     const layout = input.substring(0, idx)
         .split("\n")
@@ -20,11 +20,15 @@ function setup(input) {
         .split("\n")
         .map(l => l.split(" "))
         .map(ws => [ parseInt(ws[1]), parseInt(ws[3]) - 1, parseInt(ws[5]) - 1 ]);
+    return [ stacks, instructions ]
+}
+
+function setup(input) {
+    const [ stacks, instructions ] = parse(input);
+    const totalMoves = instructions.reduce((t, i) => t + i[0], 0);
     const colors = new Map([ ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ" ]
         .map((l, i, ls) =>
             [ l, `hsl(${360 * i / ls.length} 70% 70%)` ]));
-    let taken = 0;
-    const total = instructions.reduce((t, i) => t + i[0], 0);
     const pFormat = new Intl.NumberFormat(undefined, {
         minimumIntegerDigits: 1,
         minimumFractionDigits: 1,
@@ -35,6 +39,7 @@ function setup(input) {
         .html("")
     const $status = d3.select("div.status")
         .html("")
+    let movesTaken = 0;
     const update = () => {
         const $stacks = $container.selectAll(".stack")
             .data(stacks)
@@ -53,7 +58,7 @@ function setup(input) {
                 colors.get(d))
         $crates.exit()
             .remove()
-        $status.text(pFormat.format(taken / total))
+        $status.text(pFormat.format(movesTaken / totalMoves))
     };
     let ip = 0;
     let ip_n = 0;
@@ -69,7 +74,7 @@ function setup(input) {
             return; // NEXT!
         }
         ip_n += 1;
-        taken += 1;
+        movesTaken += 1;
         stacks[ins[2]].push(stacks[ins[1]].pop());
         update();
     }, 20);
