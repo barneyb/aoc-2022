@@ -1,3 +1,11 @@
+body {
+    font-family: "Roboto Light", sans-serif;
+}
+
+body.done {
+    background-color: #f9fff2;
+}
+
 .stacks {
     display: flex;
     gap: 1em;
@@ -11,13 +19,17 @@
     flex-direction: column-reverse;
     align-items: center;
     gap: 0.1em;
-    min-width: 3em;
+    min-width: 4em;
     border: 1px solid #ccc;
     border-top-width: 0;
+    padding: 1px;
+    background-color: #f7f7f7;
+    border-radius: 0 0 4px 4px;
 }
 
 .stacks .stack .crate {
     background-color: antiquewhite;
+    border-radius: 3px;
     width: 100%;
     text-align: center;
 }

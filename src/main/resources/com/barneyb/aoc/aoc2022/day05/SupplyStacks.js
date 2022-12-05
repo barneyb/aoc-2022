@@ -5,6 +5,7 @@ function parse(input) {
         .filter(l => l.trim());
     const last = layout[layout.length - 1];
     const stacks = [];
+    const letters = new Set();
     for (let i = 0; i < last.length; i++) {
         if (last[i] === " ") continue
         const stack = [];
@@ -13,6 +14,7 @@ function parse(input) {
             const c = layout[r][i];
             if (!c || c === " ") break;
             stack.push(c);
+            letters.add(c);
         }
     }
     const instructions = input.substring(idx)
@@ -20,15 +22,14 @@ function parse(input) {
         .split("\n")
         .map(l => l.split(" "))
         .map(ws => [ parseInt(ws[1]), parseInt(ws[3]) - 1, parseInt(ws[5]) - 1 ]);
-    return [ stacks, instructions ]
+    return [ stacks, instructions, [ ...letters ].sort() ]
 }
 
 function setup(input) {
-    const [ stacks, instructions ] = parse(input);
+    const [ stacks, instructions, letters ] = parse(input);
     const totalMoves = instructions.reduce((t, i) => t + i[0], 0);
-    const colors = new Map([ ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ" ]
-        .map((l, i, ls) =>
-            [ l, `hsl(${360 * i / ls.length} 70% 70%)` ]));
+    const colors = new Map(letters.map((l, i, ls) =>
+        [ l, `hsl(${360 * i / ls.length} 50% 80%)` ]));
     const pFormat = new Intl.NumberFormat(undefined, {
         minimumIntegerDigits: 1,
         minimumFractionDigits: 1,
@@ -45,15 +46,15 @@ function setup(input) {
             .data(stacks)
         $stacks.enter()
             .append("section")
-            .attr("class", "stack")
+            .classed("stack", true)
         $stacks.exit()
             .remove()
         const $crates = $stacks.selectAll(".crate")
             .data(d => d)
         $crates.enter()
             .append("article")
-            .attr("class", "crate")
-            .text((d, i) => `${d} (${i})`)
+            .classed("crate", true)
+            .text(d => d)
             .style("background-color", d =>
                 colors.get(d))
         $crates.exit()
@@ -62,9 +63,12 @@ function setup(input) {
     };
     let ip = 0;
     let ip_n = 0;
+    const period = Math.max(5, Math.min(250, (15 * 1000) / totalMoves));
     const interval = setInterval(() => {
         if (ip >= instructions.length) {
             clearInterval(interval);
+            d3.select("body")
+                .classed("done", true)
             return; // DONE!
         }
         const ins = instructions[ip];
@@ -77,7 +81,7 @@ function setup(input) {
         movesTaken += 1;
         stacks[ins[2]].push(stacks[ins[1]].pop());
         update();
-    }, 20);
+    }, period);
     update();
 }
 
