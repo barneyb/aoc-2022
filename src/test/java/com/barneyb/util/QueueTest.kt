@@ -3,11 +3,11 @@ package com.barneyb.util
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class StackTest {
+class QueueTest {
 
     @Test
     fun doesItSmoke() {
-        val s = Stack<Int>()
+        val s = Queue<Int>()
         assertEquals(0, s.size)
         assertEquals(0, s.size())
         assertTrue(s.isEmpty())
@@ -26,14 +26,14 @@ class StackTest {
 
     @Test
     fun equality() {
-        val a = Stack<Int>()
-        val b = Stack<Int>()
+        val a = Queue<Int>()
+        val b = Queue<Int>()
         assertEquals(a, b)
         assertEquals(a.hashCode(), b.hashCode())
         a.push(1, 2)
         b.push(1)
         b.push(2)
-        assertEquals(2, a.peek())
+        assertEquals(1, a.peek())
         assertEquals(a, b)
         assertEquals(a.hashCode(), b.hashCode())
         b.push(99999)
@@ -43,13 +43,13 @@ class StackTest {
 
     @Test
     fun testToString() {
-        assertEquals("[]", Stack<Int>().toString())
-        assertEquals("[3, 2, 1]", Stack(1, 2, 3).toString())
+        assertEquals("[]", Queue<Int>().toString())
+        assertEquals("[1, 2, 3]", Queue(1, 2, 3).toString())
     }
 
     @Test
     fun clone() {
-        val a = Stack(1, 2, 3)
+        val a = Queue(1, 2, 3)
         val b = a.clone()
         assertEquals(a, b)
         assertEquals(a::class, b::class)

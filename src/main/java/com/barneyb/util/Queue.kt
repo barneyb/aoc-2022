@@ -1,10 +1,9 @@
 package com.barneyb.util
 
-import java.util.*
-
-class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
+class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
 
     private var head: Node<E>? = null
+    private var tail: Node<E>? = null
     var size = 0
         private set
 
@@ -13,7 +12,15 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
     }
 
     fun push(element: E) {
-        head = Node(element, head)
+        val t = tail
+        if (t == null) {
+            // empty
+            tail = Node(element)
+            head = tail
+        } else {
+            t.next = Node(element)
+            tail = t.next
+        }
         size++
     }
 
@@ -28,7 +35,13 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
 
     fun pop(): E {
         val h = head ?: throw NoSuchElementException()
-        head = h.next
+        if (h.next == null) {
+            // only item
+            head = null
+            tail = null
+        } else {
+            head = h.next
+        }
         size--
         return h.value
     }
@@ -42,12 +55,12 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
     fun isNotEmpty() =
         !isEmpty()
 
-    public override fun clone(): Stack<E> {
+    public override fun clone(): Queue<E> {
         @Suppress("UNCHECKED_CAST")
-        return (super.clone() as Stack<E>).apply {
+        return (super.clone() as Queue<E>).apply {
             head = null
-            var tail: Node<E>? = null
-            for (v in this@Stack) {
+            tail = null
+            for (v in this@Queue) {
                 if (head == null) {
                     tail = Node(v, null)
                     head = tail
@@ -60,7 +73,7 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other !is Stack<*>) return false
+        if (other !is Queue<*>) return false
         if (other.size != size) return false
         return iterableEquals(this, other)
     }
@@ -73,4 +86,5 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
 
     override fun toString() =
         joinToString(prefix = "[", postfix = "]")
+
 }
