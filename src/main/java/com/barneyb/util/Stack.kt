@@ -2,7 +2,7 @@ package com.barneyb.util
 
 import java.util.*
 
-class Stack<E>(vararg elements: E) : Iterable<E> {
+class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
     private data class Node<E>(val value: E, var next: Node<E>?)
 
     private var head: Node<E>? = null
@@ -43,6 +43,22 @@ class Stack<E>(vararg elements: E) : Iterable<E> {
     fun isNotEmpty() =
         !isEmpty()
 
+    public override fun clone(): Stack<E> {
+        @Suppress("UNCHECKED_CAST")
+        val clone = super.clone() as Stack<E>
+        var curr: Node<E>? = null
+        for (v in iterator()) {
+            if (clone.head == null) {
+                curr = Node(v, null)
+                clone.head = curr
+            } else {
+                curr?.next = Node(v, null)
+                curr = curr?.next
+            }
+        }
+        return clone
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other !is Stack<*>) return false
         if (other.size != size) return false
@@ -57,7 +73,7 @@ class Stack<E>(vararg elements: E) : Iterable<E> {
     }
 
     override fun hashCode() =
-        iterator().asSequence().fold(0) { hc, it ->
+        fold(0) { hc, it ->
             hc * 31 + Objects.hashCode(it)
         }
 

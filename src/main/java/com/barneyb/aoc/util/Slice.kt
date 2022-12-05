@@ -73,10 +73,13 @@ class Slice(
     }
 
     fun lines() =
+        split('\n')
+
+    fun split(delim: Char) =
         buildList {
             var start = 0
             while (true) {
-                val idx = indexOf('\n', start)
+                val idx = indexOf(delim, start)
                 if (idx < 0) break
                 add(subSequence(start, idx))
                 start = idx + 1

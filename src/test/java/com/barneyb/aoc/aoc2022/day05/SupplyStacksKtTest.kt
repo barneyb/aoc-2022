@@ -21,7 +21,7 @@ class SupplyStacksKtTest {
 
     @Test
     fun parseLayout() {
-        val stacks = parse(EXAMPLE_ONE).stacks
+        val stacks = parse(EXAMPLE_ONE).freshStacks()
         assertEquals('N', stacks[0].peek())
         assertArrayEquals(
             arrayOf(
@@ -45,10 +45,18 @@ class SupplyStacksKtTest {
     }
 
     @Test
-    fun shuffle() {
+    fun exampleOne() {
         assertEquals(
             "CMZ",
-            shuffle(parse(EXAMPLE_ONE))
+            crateMover9000(parse(EXAMPLE_ONE))
+        )
+    }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(
+            "MCD",
+            crateMover9001(parse(EXAMPLE_ONE))
         )
     }
 }

@@ -15,7 +15,11 @@ public final class Input {
     public static String forProblem(Class<?> clazz) {
         var res = clazz.getResource("input.txt");
         if (res == null) {
-            var name = clazz.getSimpleName();
+            var name = clazz.getName();
+            var pkg = clazz.getPackageName();
+            if (!pkg.isEmpty()) {
+                name = name.substring(pkg.length() + 1); // for period
+            }
             res = clazz.getResource(name + ".txt");
             if (res == null) {
                 val idx = name.indexOf('$');
@@ -30,7 +34,7 @@ public final class Input {
             }
         }
         if (res == null) {
-            throw new RuntimeException("No input for " + clazz.getName() + " was found");
+            throw new RuntimeException("No input for '" + clazz.getName() + "' was found");
         }
         return asString(res);
     }

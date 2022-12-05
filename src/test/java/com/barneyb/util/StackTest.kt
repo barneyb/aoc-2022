@@ -46,4 +46,15 @@ class StackTest {
         assertEquals("[]", Stack<Int>().toString())
         assertEquals("[3, 2, 1]", Stack(1, 2, 3).toString())
     }
+
+    @Test
+    fun clone() {
+        val a = Stack(1, 2, 3)
+        val b = a.clone()
+        assertEquals(a, b)
+        assertEquals(a::class, b::class)
+        assertEquals(a::class.java, b::class.java)
+        assertNotSame(a, b)
+    }
+
 }

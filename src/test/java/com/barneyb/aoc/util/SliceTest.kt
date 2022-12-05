@@ -80,4 +80,17 @@ class SliceTest {
         assertFalse(itr.hasNext())
     }
 
+    @Test
+    fun splitting() {
+        assertEquals(
+            listOf(
+                Slice("a"),
+                Slice("b"),
+                Slice(" 123"),
+                Slice(" d"),
+            ),
+            Slice("a,b, 123, d")
+                .split(',')
+        )
+    }
 }

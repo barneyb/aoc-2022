@@ -2,13 +2,15 @@ package com.barneyb.aoc.aoc2022.day05
 
 import com.barneyb.aoc.util.Slice
 import com.barneyb.aoc.util.Solver
+import com.barneyb.aoc.util.toInt
 import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.Stack
 
 fun main() {
     Solver.execute(
         ::parse,
-        ::shuffle,
+        ::crateMover9000,
+        ::crateMover9001,
     )
 }
 
@@ -17,59 +19,75 @@ internal typealias Instructions = List<Ins>
 
 internal data class Ins(val n: Int, val from: Int, val to: Int)
 
-internal data class ParseResult(
-    val stacks: Stacks,
-    val instructions: Instructions
-)
+internal class ParseResult(
+    private val stacks: Stacks,
+    val instructions: Instructions,
+) {
+    fun freshStacks() =
+        Array(stacks.size) { stacks[it].clone() }
+}
 
 internal fun parse(input: String) =
     input.toSlice().let { raw ->
         raw.indexOf("\n\n").let { idxSplit ->
-            val stacks = raw.subSequence(0, idxSplit)
-            val instructions = raw.subSequence(idxSplit, raw.length)
-            ParseResult(parseStacks(stacks), parseInstructions(instructions))
+            ParseResult(
+                parseStacks(raw.subSequence(0, idxSplit)),
+                parseInstructions(raw.subSequence(idxSplit, raw.length))
+            )
         }
     }
 
-internal fun parseStacks(input: Slice): Stacks {
-    val lines = input
-        .lines()
+internal fun parseStacks(input: Slice) =
+    input.lines()
         .filter { it.isNotBlank() }
-    val numbers = lines.last()
-    val stacks = Array<Stack<Char>>(
-        numbers
-            .last(Char::isDigit)
-            .digitToInt()
-    ) { Stack() }
-    numbers.withIndex()
-        .filter { (_, c) -> c.isDigit() }
-        .forEach { (cIdx, c) ->
-            stacks[c.digitToInt() - 1].apply {
-                for (l in lines.size - 2 downTo 0) {
-                    val v = lines[l][cIdx]
-                    if (v.isWhitespace()) break // reached top
-                    push(v)
+        .let { lines ->
+            lines.last()
+                .withIndex()
+                .filter { (_, c) -> c.isDigit() }
+                .map { (cIdx, _) ->
+                    Stack<Char>().apply {
+                        for (l in lines.size - 2 downTo 0) {
+                            val v = lines[l][cIdx]
+                            if (v.isWhitespace()) break // reached top
+                            push(v)
+                        }
+                    }
                 }
-            }
+                .toTypedArray()
         }
-    return stacks
-}
 
 // move 2 from 2 to 1
-internal fun parseInstructions(input: Slice): Instructions {
-    return input.trim()
+internal fun parseInstructions(input: Slice) =
+    input.trim()
         .lines()
         .map { it.split(' ') }
         .map { Ins(it[1].toInt(), it[3].toInt() - 1, it[5].toInt() - 1) }
-}
 
-internal fun shuffle(parse: ParseResult): CharSequence {
-    parse.instructions.forEach { ins ->
-        repeat(ins.n) { i ->
-            parse.stacks[ins.to].push(parse.stacks[ins.from].pop())
+internal fun crateMover9000(parse: ParseResult) =
+    parse.freshStacks().let { stacks ->
+        parse.instructions.forEach { ins ->
+            repeat(ins.n) {
+                stacks[ins.to].push(stacks[ins.from].pop())
+            }
         }
+        stacks.topsAsString()
     }
-    return buildString {
-        parse.stacks.forEach { append(it.peek()) }
+
+private fun Stacks.topsAsString() =
+    buildString {
+        this@topsAsString.forEach { append(it.peek()) }
     }
-}
+
+internal fun crateMover9001(parse: ParseResult) =
+    parse.freshStacks().let { stacks ->
+        val temp = Stack<Char>()
+        parse.instructions.forEach { ins ->
+            repeat(ins.n) {
+                temp.push(stacks[ins.from].pop())
+            }
+            while (temp.isNotEmpty()) {
+                stacks[ins.to].push(temp.pop())
+            }
+        }
+        stacks.topsAsString()
+    }
