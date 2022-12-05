@@ -31,15 +31,15 @@ internal fun parse(input: String) =
     input.toSlice().let { raw ->
         raw.indexOf("\n\n").let { idxSplit ->
             ParseResult(
-                parseStacks(raw.subSequence(0, idxSplit)),
-                parseInstructions(raw.subSequence(idxSplit, raw.length))
+                parseStacks(raw[0, idxSplit]),
+                parseInstructions(raw[idxSplit, raw.length])
             )
         }
     }
 
 internal fun parseStacks(input: Slice) =
     input.lines()
-        .filter { it.isNotBlank() }
+        .filter(Slice::isNotBlank)
         .let { lines ->
             lines.last()
                 .withIndex()

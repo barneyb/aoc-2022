@@ -22,6 +22,12 @@ class Slice(
     override fun get(index: Int) =
         arr[start + index]
 
+    /**
+     * Offer sub-slicing via indexing syntax: `s.subSequence(n, m) == s[n, m]`.
+     */
+    operator fun get(startIndex: Int, endIndex: Int) =
+        subSequence(startIndex, endIndex)
+
     override fun subSequence(startIndex: Int, endIndex: Int) =
         Slice(arr, start + startIndex, start + endIndex)
 
