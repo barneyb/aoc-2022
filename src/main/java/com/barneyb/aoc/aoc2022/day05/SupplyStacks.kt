@@ -1,12 +1,14 @@
 package com.barneyb.aoc.aoc2022.day05
 
-import com.barneyb.aoc.util.Slice
-import com.barneyb.aoc.util.Solver
-import com.barneyb.aoc.util.toInt
-import com.barneyb.aoc.util.toSlice
+import com.barneyb.aoc.util.*
 import com.barneyb.util.Stack
+import com.barneyb.util.Timing
 
 fun main() {
+    val input = Input.forProblem(::crateMover9000)
+    val parsed = Timing.benchmark(1000) { parse(input) }.result
+    Timing.benchmark(1000) { crateMover9000(parsed) }
+    Timing.benchmark(1000) { crateMover9001(parsed) }
     Solver.execute(
         ::parse,
         ::crateMover9000,
@@ -64,14 +66,13 @@ internal fun parseInstructions(input: Slice) =
         .map { Ins(it[1].toInt(), it[3].toInt() - 1, it[5].toInt() - 1) }
 
 internal fun crateMover9000(parse: ParseResult) =
-    parse.freshStacks().let { stacks ->
+    parse.freshStacks().apply {
         parse.instructions.forEach { ins ->
             repeat(ins.n) {
-                stacks[ins.to].push(stacks[ins.from].pop())
+                this[ins.to].push(this[ins.from].pop())
             }
         }
-        stacks.topsAsString()
-    }
+    }.topsAsString()
 
 private fun Stacks.topsAsString() =
     buildString {
@@ -79,15 +80,14 @@ private fun Stacks.topsAsString() =
     }
 
 internal fun crateMover9001(parse: ParseResult) =
-    parse.freshStacks().let { stacks ->
+    parse.freshStacks().apply {
         val temp = Stack<Char>()
         parse.instructions.forEach { ins ->
             repeat(ins.n) {
-                temp.push(stacks[ins.from].pop())
+                temp.push(this[ins.from].pop())
             }
             while (temp.isNotEmpty()) {
-                stacks[ins.to].push(temp.pop())
+                this[ins.to].push(temp.pop())
             }
         }
-        stacks.topsAsString()
-    }
+    }.topsAsString()
