@@ -24,23 +24,24 @@ if [ "$(git status --porcelain src | wc -l)" != "0" ]; then
 fi
 
 THIS_YEAR=$(date +%Y)
-THIS_DAY=$(date +%d)
+THIS_DAY=$(date +%-d)
 if [ "$(date +%H)" -ge 21 ]; then
     # Past 9pm (EST midnight), assume "tomorrow"
     THIS_DAY=$((THIS_DAY+1))
 fi
 
 read -r -p "Year (${THIS_YEAR}): " YEAR
-read -r -p "Day (${THIS_DAY}): " DAY
+read -r -p "Day (${THIS_DAY}): " BARE_DAY
 read -r -p "Title: " -a WORDS
 
 if [ -z "${YEAR}" ]; then
     YEAR=${THIS_YEAR}
 fi
 
-if [ -z "${DAY}" ]; then
-    DAY=${THIS_DAY}
+if [ -z "${BARE_DAY}" ]; then
+    BARE_DAY=${THIS_DAY}
 fi
+DAY=$BARE_DAY
 if [ "${#DAY}" = "1" ]; then
     DAY="0${DAY}"
 fi
@@ -60,7 +61,7 @@ PACKAGE="${BASE_PACKAGE}.aoc${YEAR}.day${DAY}"
 DIR=$(echo "$PACKAGE" | tr . /)
 
 SRC_FILE=$SRC_ROOT/$DIR/${CAMEL}.kt
-mkdir -p "$SRC_ROOT/$DIR"
+mkdir -p "$(dirname "$SRC_FILE")"
 cat > "$SRC_FILE" << EOF
 package $PACKAGE
 
@@ -76,8 +77,9 @@ internal fun parse(input: String) =
     input.trim()
 EOF
 
-mkdir -p "$TEST_ROOT/$DIR"
-cat > "$TEST_ROOT/$DIR/${CAMEL}KtTest.kt" << EOF
+TEST_FILE=$TEST_ROOT/$DIR/${CAMEL}KtTest.kt
+mkdir -p "$(dirname "$TEST_FILE")"
+cat > "$TEST_FILE" << EOF
 package $PACKAGE
 
 import org.junit.jupiter.api.Assertions.*
@@ -95,8 +97,9 @@ class ${CAMEL}KtTest {
 }
 EOF
 
-mkdir -p "$RESOURCE_ROOT/$DIR"
-cat > "$RESOURCE_ROOT/$DIR/${CAMEL}.txt" << EOF
+INPUT_FILE=$RESOURCE_ROOT/$DIR/${CAMEL}.txt
+mkdir -p "$(dirname "$INPUT_FILE")"
+cat > "$INPUT_FILE" << EOF
                                 Dec $DAY, $YEAR
 
 You look fabulous, by the way. Very healthy.
@@ -104,6 +107,14 @@ You look fabulous, by the way. Very healthy.
   -- barney
 
 EOF
+
+COOKIE_FILE=.cookie.txt
+if [ -f "$COOKIE_FILE" ]; then
+    curl --request GET -sL \
+         --url "https://adventofcode.com/${YEAR}/day/${BARE_DAY}/input" \
+         --cookie "$COOKIE_FILE" \
+         --output "$INPUT_FILE"
+fi
 
 git add .
 idea --line 12 "$SRC_FILE"

@@ -17,3 +17,6 @@
 # vendor/
 /.idea/
 *.iml
+
+# put your session cookie here for cURL to auto-download input files
+/.cookie.txt
