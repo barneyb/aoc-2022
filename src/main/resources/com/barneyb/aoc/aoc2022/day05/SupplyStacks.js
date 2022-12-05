@@ -20,37 +20,41 @@ function setup(input) {
         .split("\n")
         .map(l => l.split(" "))
         .map(ws => [ parseInt(ws[1]), parseInt(ws[3]) - 1, parseInt(ws[5]) - 1 ]);
-    const $container = d3.select("div.stacks")
-    const $status = d3.select("div.status")
-    const $stacks = $container.selectAll("section")
-        .data(stacks)
-        .enter()
-        .append("section")
     const colors = new Map([ ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ" ]
-        .map((l, i, ls) => [ l, `hsl(${360 * i / ls.length} 70% 70%)` ]));
+        .map((l, i, ls) =>
+            [ l, `hsl(${360 * i / ls.length} 70% 70%)` ]));
     let taken = 0;
     const total = instructions.reduce((t, i) => t + i[0], 0);
-    const nFormat = new Intl.NumberFormat(undefined, {
+    const pFormat = new Intl.NumberFormat(undefined, {
         minimumIntegerDigits: 1,
         minimumFractionDigits: 1,
         maximumFractionDigits: 1,
         style: "percent",
     });
-    const draw = () => {
-        const $crates = $stacks.selectAll("article")
+    const $container = d3.select("div.stacks")
+        .html("")
+    const $status = d3.select("div.status")
+        .html("")
+    const update = () => {
+        const $stacks = $container.selectAll(".stack")
+            .data(stacks)
+        $stacks.enter()
+            .append("section")
+            .attr("class", "stack")
+        $stacks.exit()
+            .remove()
+        const $crates = $stacks.selectAll(".crate")
             .data(d => d)
-        $crates
-            .enter()
+        $crates.enter()
             .append("article")
-            .text(d => d)
+            .attr("class", "crate")
+            .text((d, i) => `${d} (${i})`)
             .style("background-color", d =>
                 colors.get(d))
-        $crates
-            .exit()
+        $crates.exit()
             .remove()
-        $status.text(nFormat.format(taken / total))
+        $status.text(pFormat.format(taken / total))
     };
-    draw();
     let ip = 0;
     let ip_n = 0;
     const interval = setInterval(() => {
@@ -67,8 +71,9 @@ function setup(input) {
         ip_n += 1;
         taken += 1;
         stacks[ins[2]].push(stacks[ins[1]].pop());
-        draw();
-    }, 20)
+        update();
+    }, 20);
+    update();
 }
 
 fetch("SupplyStacks.txt")

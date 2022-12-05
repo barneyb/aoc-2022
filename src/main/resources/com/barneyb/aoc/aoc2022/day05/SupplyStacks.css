@@ -6,17 +6,18 @@
     left: 1em;
 }
 
-.stacks section {
+.stacks .stack {
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
     gap: 0.1em;
     min-width: 3em;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
+    border: 1px solid #ccc;
+    border-top-width: 0;
 }
 
-.stacks section article {
+.stacks .stack .crate {
+    background-color: antiquewhite;
     width: 100%;
     text-align: center;
 }
