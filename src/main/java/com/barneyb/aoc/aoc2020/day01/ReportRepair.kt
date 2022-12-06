@@ -24,19 +24,20 @@ internal fun parse(input: String) =
         .sorted()
 
 internal fun productOfTwo(sortedExpenses: List<Long>) =
-    sortedExpenses.find { n ->
-        sortedExpenses.binarySearch(2020 - n) > 0
-    }.let { n ->
+    complement(sortedExpenses, 2020).let { n ->
         n!! * (2020 - n)
+    }
+
+private fun complement(sortedExpenses: List<Long>, sum: Long) =
+    sortedExpenses.find { n ->
+        n < sum && sortedExpenses.binarySearch(sum - n) > 0
     }
 
 internal fun productOfThree(sortedExpenses: List<Long>) =
     sortedExpenses.firstNotNullOfOrNull { a ->
-        val left = 2020 - a
-        val b = sortedExpenses.find { n ->
-            sortedExpenses.binarySearch(left - n) > 0
+        complement(sortedExpenses, 2020 - a)?.let { b ->
+            Pair(a, b)
         }
-        if (b == null) null else Pair(a, b)
     }.let { pair ->
         pair!!.first * pair.second * (2020 - pair.first - pair.second)
     }
