@@ -66,6 +66,7 @@ cat > "$SRC_FILE" << EOF
 package $PACKAGE
 
 import ${BASE_PACKAGE}.util.Solver
+import ${BASE_PACKAGE}.util.toSlice
 
 fun main() {
     Solver.execute(
@@ -74,7 +75,7 @@ fun main() {
 }
 
 internal fun parse(input: String) =
-    input.trim()
+    input.toSlice().trim()
 EOF
 
 TEST_FILE=$TEST_ROOT/$DIR/${CAMEL}KtTest.kt
@@ -82,6 +83,7 @@ mkdir -p "$(dirname "$TEST_FILE")"
 cat > "$TEST_FILE" << EOF
 package $PACKAGE
 
+import com.barneyb.aoc.util.Slice
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -92,7 +94,7 @@ class ${CAMEL}KtTest {
 
     @Test
     fun parse() {
-        assertEquals("", parse(EXAMPLE_ONE))
+        assertEquals(Slice(""), parse(EXAMPLE_ONE))
     }
 
 }
