@@ -4,7 +4,7 @@ import com.barneyb.aoc.util.Solver
 import com.barneyb.util.Queue
 
 fun main() {
-    Solver.execute(
+    Solver.benchmark(
         ::parse,
         ::endOfStartPacketMarker,
         ::endOfStartMessageMarker,
@@ -20,13 +20,18 @@ internal fun endOfStartPacketMarker(signal: String) =
 internal fun endOfStartMessageMarker(signal: String) =
     endOfStartMarker(signal, 14)
 
-internal fun endOfStartMarker(signal: String, len: Int): Int {
+private fun endOfStartMarker(signal: String, len: Int): Int {
+    val hist = IntArray(26)
+    var dupes = 0
     val queue = Queue<Char>()
-    for ((i, c) in signal.withIndex()) {
+    for ((idx, c) in signal.withIndex()) {
         queue.enqueue(c)
-        if (queue.size > len) queue.dequeue()
-        if (queue.size == len && queue.distinct().size == len) {
-            return i + 1 // one-indexing
+        if (++hist[c - 'a'] == 2) dupes++
+        if (queue.size > len) {
+            if (--hist[queue.dequeue() - 'a'] == 1) dupes--
+        }
+        if (queue.size == len && dupes == 0) {
+            return idx + 1 // one-indexing
         }
     }
     return -1
