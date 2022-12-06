@@ -1,6 +1,5 @@
-package com.barneyb.aoc.util;
+package com.barneyb.util;
 
-import com.barneyb.util.Ratio;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
