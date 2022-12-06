@@ -1,5 +1,6 @@
 package com.barneyb.aoc.aoc2022.day06
 
+import com.barneyb.aoc.util.Slice
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -19,7 +20,10 @@ class TuningTroubleKtTest {
 
     @Test
     fun parse() {
-        assertEquals("mjqjpqmgbljsphdztnvjfqwrcgsmlb", parse(EXAMPLE_ONE))
+        assertEquals(
+            Slice("mjqjpqmgbljsphdztnvjfqwrcgsmlb"),
+            parse(EXAMPLE_ONE)
+        )
     }
 
     @Test
