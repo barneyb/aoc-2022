@@ -32,5 +32,5 @@ private fun endOfStartMarker(signal: CharSequence, len: Int): Int {
             }
         }
     }
-    return -1
+    throw IllegalArgumentException("No marker found in signal")
 }
