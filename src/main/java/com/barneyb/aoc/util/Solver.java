@@ -12,6 +12,38 @@ public final class Solver {
         throw new UnsupportedOperationException("really?");
     }
 
+    @SuppressWarnings("unused")
+    public static <T> void benchmark(Function<String, T> init,
+                                     Function<T, ?> partOne,
+                                     Function<T, ?> partTwo) {
+        benchmark(100, init, 1000, partOne, 1000, partTwo);
+    }
+
+    @SuppressWarnings("unused")
+    public static <T> void benchmark(int iterations,
+                                     Function<String, T> init,
+                                     Function<T, ?> partOne,
+                                     Function<T, ?> partTwo) {
+        benchmark(iterations, init, iterations, partOne, iterations, partTwo);
+    }
+
+    public static <T> void benchmark(int initIterations, Function<String, T> init,
+                                     int oneIterations, Function<T, ?> partOne,
+                                     int twoIterations, Function<T, ?> partTwo) {
+        val result = Timing.timed(() -> {
+            val input = Input.forProblem(init.getClass());
+            val parsed = Timing.benchmark(initIterations, () ->
+                    init.apply(input)).getResult();
+            Timing.benchmark(oneIterations, () ->
+                    partOne.apply(parsed));
+            Timing.benchmark(twoIterations, () ->
+                    partTwo.apply(parsed));
+            execute(init, partOne, partTwo);
+            return null;
+        }).humanize();
+        System.err.printf("%-10s : %s%n", "Overall", result.toDurationString());
+    }
+
     public static <T> void execute(Function<String, T> init) {
         execute(init, null, null);
     }

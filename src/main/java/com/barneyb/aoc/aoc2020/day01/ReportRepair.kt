@@ -1,16 +1,10 @@
 package com.barneyb.aoc.aoc2020.day01
 
-import com.barneyb.aoc.util.Input
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toLong
-import com.barneyb.util.Timing
 
 fun main() {
-    val input = Input.forProblem(::main)
-    val parsed = Timing.benchmark(100) { parse(input) }.result
-    Timing.benchmark(1000) { productOfTwo(parsed) }
-    Timing.benchmark(1000) { productOfThree(parsed) }
-    Solver.execute(
+    Solver.benchmark(
         ::parse,
         ::productOfTwo,
         ::productOfThree,

@@ -1,15 +1,13 @@
 package com.barneyb.aoc.aoc2022.day05
 
-import com.barneyb.aoc.util.*
+import com.barneyb.aoc.util.Slice
+import com.barneyb.aoc.util.Solver
+import com.barneyb.aoc.util.toInt
+import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.Stack
-import com.barneyb.util.Timing
 
 fun main() {
-    val input = Input.forProblem(::crateMover9000)
-    val parsed = Timing.benchmark(1000) { parse(input) }.result
-    Timing.benchmark(1000) { crateMover9000(parsed) }
-    Timing.benchmark(1000) { crateMover9001(parsed) }
-    Solver.execute(
+    Solver.benchmark(
         ::parse,
         ::crateMover9000,
         ::crateMover9001,
