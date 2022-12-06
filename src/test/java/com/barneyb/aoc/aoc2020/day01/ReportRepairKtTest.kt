@@ -28,7 +28,12 @@ class ReportRepairKtTest {
 
     @Test
     fun exampleOne() {
-        assertEquals(514579, findIt(parse(EXAMPLE_ONE)))
+        assertEquals(514579, productOfTwo(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(241861950, productOfThree(parse(EXAMPLE_ONE)))
     }
 
 }
