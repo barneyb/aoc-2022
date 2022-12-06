@@ -8,10 +8,10 @@ class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
         private set
 
     init {
-        push(*elements)
+        enqueue(*elements)
     }
 
-    fun push(element: E) {
+    fun enqueue(element: E) {
         val t = tail
         if (t == null) {
             // empty
@@ -24,8 +24,8 @@ class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
         size++
     }
 
-    fun push(vararg elements: E) {
-        elements.forEach(this::push)
+    fun enqueue(vararg elements: E) {
+        elements.forEach(this::enqueue)
     }
 
     fun peek(): E {
@@ -33,7 +33,7 @@ class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
         return h.value
     }
 
-    fun pop(): E {
+    fun dequeue(): E {
         val h = head ?: throw NoSuchElementException()
         if (h.next == null) {
             // only item

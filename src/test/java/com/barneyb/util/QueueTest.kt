@@ -13,14 +13,14 @@ class QueueTest {
         assertTrue(s.isEmpty())
         assertFalse(s.isNotEmpty())
         assertThrows(NoSuchElementException::class.java) { s.peek() }
-        assertThrows(NoSuchElementException::class.java) { s.pop() }
-        s.push(123)
+        assertThrows(NoSuchElementException::class.java) { s.dequeue() }
+        s.enqueue(123)
         assertEquals(1, s.size)
         assertEquals(1, s.size())
         assertFalse(s.isEmpty())
         assertTrue(s.isNotEmpty())
         assertEquals(123, s.peek())
-        assertEquals(123, s.pop())
+        assertEquals(123, s.dequeue())
         assertTrue(s.isEmpty())
     }
 
@@ -30,13 +30,13 @@ class QueueTest {
         val b = Queue<Int>()
         assertEquals(a, b)
         assertEquals(a.hashCode(), b.hashCode())
-        a.push(1, 2)
-        b.push(1)
-        b.push(2)
+        a.enqueue(1, 2)
+        b.enqueue(1)
+        b.enqueue(2)
         assertEquals(1, a.peek())
         assertEquals(a, b)
         assertEquals(a.hashCode(), b.hashCode())
-        b.push(99999)
+        b.enqueue(99999)
         assertNotEquals(a, b)
         assertNotEquals(a.hashCode(), b.hashCode())
     }
@@ -56,9 +56,9 @@ class QueueTest {
         assertEquals(a::class.java, b::class.java)
         assertNotSame(a, b)
 
-        b.push(99999)
+        b.enqueue(99999)
         assertNotEquals(a, b)
-        a.push(99999)
+        a.enqueue(99999)
         assertEquals(a, b)
     }
 
