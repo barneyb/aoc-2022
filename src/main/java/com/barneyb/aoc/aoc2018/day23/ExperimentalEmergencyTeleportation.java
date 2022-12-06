@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public class ExperimentalEmergencyTeleportation {
 
     long partOne;
-    long partTwo;
 
     private static Pattern RE_BOT = Pattern.compile("pos=<(-?\\d+),(-?\\d+),(-?\\d+)>, r=(\\d+)");
 
@@ -37,13 +36,11 @@ public class ExperimentalEmergencyTeleportation {
         partOne = bots.stream()
                 .filter(strongest::isInRange)
                 .count();
-        partTwo = bots.size();
     }
 
     public static void main(String[] args) {
         Solver.execute(ExperimentalEmergencyTeleportation::new,
-                ExperimentalEmergencyTeleportation::getPartOne,
-                ExperimentalEmergencyTeleportation::getPartTwo);
+                ExperimentalEmergencyTeleportation::getPartOne);
     }
 
 }

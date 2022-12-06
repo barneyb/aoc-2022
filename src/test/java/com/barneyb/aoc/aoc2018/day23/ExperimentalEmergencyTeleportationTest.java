@@ -30,10 +30,4 @@ class ExperimentalEmergencyTeleportationTest {
         assertEquals(7, eet.getPartOne());
     }
 
-    @Test
-    public void exampleTwo() {
-        val eet = new ExperimentalEmergencyTeleportation(INPUT_TWO);
-        assertEquals(36, eet.getPartTwo());
-    }
-
 }
