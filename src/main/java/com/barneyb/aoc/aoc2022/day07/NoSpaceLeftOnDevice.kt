@@ -7,38 +7,45 @@ import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.Queue
 
 fun main() {
-    Solver.execute(
+    Solver.benchmark(
         ::parse,
         ::partOne,
         ::partTwo,
     )
 }
 
-internal data class Dir(val name: CharSequence, val parent: Dir?) {
-    private val dirsByName = HashMap<CharSequence, Dir>()
-    private val filesByName = HashMap<CharSequence, Int>()
+internal open class File(val name: CharSequence, val size: Int) {
+    override fun toString() =
+        "$name (file, size=$size)"
+}
 
-    var localSize = -1
-        private set
+internal class Dir(name: CharSequence, val parent: Dir?) : File(name, 0) {
+    private val byName = LinkedHashMap<CharSequence, File>()
 
-    var totalSize = -1
-        private set
+    val totalSize: Int
+        get() = children.sumOf {
+            when (it) {
+                is Dir -> it.totalSize
+                else -> it.size
+            }
+        }
+
+    val children
+        get() = byName.values
 
     val subdirs
-        get() = dirsByName.values
+        get() = children.filterIsInstance<Dir>()
 
     fun subdir(name: CharSequence) =
-        dirsByName.getOrPut(name) { Dir(name, this) }
+        byName.getOrPut(name) { Dir(name, this) } as Dir
 
     fun file(name: CharSequence, size: Int) {
-        filesByName[name] = size
+        byName[name] = File(name, size)
     }
 
-    fun computeSizes() {
-        localSize = filesByName.values.sum()
-        dirsByName.values.forEach(Dir::computeSizes)
-        totalSize = localSize + subdirs.sumOf(Dir::totalSize)
-    }
+    override fun toString() =
+        "$name (dir)"
+
 }
 
 internal fun parse(input: String) =
@@ -66,7 +73,6 @@ internal fun parse(input: String) =
                 curr.file(l.drop(idx + 1), l[0, idx].toInt())
             }
         }
-        root.computeSizes()
         root
     }
 
@@ -95,4 +101,19 @@ internal fun partTwo(root: Dir) =
                 .filter { it >= needed }
                 .min()
         }
+    }
+
+internal fun draw(root: Dir) =
+    buildString {
+        fun walk(f: File, l: Int) {
+            if (isNotEmpty()) append('\n')
+            repeat(l) { append("  ") }
+            append("- ")
+            append(f)
+            if (f is Dir)
+                f.children.forEach {
+                    walk(it, l + 1)
+                }
+        }
+        walk(root, 0)
     }
