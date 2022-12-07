@@ -41,4 +41,9 @@ class NoSpaceLeftOnDeviceKtTest {
     fun exampleOne() {
         assertEquals(95437, partOne(parse(EXAMPLE_ONE)))
     }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(24933642, partTwo(parse(EXAMPLE_ONE)))
+    }
 }

@@ -10,6 +10,7 @@ fun main() {
     Solver.execute(
         ::parse,
         ::partOne,
+        ::partTwo,
     )
 }
 
@@ -85,3 +86,13 @@ internal fun partOne(root: Dir) =
         .map(Dir::totalSize)
         .filter { it <= 100_000 }
         .sum()
+
+internal fun partTwo(root: Dir) =
+    (70_000_000 - root.totalSize).let { available ->
+        (30_000_000 - available).let { needed ->
+            allDirs(root)
+                .map(Dir::totalSize)
+                .filter { it >= needed }
+                .min()
+        }
+    }
