@@ -1,6 +1,5 @@
 package com.barneyb.aoc.aoc2022.day07
 
-import com.barneyb.aoc.util.Slice
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -34,7 +33,7 @@ class NoSpaceLeftOnDeviceKtTest {
 
     @Test
     fun parse() {
-        assertEquals(Slice("/"), parse(EXAMPLE_ONE).name)
+        assertEquals(listOf(584, 94853, 24933642, 48381165), parse(EXAMPLE_ONE))
     }
 
     @Test
@@ -45,30 +44,6 @@ class NoSpaceLeftOnDeviceKtTest {
     @Test
     fun exampleTwo() {
         assertEquals(24933642, partTwo(parse(EXAMPLE_ONE)))
-    }
-
-    @Test
-    fun render() {
-        val str = draw(parse(EXAMPLE_ONE))
-        println(str)
-        assertEquals(
-            """
-                - / (dir)
-                  - a (dir)
-                    - e (dir)
-                      - i (file, size=584)
-                    - f (file, size=29116)
-                    - g (file, size=2557)
-                    - h.lst (file, size=62596)
-                  - b.txt (file, size=14848514)
-                  - c.dat (file, size=8504156)
-                  - d (dir)
-                    - j (file, size=4060174)
-                    - d.log (file, size=8033020)
-                    - d.ext (file, size=5626152)
-                    - k (file, size=7214296)
-            """.trimIndent(), str
-        )
     }
 
 }
