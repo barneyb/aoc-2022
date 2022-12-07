@@ -1,5 +1,6 @@
 package com.barneyb.aoc.aoc2022.day07
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -33,7 +34,10 @@ class NoSpaceLeftOnDeviceKtTest {
 
     @Test
     fun parse() {
-        assertEquals(listOf(584, 94853, 24933642, 48381165), parse(EXAMPLE_ONE))
+        assertArrayEquals(
+            intArrayOf(584, 94853, 24933642, 48381165),
+            parse(EXAMPLE_ONE)
+        )
     }
 
     @Test
