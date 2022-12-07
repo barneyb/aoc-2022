@@ -3,6 +3,7 @@ package com.barneyb.aoc.aoc2016.day01;
 import com.barneyb.aoc.util.*;
 import com.barneyb.util.Dir;
 import com.barneyb.util.Vec2;
+import kotlin.text.StringsKt;
 import lombok.Value;
 import lombok.val;
 
@@ -22,7 +23,7 @@ public class NoTimeForATaxicab {
                 .map(Slice::trim)
                 .map(ins -> new Ins(
                         ins.charAt(0) == 'R' ? Turn.RIGHT : Turn.LEFT,
-                        CharSequenceKt.toInt(CharSequenceKt.subSequence(ins, 1))
+                        CharSequenceKt.toInt(StringsKt.drop(ins, 1))
                 ))
                 .collect(Collectors.toList());
     }

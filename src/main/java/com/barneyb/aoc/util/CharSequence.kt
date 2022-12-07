@@ -6,9 +6,6 @@ fun CharSequence.toInt() =
 fun CharSequence.toLong() =
     java.lang.Long.parseLong(this, 0, length, 10)
 
-fun CharSequence.subSequence(startIndex: Int) =
-    subSequence(startIndex, length)
-
 fun CharSequence.camelToTitle() =
     this
         // strip kotlin suffixes

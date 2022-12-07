@@ -93,7 +93,7 @@ private const val EXAMPLE_ONE = """
 class ${CAMEL}KtTest {
 
     @Test
-    fun parse() {
+    fun parsing() {
         assertEquals(Slice(""), parse(EXAMPLE_ONE))
     }
 
