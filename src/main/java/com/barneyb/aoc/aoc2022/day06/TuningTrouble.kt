@@ -23,12 +23,12 @@ internal fun endOfStartMessageMarker(signal: CharSequence) =
 private fun endOfStartMarker(signal: CharSequence, len: Int): Int {
     val hist = IntArray(26)
     var dupes = 0
-    for ((idx, c) in signal.withIndex()) {
-        if (++hist[c - 'a'] == 2) dupes++
-        if (idx >= len) {
-            if (--hist[signal[idx - len] - 'a'] == 1) dupes--
+    for (i in signal.indices) {
+        if (++hist[signal[i] - 'a'] == 2) dupes++
+        if (i >= len) {
+            if (--hist[signal[i - len] - 'a'] == 1) dupes--
             if (dupes == 0) {
-                return idx + 1 // one-indexing
+                return i + 1 // one-indexing
             }
         }
     }
