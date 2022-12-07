@@ -17,7 +17,7 @@ fun CharSequence.camelToTitle() =
         .replace(Regex("(\\w)([A-Z][a-z])"), "$1 $2")
         // first uppercase letter of a run
         .replace(Regex("([a-z])([A-Z])"), "$1 $2")
-        // stop word capitalization
-        .replace(Regex(" (A|And|The|Of) ")) {
+        // stop-word capitalization
+        .replace(Regex(" (A|An|And|For|Of|The) ")) {
             it.value.lowercase()
         }

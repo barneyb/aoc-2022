@@ -1,14 +1,12 @@
 package com.barneyb.aoc.aoc2016.day01;
 
-import com.barneyb.aoc.util.CharSequenceKt;
-import com.barneyb.aoc.util.Slice;
-import com.barneyb.aoc.util.SliceKt;
-import com.barneyb.aoc.util.Solver;
+import com.barneyb.aoc.util.*;
 import com.barneyb.util.Dir;
 import com.barneyb.util.Vec2;
 import lombok.Value;
 import lombok.val;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +28,9 @@ public class NoTimeForATaxicab {
     }
 
     public static void main(String[] args) {
-        Solver.benchmark(NoTimeForATaxicab::new,
+        var it = new NoTimeForATaxicab(Input.forProblem(NoTimeForATaxicab.class));
+        it.draw();
+        Solver.benchmark(garbage -> it,
                 NoTimeForATaxicab::partOne,
                 NoTimeForATaxicab::partTwo);
     }
@@ -96,6 +96,76 @@ public class NoTimeForATaxicab {
             }
         }
         throw new IllegalStateException("Path never crosses itself?!");
+    }
+
+    void draw() {
+        val visited = new HashSet<Vec2>();
+        val turns = new HashMap<Vec2, Dir>();
+        var h = Dir.NORTH;
+        var pos = Vec2.origin();
+        var rOne = -1;
+        visited.add(pos);
+        for (val ins : instructions) {
+            h = ins.turn.execute(h);
+            turns.put(pos, h);
+            for (var i = 0; i < ins.move; i++) {
+                pos = pos.move(h);
+                if (!visited.add(pos) && rOne < 0) {
+                    rOne = pos.getManhattanDistance();
+                }
+            }
+        }
+        val rTwo = pos.getManhattanDistance();
+        var min = visited.iterator().next();
+        var max = min;
+        for (val p : visited) {
+            if (p.getX() < min.getX() || p.getY() < min.getY()) {
+                min = new Vec2(
+                        Math.min(p.getX(), min.getX()),
+                        Math.min(p.getY(), min.getY())
+                );
+            }
+            if (p.getX() < max.getX() || p.getY() < max.getY()) {
+                max = new Vec2(
+                        Math.max(p.getX(), max.getX()),
+                        Math.max(p.getY(), max.getY())
+                );
+            }
+        }
+        System.out.println();
+        for (int y = min.getY() - 1, my = max.getY() + 1; y < my; y++) {
+            for (int x = min.getX() - 1, mx = max.getX() + 1; x < mx; x++) {
+                pos = new Vec2(x, y);
+                var md = pos.getManhattanDistance();
+                System.out.print(
+                        turns.containsKey(pos)
+                                ? render(turns.get(pos))
+                                : visited.contains(pos)
+                                ? '·'
+                                : md == rOne || md == rTwo
+                                ? '◌'
+                                : x == 0
+                                ? '|'
+                                : y == 0
+                                ? '-'
+                                : ' ');
+            }
+            System.out.println();
+        }
+    }
+
+    private char render(Dir d) {
+        switch (d) {
+            case NORTH:
+                return '▲';
+            case SOUTH:
+                return '▼';
+            case EAST:
+                return '▶';
+            case WEST:
+                return '◀';
+        }
+        throw new IllegalArgumentException();
     }
 
 }
