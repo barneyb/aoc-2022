@@ -1,7 +1,9 @@
 package com.barneyb.aoc.aoc2022.day08
 
+import com.barneyb.util.Vec2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 
 private const val EXAMPLE_ONE = """
 30373
@@ -30,4 +32,19 @@ class TreetopTreeHouseKtTest {
     fun exampleOne() {
         assertEquals(21, visibleTreeCount(parse(EXAMPLE_ONE)))
     }
+
+    @Test
+    fun exampleTwo() {
+        assertAll(
+            { assertEquals(4, scenicScore(parse(EXAMPLE_ONE), Vec2(2, 1))) },
+            { assertEquals(8, scenicScore(parse(EXAMPLE_ONE), Vec2(2, 3))) },
+            { assertEquals(1, scenicScore(parse(EXAMPLE_ONE), Vec2(1, 3))) },
+        )
+    }
+
+    @Test
+    fun exampleTwoB() {
+        assertEquals(8, bestScenicScore(parse(EXAMPLE_ONE)))
+    }
+
 }

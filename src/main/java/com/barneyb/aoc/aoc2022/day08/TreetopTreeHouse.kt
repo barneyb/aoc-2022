@@ -3,11 +3,13 @@ package com.barneyb.aoc.aoc2022.day08
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.Vec2
+import kotlin.math.max
 
 fun main() {
     Solver.execute(
         ::parse,
-        ::visibleTreeCount
+        ::visibleTreeCount,
+        ::bestScenicScore,
     )
 }
 
@@ -60,4 +62,35 @@ internal fun visibleTreeCount(grid: Grid): Int {
         scan(Vec2(grid.width - 1, y), Vec2::west)
     }
     return visible.size
+}
+
+internal fun scenicScore(grid: Grid, pos: Vec2): Int {
+    fun scan(step: (Vec2) -> Vec2): Int {
+        var curr = pos
+        var count = 0
+        val max = grid[curr]
+        var tallest = Int.MIN_VALUE
+        while (true) {
+            curr = step(curr)
+            if (!grid.contains(curr)) break
+            count += 1
+            val h = grid[curr]
+            if (h > tallest) {
+                tallest = h
+                if (h >= max) break
+            }
+        }
+        return count
+    }
+    return scan(Vec2::north) * scan(Vec2::south) * scan(Vec2::east) * scan(Vec2::west)
+}
+
+internal fun bestScenicScore(grid: Grid): Int {
+    var best = Int.MIN_VALUE
+    for (x in 0 until grid.width) {
+        for (y in 0 until grid.height) {
+            best = max(best, scenicScore(grid, Vec2(x, y)))
+        }
+    }
+    return best
 }
