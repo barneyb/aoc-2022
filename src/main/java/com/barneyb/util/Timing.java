@@ -54,6 +54,9 @@ public class Timing {
         }
     }
 
+    /**
+     * Time the supplied work with nanosecond precision.
+     */
     public static <R> With<R> timed(Supplier<R> work) {
         return timed(work, TimeUnit.NANOSECONDS);
     }
@@ -70,29 +73,27 @@ public class Timing {
                 unit);
     }
 
-    private static int ITERATION_WIDTH = 6;
+    private static int ITERATIONS_WIDTH = 6;
 
     public static <R> With<R> benchmark(int iterations, Supplier<R> work) {
-        if (iterations < 2) {
-            throw new IllegalArgumentException("Benchmarking makes no sense with fewer than two iterations");
+        if (iterations < 1) {
+            throw new IllegalArgumentException("Benchmarking requires at least one iteration");
         }
-        // warm up
-        var first = work.get();
-        for (int i = iterations / 100; i > 0; i--) {
-            work.get();
-        }
+        // warm up, at least one iteration, up to 1% of the benchmark's
+        for (int i = iterations / 100; i >= 0; i--) work.get();
         // benchmark
-        long total = 0;
-        for (int i = iterations; i > 0; i--) {
-            total += timed(work, TimeUnit.NANOSECONDS).elapsed;
-        }
-        var r = new With<R>(first, total / iterations, TimeUnit.NANOSECONDS)
+        var r = timed(() -> {
+            // the last iteration will be for its result
+            for (int i = iterations; i > 1; i--) work.get();
+            return work.get();
+        });
+        r = new With<R>(r.result, r.elapsed / iterations, r.unit)
                 .humanize();
         val itr = String.format("%,d", iterations);
-        if (itr.length() > ITERATION_WIDTH) {
-            ITERATION_WIDTH = itr.length();
+        if (itr.length() > ITERATIONS_WIDTH) {
+            ITERATIONS_WIDTH = itr.length();
         }
-        System.err.printf("Benchmark(%" + ITERATION_WIDTH + "s): %s%n", itr, r.humanize().toDurationString(6));
+        System.err.printf("Benchmark(%" + ITERATIONS_WIDTH + "s): %s%n", itr, r.toDurationString(6));
         return r;
     }
 
