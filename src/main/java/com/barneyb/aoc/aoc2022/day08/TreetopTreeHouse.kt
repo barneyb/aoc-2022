@@ -13,28 +13,29 @@ fun main() {
     )
 }
 
-typealias Grid = List<List<Int>>
+private const val MAX_HEIGHT = 9
 
-operator fun Grid.get(p: Vec2) =
+internal typealias Grid = List<List<Int>>
+
+internal operator fun Grid.get(p: Vec2) =
     get(p.y)[p.x]
 
-val Grid.height
+internal val Grid.height
     get() = size
 
-val Grid.width
+internal val Grid.width
     get() = get(0).size
 
-fun Grid.contains(p: Vec2) =
+internal fun Grid.contains(p: Vec2) =
     p.y in 0 until height && p.x in 0 until width
 
 internal fun parse(input: String) =
-    buildList {
-        input.toSlice().trim().lines().forEach { l ->
-            add(l.map<Int>(Char::digitToInt))
+    input.toSlice()
+        .trim()
+        .lines()
+        .map {
+            it.map<Int>(Char::digitToInt)
         }
-    }
-
-private const val MAX_HEIGHT = 9
 
 internal fun visibleTreeCount(grid: Grid): Int {
     val visible = HashSet<Vec2>()
@@ -82,13 +83,17 @@ internal fun scenicScore(grid: Grid, pos: Vec2): Int {
         }
         return count
     }
-    return scan(Vec2::north) * scan(Vec2::south) * scan(Vec2::east) * scan(Vec2::west)
+    return scan(Vec2::north) *
+            scan(Vec2::south) *
+            scan(Vec2::east) *
+            scan(Vec2::west)
 }
 
 internal fun bestScenicScore(grid: Grid): Int {
     var best = Int.MIN_VALUE
-    for (x in 0 until grid.width) {
-        for (y in 0 until grid.height) {
+    // no need to check the edges, since they're guaranteed zero
+    for (x in 1 until grid.width - 1) {
+        for (y in 1 until grid.height - 1) {
             best = max(best, scenicScore(grid, Vec2(x, y)))
         }
     }
