@@ -6,7 +6,7 @@ public enum Dir {
     EAST,
     WEST;
 
-    public static Dir parse(int c) {
+    public static Dir parse(char c) {
         switch (c) {
             case 'n':
             case 'N':

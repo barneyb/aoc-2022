@@ -24,7 +24,7 @@ public class Vec2 {
         return new Vec2(0, 0);
     }
 
-    public Vec2 sum(Vec2 other) {
+    public Vec2 plus(Vec2 other) {
         return new Vec2(x + other.x, y + other.y);
     }
 
