@@ -15,6 +15,17 @@ L 5
 R 2
 """
 
+private const val EXAMPLE_TWO = """
+R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20
+"""
+
 class RopeBridgeKtTest {
 
     @Test
@@ -51,7 +62,17 @@ class RopeBridgeKtTest {
 
     @Test
     fun exampleOne() {
-        assertEquals(13, positionsVisited(parse(EXAMPLE_ONE)))
+        assertEquals(13, partOne(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(1, partTwo(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun exampleThree() {
+        assertEquals(36, partTwo(parse(EXAMPLE_TWO)))
     }
 
 }
