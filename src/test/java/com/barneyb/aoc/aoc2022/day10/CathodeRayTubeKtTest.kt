@@ -176,14 +176,33 @@ class CathodeRayTubeKtTest {
     @Test
     fun exampleOne() {
         assertEquals(
-            0, execute(parse(EXAMPLE_ONE))
+            0, signalStrengths(parse(EXAMPLE_ONE))
         )
     }
 
     @Test
     fun exampleTwo() {
         assertEquals(
-            13140, execute(parse(EXAMPLE_TWO))
+            13140, signalStrengths(parse(EXAMPLE_TWO))
+        )
+    }
+
+    @Test
+    fun exampleThree() {
+        val r = render(parse(EXAMPLE_TWO))
+        println("-".repeat(40))
+        println(r)
+        println("-".repeat(40))
+        assertEquals(
+            """
+                
+                ##..##..##..##..##..##..##..##..##..##..
+                ###...###...###...###...###...###...###.
+                ####....####....####....####....####....
+                #####.....#####.....#####.....#####.....
+                ######......######......######......####
+                #######.......#######.......#######.....
+            """.trimIndent(), r
         )
     }
 
