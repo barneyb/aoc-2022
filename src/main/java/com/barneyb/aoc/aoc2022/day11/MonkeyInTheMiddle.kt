@@ -34,6 +34,12 @@ data class Monkey(
     fun addItem(item: Long) {
         items.enqueue(item)
     }
+
+    fun target(level: Long) =
+        if (level % modulus == 0L)
+            targets.first
+        else
+            targets.second
 }
 
 /*
@@ -61,17 +67,16 @@ internal fun parseMonkey(str: Slice): Monkey {
             .forEach(this::enqueue)
     }
 
-    val op = lines[2].trim().split(' ').drop(4).let { parts ->
-        parts[1].let { str ->
-            if (parts[0][0] == '+') {
-                fun(n: Long) =
-                    n + if (str[0] == 'o') n else str.toLong()
-            } else if (parts[0][0] == '*') {
-                fun(n: Long) =
-                    n * if (str[0] == 'o') n else str.toLong()
-            } else {
-                throw IllegalArgumentException("Unknown '${parts[0]}' operation")
-            }
+    val op = lines[2].trim().split(' ').drop(4).let { (op, str) ->
+        val operand = if (str[0] == 'o') null else str.toLong()
+        if (op[0] == '+') {
+            fun(a: Long) =
+                a + (operand ?: a)
+        } else if (op[0] == '*') {
+            fun(a: Long) =
+                a * (operand ?: a)
+        } else {
+            throw IllegalArgumentException("Unknown '$op $str' operation")
         }
     }
 
@@ -102,16 +107,13 @@ private fun part(
     rounds: Int,
     transform: (Long) -> Long
 ): Long {
-    repeat(rounds) { round ->
+    repeat(rounds) {
         monkeys.forEach { m ->
             while (m.hasItems()) {
                 var level = m.inspect()
                 level = m.op(level)
                 level = transform(level)
-                monkeys[if (level % m.modulus == 0L)
-                    m.targets.first
-                else
-                    m.targets.second].addItem(level)
+                monkeys[m.target(level)].addItem(level)
             }
         }
     }

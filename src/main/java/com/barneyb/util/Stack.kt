@@ -2,6 +2,9 @@ package com.barneyb.util
 
 import java.util.*
 
+/**
+ * I am a simple LIFO stack using linked storage.
+ */
 class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
 
     private var head: Node<E>? = null

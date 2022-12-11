@@ -1,5 +1,8 @@
 package com.barneyb.util
 
+/**
+ * I am a simple FIFO queue using linked storage.
+ */
 class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
 
     private var head: Node<E>? = null
