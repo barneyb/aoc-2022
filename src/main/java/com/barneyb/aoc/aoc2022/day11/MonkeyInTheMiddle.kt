@@ -9,17 +9,18 @@ fun main() {
     Solver.execute(
         ::parse,
         ::partOne,
+        ::partTwo, // 15310845153
     )
 }
 
 data class Monkey(
     val items: Queue<Long>,
     val op: (Long) -> Long,
-    val test: (Long) -> Boolean,
+    val modulus: Long,
     val targets: IntPair,
 ) {
 
-    var inspectionCount = 0
+    var inspectionCount = 0L
         private set
 
     fun hasItems() =
@@ -27,7 +28,7 @@ data class Monkey(
 
     fun inspect(): Long {
         inspectionCount++
-        return op(items.dequeue())
+        return items.dequeue()
     }
 
     fun addItem(item: Long) {
@@ -47,7 +48,6 @@ internal fun parse(input: String) =
     input.toSlice()
         .trim()
         .split("\n\n")
-        .map(::parseMonkey)
 
 internal fun parseMonkey(str: Slice): Monkey {
     val lines = str.trim()
@@ -75,25 +75,40 @@ internal fun parseMonkey(str: Slice): Monkey {
         }
     }
 
-    val test = lines[3].split(' ').last().toLong().let { divisor ->
-        fun(n: Long) =
-            n % divisor == 0L
-    }
+    val modulus = lines[3].split(' ').last().toLong()
 
     val targets = IntPair(
         lines[4].trim().split(' ').last().toInt(),
         lines[5].trim().split(' ').last().toInt(),
     )
 
-    return Monkey(items, op, test, targets)
+    return Monkey(items, op, modulus, targets)
 }
 
-internal fun partOne(monkeys: List<Monkey>): Int {
-    repeat(20) { round ->
+internal fun partOne(blocks: List<Slice>) =
+    part(blocks.map(::parseMonkey), 20) { it / 3 }
+
+internal fun partTwo(blocks: List<Slice>) =
+    blocks.map(::parseMonkey).let { monkeys ->
+        monkeys.map(Monkey::modulus)
+            .fold(1, Long::times)
+            .let { modulus ->
+                part(monkeys, 10000) { it % modulus }
+            }
+    }
+
+private fun part(
+    monkeys: List<Monkey>,
+    rounds: Int,
+    transform: (Long) -> Long
+): Long {
+    repeat(rounds) { round ->
         monkeys.forEach { m ->
             while (m.hasItems()) {
-                val level = m.inspect() / 3
-                monkeys[if (m.test(level))
+                var level = m.inspect()
+                level = m.op(level)
+                level = transform(level)
+                monkeys[if (level % m.modulus == 0L)
                     m.targets.first
                 else
                     m.targets.second].addItem(level)
@@ -104,5 +119,5 @@ internal fun partOne(monkeys: List<Monkey>): Int {
         .map(Monkey::inspectionCount)
         .sortedDescending()
         .take(2)
-        .fold(1, Int::times)
+        .fold(1, Long::times)
 }

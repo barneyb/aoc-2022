@@ -38,11 +38,16 @@ class MonkeyInTheMiddleKtTest {
 
     @Test
     fun parsing() {
-        assertEquals(Queue(79L, 98L), parse(EXAMPLE_ONE)[0].items)
+        assertEquals(Queue(79L, 98L), parseMonkey(parse(EXAMPLE_ONE)[0]).items)
     }
 
     @Test
     fun exampleOne() {
         assertEquals(10605, partOne(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(2713310158, partTwo(parse(EXAMPLE_ONE)))
     }
 }
