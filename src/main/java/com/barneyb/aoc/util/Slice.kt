@@ -85,6 +85,9 @@ class Slice(
         split('\n')
 
     fun split(delim: Char) =
+        split(delim.toString())
+
+    fun split(delim: String) =
         buildList {
             var start = 0
             while (true) {
