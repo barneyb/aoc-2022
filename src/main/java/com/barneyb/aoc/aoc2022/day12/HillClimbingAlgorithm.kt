@@ -10,86 +10,86 @@ import com.barneyb.util.Vec2
 fun main() {
     Solver.execute(
         ::parse,
-        ::shortestPath,
-        ::shortestPathFromBestStart,
+        ::shortestPath, // 352
+        ::shortestPathFromBestStart, // 345
     )
 }
 
-typealias Grid = List<Slice>
+private typealias Elevation = Char
+private typealias Map = List<Slice>
 
-val Grid.height
+private val Map.height
     get() = this.size
 
-val Grid.width
+private val Map.width
     get() = this[0].length
 
-operator fun Grid.get(p: Vec2) =
+private fun Map.elevationAt(p: Vec2): Elevation =
     if (contains(p))
-        this[p.y][p.x]
+        when (val c = this[p.y][p.x]) {
+            'S' -> 'a'
+            'E' -> 'z'
+            else -> c
+        }
     else
         throw IllegalArgumentException("$p isn't a valid position")
 
-fun Grid.contains(p: Vec2) =
+private fun Map.contains(p: Vec2) =
     p.x in 0 until width && p.y in 0 until height
 
-private data class Step(val pos: Vec2, val elev: Char, val steps: Int)
+private fun Map.findMarker(marker: Char): Vec2 {
+    for ((y, l) in withIndex()) {
+        val x = l.indexOf(marker)
+        if (x >= 0) return Vec2(x, y)
+    }
+    throw IllegalArgumentException("No position with marker '$marker' found")
+}
+
+private fun Map.stepsUntil(
+    start: Vec2,
+    testStep: (Elevation, Elevation) -> Boolean,
+    testGoal: (Vec2) -> Boolean
+): Int {
+    val visited = HashMap<Vec2, Int>()
+    val queue = Queue<Step>()
+    queue.enqueue(Step(start, elevationAt(start), 0))
+    while (queue.isNotEmpty()) {
+        val (pos, elev, steps) = queue.dequeue()
+        if (visited.contains(pos)) {
+            continue
+        }
+        if (testGoal(pos)) return steps
+        visited[pos] = steps
+        for (d in Dir.values()) {
+            val next = pos.move(d)
+            if (!contains(next)) continue
+            val e = elevationAt(next)
+            if (testStep(elev, e)) {
+                queue.enqueue(Step(next, e, steps + 1))
+            }
+        }
+    }
+    throw IllegalArgumentException("No path from $start found?!")
+}
+
+private data class Step(val pos: Vec2, val elev: Elevation, val steps: Int)
 
 internal fun parse(input: String) =
     input.toSlice().trim().lines()
 
-internal fun Grid.allAt(elev: Char) =
-    sequence {
-        for ((y, l) in withIndex()) {
-            var x = -1
-            while (true) {
-                x = l.indexOf(elev, x + 1)
-                if (x < 0) break
-                yield(Vec2(x, y))
-            }
-        }
+internal fun shortestPath(map: Map) =
+    map.findMarker('E').let { goal ->
+        map.stepsUntil(
+            map.findMarker('S'),
+            { curr, next -> next - curr <= 1 },
+            goal::equals,
+        )
     }
 
-internal fun shortestPath(grid: Grid): Int {
-    val start = grid.allAt('S').first()
-    val end = grid.allAt('E').first()
-    val visited = HashMap<Vec2, Int>()
-    val queue = Queue<Step>()
-    queue.enqueue(Step(start, 'a', 0))
-    while (queue.isNotEmpty()) {
-        val (pos, elev, steps) = queue.dequeue()
-        if (visited.contains(pos) && steps >= visited[pos]!!) {
-            continue
-        }
-        visited[pos] = steps
-        for (d in Dir.values()) {
-            val next = pos.move(d)
-            if (!grid.contains(next)) continue
-            val e = grid[next]
-            if (e == 'E' && elev >= 'y') return steps + 1
-            if (e - elev <= 1) queue.enqueue(Step(next, e, steps + 1))
-        }
-    }
-    throw IllegalArgumentException("No path from $start to $end found?!")
-}
-
-fun shortestPathFromBestStart(grid: Grid): Int {
-    val end = grid.allAt('E').first()
-    val visited = HashMap<Vec2, Int>()
-    val queue = Queue<Step>()
-    queue.enqueue(Step(end, 'z', 0))
-    while (queue.isNotEmpty()) {
-        val (pos, elev, steps) = queue.dequeue()
-        if (visited.contains(pos) && steps >= visited[pos]!!) {
-            continue
-        }
-        visited[pos] = steps
-        for (d in Dir.values()) {
-            val next = pos.move(d)
-            if (!grid.contains(next)) continue
-            val e = grid[next]
-            if (elev <= 'b') return steps + 1
-            if (elev - e <= 1) queue.enqueue(Step(next, e, steps + 1))
-        }
-    }
-    throw IllegalArgumentException("No path from elevation 'a' to $end found?!")
+fun shortestPathFromBestStart(map: Map): Int {
+    return map.stepsUntil(
+        map.findMarker('E'),
+        { curr, next -> curr - next <= 1 },
+        { pos -> map.elevationAt(pos) == 'a' },
+    )
 }
