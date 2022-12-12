@@ -15,7 +15,12 @@ class HillClimbingAlgorithmKtTest {
 
     @Test
     fun exampleOne() {
-        assertEquals(31, parse(EXAMPLE_ONE))
+        assertEquals(31, shortestPath(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(29, shortestPathFromBestStart(parse(EXAMPLE_ONE)))
     }
 
 }

@@ -10,6 +10,8 @@ import com.barneyb.util.Vec2
 fun main() {
     Solver.execute(
         ::parse,
+        ::shortestPath,
+        ::shortestPathFromBestStart,
     )
 }
 
@@ -30,36 +32,64 @@ operator fun Grid.get(p: Vec2) =
 fun Grid.contains(p: Vec2) =
     p.x in 0 until width && p.y in 0 until height
 
-private data class Step(val pos: Vec2, val height: Char, val steps: Int)
+private data class Step(val pos: Vec2, val elev: Char, val steps: Int)
 
 internal fun parse(input: String) =
-    input.toSlice().trim().lines().let { grid ->
-        var start: Vec2? = null
-        var end: Vec2? = null
-        for ((y, l) in grid.withIndex()) {
-            var x = l.indexOf('S')
-            if (x >= 0) start = Vec2(x, y)
-            x = l.indexOf('E')
-            if (x >= 0) end = Vec2(x, y)
-            if (start != null && end != null) break
-        }
-        if (start == null) throw IllegalArgumentException("didn't find start?!")
-        if (end == null) throw IllegalArgumentException("didn't find end?!")
-        val visited = HashMap<Vec2, Int>()
-        val queue = Queue<Step>()
-        queue.enqueue(Step(start, 'a', 0))
-        while (queue.isNotEmpty()) {
-            val (pos, height, steps) = queue.dequeue()
-            if (visited.contains(pos) && steps >= visited[pos]!!) {
-                continue
-            }
-            visited[pos] = steps
-            for (d in Dir.values()) {
-                val next = pos.move(d)
-                if (!grid.contains(next)) continue
-                val h = grid[next]
-                if (h == 'E' && height >= 'y') return@let steps + 1
-                if (h - height <= 1) queue.enqueue(Step(next, h, steps + 1))
+    input.toSlice().trim().lines()
+
+internal fun Grid.allAt(elev: Char) =
+    sequence {
+        for ((y, l) in withIndex()) {
+            var x = -1
+            while (true) {
+                x = l.indexOf(elev, x + 1)
+                if (x < 0) break
+                yield(Vec2(x, y))
             }
         }
     }
+
+internal fun shortestPath(grid: Grid): Int {
+    val start = grid.allAt('S').first()
+    val end = grid.allAt('E').first()
+    val visited = HashMap<Vec2, Int>()
+    val queue = Queue<Step>()
+    queue.enqueue(Step(start, 'a', 0))
+    while (queue.isNotEmpty()) {
+        val (pos, elev, steps) = queue.dequeue()
+        if (visited.contains(pos) && steps >= visited[pos]!!) {
+            continue
+        }
+        visited[pos] = steps
+        for (d in Dir.values()) {
+            val next = pos.move(d)
+            if (!grid.contains(next)) continue
+            val e = grid[next]
+            if (e == 'E' && elev >= 'y') return steps + 1
+            if (e - elev <= 1) queue.enqueue(Step(next, e, steps + 1))
+        }
+    }
+    throw IllegalArgumentException("No path from $start to $end found?!")
+}
+
+fun shortestPathFromBestStart(grid: Grid): Int {
+    val end = grid.allAt('E').first()
+    val visited = HashMap<Vec2, Int>()
+    val queue = Queue<Step>()
+    queue.enqueue(Step(end, 'z', 0))
+    while (queue.isNotEmpty()) {
+        val (pos, elev, steps) = queue.dequeue()
+        if (visited.contains(pos) && steps >= visited[pos]!!) {
+            continue
+        }
+        visited[pos] = steps
+        for (d in Dir.values()) {
+            val next = pos.move(d)
+            if (!grid.contains(next)) continue
+            val e = grid[next]
+            if (elev <= 'b') return steps + 1
+            if (elev - e <= 1) queue.enqueue(Step(next, e, steps + 1))
+        }
+    }
+    throw IllegalArgumentException("No path from elevation 'a' to $end found?!")
+}
