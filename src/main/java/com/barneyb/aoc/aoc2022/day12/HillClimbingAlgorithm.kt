@@ -4,11 +4,12 @@ import com.barneyb.aoc.util.Slice
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.Dir
+import com.barneyb.util.HashMap
 import com.barneyb.util.Queue
 import com.barneyb.util.Vec2
 
 fun main() {
-    Solver.execute(
+    Solver.benchmark(
         ::parse,
         ::shortestPath, // 352
         ::shortestPathFromBestStart, // 345
