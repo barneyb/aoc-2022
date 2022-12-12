@@ -4,7 +4,7 @@ import com.barneyb.aoc.util.Slice
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.Dir
-import com.barneyb.util.HashMap
+import com.barneyb.util.HashSet
 import com.barneyb.util.Queue
 import com.barneyb.util.Vec2
 
@@ -51,7 +51,7 @@ private fun Map.stepsUntil(
     testStep: (Elevation, Elevation) -> Boolean,
     testGoal: (Vec2) -> Boolean
 ): Int {
-    val visited = HashMap<Vec2, Int>()
+    val visited = HashSet<Vec2>()
     val queue = Queue<Step>()
     queue.enqueue(Step(start, elevationAt(start), 0))
     while (queue.isNotEmpty()) {
@@ -60,7 +60,7 @@ private fun Map.stepsUntil(
             continue
         }
         if (testGoal(pos)) return steps
-        visited[pos] = steps
+        visited.add(pos)
         for (d in Dir.values()) {
             val next = pos.move(d)
             if (!contains(next)) continue
