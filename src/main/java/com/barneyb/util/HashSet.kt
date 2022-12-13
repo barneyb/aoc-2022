@@ -8,7 +8,7 @@ class HashSet<E : Any> : Iterable<E> {
         map.put(element, Unit)
 
     fun remove(element: E) =
-        map.delete(element)
+        map.remove(element)
 
     fun contains(element: E) =
         map.contains(element)

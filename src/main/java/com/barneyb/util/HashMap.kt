@@ -18,6 +18,12 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
     var size = 0
         private set
 
+    fun isEmpty() =
+        size == 0
+
+    fun isNotEmpty() =
+        !isEmpty()
+
     val keys: Iterable<K>
         get() = object : Iterable<K> {
             override fun iterator() =
@@ -48,6 +54,9 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
     }
 
     fun put(key: K, value: V) {
+        if (size >= bins.size / 4 * 3) {
+            resize(bins.size * 2)
+        }
         val hash = Objects.hashCode(key)
         val idx = index(hash)
         val n = nodeInBin(bins[idx], key)
@@ -56,12 +65,10 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
             return
         }
         bins[idx] = Node(hash, key, value, bins[idx])
-        if (++size > bins.size / 2) {
-            rehash(bins.size * 2)
-        }
+        size++
     }
 
-    fun delete(key: Any) {
+    fun remove(key: Any) {
         val hash = Objects.hashCode(key)
         val idx = index(hash)
         var prev: Node<K, V>? = null
@@ -74,8 +81,9 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
                     prev.next = curr.next
                     curr.next = null
                 }
-                if (--size < bins.size / 8) {
-                    rehash(bins.size / 2)
+                size--
+                if (size > 0 && size <= bins.size / 4) {
+                    resize(bins.size / 2)
                 }
                 break
             }
@@ -84,10 +92,10 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
         }
     }
 
-    private fun rehash(cap: Int) {
+    private fun resize(cap: Int) {
         val next = Array<Node<K, V>?>(cap) { null }
         for (n in nodeIterator()) {
-            val idx = index(n.hash)
+            val idx = index(n.hash, next.size)
             next[idx] = n.copy(next = next[idx])
         }
         bins = next
@@ -103,8 +111,8 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
     private fun node(hash: Int, key: Any): Node<K, V>? =
         nodeInBin(bins[index(hash)], key)
 
-    private fun index(hash: Int) =
-        hash % bins.size
+    private fun index(hash: Int, binCount: Int = bins.size) =
+        (hash and 0x7fffffff) % binCount
 
     private fun nodeInBin(
         bin: Node<K, V>?,
