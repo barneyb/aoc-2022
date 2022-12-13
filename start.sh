@@ -120,7 +120,7 @@ if [ -f "$COOKIE_FILE" ]; then
 fi
 
 git add .
-idea --line 12 "$SRC_FILE"
+idea --line 12 "$SRC_FILE" --line 14 "$TEST_FILE"
 
 if [[ $SCRIPT = .* ]]; then
   rm "$SCRIPT"
