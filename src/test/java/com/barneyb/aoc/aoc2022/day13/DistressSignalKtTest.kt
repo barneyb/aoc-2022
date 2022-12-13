@@ -35,12 +35,12 @@ class DistressSignalKtTest {
     @Test
     fun parsing() {
         assertAll(
-            { assertEquals(listOf(1, 1, 3, 1, 1), parseList("[1,1,3,1,1]")) },
-            { assertEquals(listOf(listOf(1), 4), parseList("[[1],4]")) },
+            { assertEquals(listOf(1, 1, 3, 1, 1), parsePacket("[1,1,3,1,1]")) },
+            { assertEquals(listOf(listOf(1), 4), parsePacket("[[1],4]")) },
             {
                 assertEquals(
                     listOf(listOf(emptyList<Int>())),
-                    parseList("[[[]]]")
+                    parsePacket("[[[]]]")
                 )
             },
             {
@@ -51,7 +51,7 @@ class DistressSignalKtTest {
                         8,
                         9
                     ),
-                    parseList("[1,[2,[3,[4,[5,6,7]]]],8,9]")
+                    parsePacket("[1,[2,[3,[4,[5,6,7]]]],8,9]")
                 )
             },
         )
@@ -64,13 +64,13 @@ class DistressSignalKtTest {
         assertEquals(1, comparePackets(listOf(2), listOf(1)))
         assertEquals(-1, comparePackets(listOf(1), listOf(1, 2)))
         assertEquals(1, comparePackets(listOf(1, 2), listOf(1)))
-        assertEquals(-1, comparePackets(listOf(listOf(0, 0, 0)), listOf(2)))
+        assertEquals(-2, comparePackets(listOf(listOf(0, 0, 0)), listOf(2)))
     }
 
     @Test
     fun pairTwo() {
         assertEquals(
-            -1,
+            -2,
             comparePackets(
                 listOf(listOf(1), listOf(2, 3, 4)),
                 listOf(listOf(1), 4),
@@ -81,5 +81,10 @@ class DistressSignalKtTest {
     @Test
     fun exampleOne() {
         assertEquals(13, partOne(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(140, decoderKey(parse(EXAMPLE_ONE)))
     }
 }

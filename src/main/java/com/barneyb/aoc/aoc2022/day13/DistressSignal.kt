@@ -8,6 +8,7 @@ fun main() {
     Solver.execute(
         ::parse,
         ::partOne, // 4809
+        ::decoderKey, // 22600
     )
 }
 
@@ -16,9 +17,9 @@ internal fun parse(input: String) =
         .trim()
         .split('\n')
         .filter(CharSequence::isNotBlank)
-        .map(::parseList)
+        .map(::parsePacket)
 
-internal fun parseList(str: CharSequence): List<*> {
+internal fun parsePacket(str: CharSequence): List<*> {
     var i = 0
     val stack = Stack<MutableList<Any>>()
     var n: Int? = null
@@ -70,8 +71,8 @@ internal fun comparePackets(left: List<*>, right: List<*>): Int {
                 val c = comparePackets(listOf(l), r)
                 if (c != 0) return c
             } else { // must be Int
-                if (l < r as Int) return -1
-                if (l > r) return 1
+                val c = l - r as Int
+                if (c != 0) return c
             }
         } else if (l is List<*>) {
             if (r is List<*>) {
@@ -87,14 +88,23 @@ internal fun comparePackets(left: List<*>, right: List<*>): Int {
     return if (rItr.hasNext()) -1 else 0
 }
 
-internal fun partOne(signals: List<List<*>>) =
-    (signals.indices step 2).map { i ->
-        Pair(signals[i], signals[i + 1])
+internal fun partOne(packets: List<List<*>>) =
+    (packets.indices step 2).map { i ->
+        Pair(packets[i], packets[i + 1])
     }
         .withIndex()
-        .filter { (_, p) ->
-            comparePackets(p.first, p.second) <= 0
-        }
-        .sumOf { (i, _) ->
-            i + 1
-        }
+        .filter { (_, p) -> comparePackets(p.first, p.second) <= 0 }
+        .sumOf { (i, _) -> i + 1 }
+
+internal fun decoderKey(packets: List<List<*>>): Int {
+    val one = parsePacket("[[2]]")
+    val two = parsePacket("[[6]]")
+    val aug = ArrayList<List<*>>(packets.size + 2)
+    aug.addAll(packets)
+    aug.add(one)
+    aug.add(two)
+    return aug.sortedWith(::comparePackets)
+        .withIndex()
+        .filter { (_, p) -> p === one || p === two }
+        .fold(1) { r, (i, _) -> r * (i + 1) }
+}
