@@ -1,6 +1,6 @@
 package com.barneyb.aoc.aoc2015.day15;
 
-import com.barneyb.util.Pair;
+import kotlin.Pair;
 import lombok.Getter;
 import lombok.val;
 
@@ -33,7 +33,7 @@ class Searcher {
         val candidate = ingredients.get(0);
         if (ingredients.size() == 1) {
             val ing = basis.sum(candidate.times(picking));
-            return Pair.of(ing, ing);
+            return new Pair<>(ing, ing);
         }
         Ingredient best = null, bestcc = null;
         for (var i = 0; i < picking; i++) {
@@ -52,6 +52,6 @@ class Searcher {
             }
 
         }
-        return Pair.of(best, bestcc);
+        return new Pair<>(best, bestcc);
     }
 }

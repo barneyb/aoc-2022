@@ -1,7 +1,5 @@
 package com.barneyb.util
 
-import kotlin.Pair
-
 data class Entry<K, V>(val key: K, var value: V)
 
 class UnknownKeyException(key: Any) :
