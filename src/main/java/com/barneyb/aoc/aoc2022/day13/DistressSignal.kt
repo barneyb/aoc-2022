@@ -20,11 +20,10 @@ internal fun parse(input: String) =
         .map(::parsePacket)
 
 internal fun parsePacket(str: CharSequence): List<*> {
-    var i = 0
     val stack = Stack<MutableList<Any>>()
     var n: Int? = null
-    while (i < str.length) {
-        when (val c = str[i]) {
+    for (c in str) {
+        when (c) {
             '[' -> {
                 stack.push(mutableListOf())
             }
@@ -47,15 +46,11 @@ internal fun parsePacket(str: CharSequence): List<*> {
             }
 
             else -> {
-                if (n == null) {
-                    n = 0
-                } else {
-                    n *= 10
-                }
+                if (n == null) n = 0
+                else n *= 10
                 n += c.digitToInt()
             }
         }
-        i++
     }
     throw IllegalArgumentException("mismatched brackets?")
 }
@@ -66,26 +61,24 @@ internal fun comparePackets(left: List<*>, right: List<*>): Int {
     while (lItr.hasNext() && rItr.hasNext()) {
         val l = lItr.next()
         val r = rItr.next()
-        if (l is Int) {
+        val c = if (l is Int) {
             if (r is List<*>) {
-                val c = comparePackets(listOf(l), r)
-                if (c != 0) return c
+                comparePackets(listOf(l), r)
             } else { // must be Int
-                val c = l - r as Int
-                if (c != 0) return c
+                l - r as Int
             }
         } else if (l is List<*>) {
             if (r is List<*>) {
-                val c = comparePackets(l, r)
-                if (c != 0) return c
+                comparePackets(l, r)
             } else { // must be Int
-                val c = comparePackets(l, listOf(r))
-                if (c != 0) return c
+                comparePackets(l, listOf(r))
             }
+        } else {
+            throw IllegalStateException("non-int, non-List found?")
         }
+        if (c != 0) return c
     }
-    if (lItr.hasNext()) return 1
-    return if (rItr.hasNext()) -1 else 0
+    return left.size - right.size
 }
 
 internal fun partOne(packets: List<List<*>>) =
