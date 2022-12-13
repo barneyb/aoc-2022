@@ -94,7 +94,7 @@ class Slice(
                 val idx = indexOf(delim, start)
                 if (idx < 0) break
                 add(subSequence(start, idx))
-                start = idx + 1
+                start = idx + delim.length
             }
             if (start < length) {
                 add(subSequence(start, length))
