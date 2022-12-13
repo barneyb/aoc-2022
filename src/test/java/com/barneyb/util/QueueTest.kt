@@ -9,14 +9,12 @@ class QueueTest {
     fun doesItSmoke() {
         val s = Queue<Int>()
         assertEquals(0, s.size)
-        assertEquals(0, s.size())
         assertTrue(s.isEmpty())
         assertFalse(s.isNotEmpty())
         assertThrows(NoSuchElementException::class.java) { s.peek() }
         assertThrows(NoSuchElementException::class.java) { s.dequeue() }
         s.enqueue(123)
         assertEquals(1, s.size)
-        assertEquals(1, s.size())
         assertFalse(s.isEmpty())
         assertTrue(s.isNotEmpty())
         assertEquals(123, s.peek())

@@ -36,27 +36,6 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
         return h.value
     }
 
-    fun remove(element: E) {
-        var prev: Node<E>? = null
-        var curr = head
-        while (curr != null) {
-            if (curr.value == element) {
-                if (prev == null) {
-                    head = curr.next
-                } else { // middle
-                    prev.next = curr.next
-                }
-                curr.next = null
-                return
-            }
-            prev = curr
-            curr = curr.next
-        }
-    }
-
-    fun size() =
-        size
-
     fun isEmpty() =
         head == null
 

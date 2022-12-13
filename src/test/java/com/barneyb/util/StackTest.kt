@@ -9,14 +9,12 @@ class StackTest {
     fun doesItSmoke() {
         val s = Stack<Int>()
         assertEquals(0, s.size)
-        assertEquals(0, s.size())
         assertTrue(s.isEmpty())
         assertFalse(s.isNotEmpty())
         assertThrows(NoSuchElementException::class.java) { s.peek() }
         assertThrows(NoSuchElementException::class.java) { s.pop() }
         s.push(123)
         assertEquals(1, s.size)
-        assertEquals(1, s.size())
         assertFalse(s.isEmpty())
         assertTrue(s.isNotEmpty())
         assertEquals(123, s.peek())

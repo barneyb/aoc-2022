@@ -15,7 +15,7 @@ class HashMapTest {
         assertEquals('a', m[1])
         m[1] = 'q'
         assertEquals('q', m[1])
-        m.remove(1)
+        m.delete(1)
         assertThrows<UnknownKeyException> {
             m[1]
         }
@@ -32,7 +32,7 @@ class HashMapTest {
         assertEquals(2, m.size)
         m[26] = 'z'
         assertEquals(3, m.size)
-        m.remove(1)
+        m.delete(1)
         assertEquals(2, m.size)
     }
 
@@ -46,8 +46,8 @@ class HashMapTest {
         assertEquals(setOf('a', 'b'), m.values.toSet())
         assertEquals(
             setOf(
-                Entry(1, 'a'),
-                Entry(2, 'b'),
+                1 to 'a',
+                2 to 'b',
             ), m.toSet()
         )
     }

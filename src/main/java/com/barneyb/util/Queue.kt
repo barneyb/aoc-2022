@@ -49,9 +49,6 @@ class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
         return h.value
     }
 
-    fun size() =
-        size
-
     fun isEmpty() =
         head == null
 

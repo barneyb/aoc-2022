@@ -1,107 +1,137 @@
 package com.barneyb.util
 
-data class Entry<K, V>(val key: K, var value: V)
+import java.util.*
 
 class UnknownKeyException(key: Any) :
     IllegalArgumentException("No '$key' is known")
 
-class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Entry<K, V>> {
+class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
 
-    private var buckets = Array<Stack<Entry<K, V>>>(initialCapacity) { Stack() }
+    private data class Node<K, V>(
+        val hash: Int,
+        val key: K,
+        var value: V,
+        var next: Node<K, V>? = null,
+    )
+
+    private var bins = Array<Node<K, V>?>(initialCapacity) { null }
     var size = 0
         private set
 
     val keys: Iterable<K>
         get() = object : Iterable<K> {
             override fun iterator() =
-                MappingIterator(this@HashMap.iterator(), Entry<K, *>::key)
+                MappingIterator(this@HashMap.iterator(), Pair<K, *>::first)
         }
 
     val values: Iterable<V>
         get() = object : Iterable<V> {
             override fun iterator() =
-                MappingIterator(this@HashMap.iterator(), Entry<*, V>::value)
+                MappingIterator(this@HashMap.iterator(), Pair<*, V>::second)
+        }
+
+    private val nodes: Iterable<Node<K, V>>
+        get() = object : Iterable<Node<K, V>> {
+            override fun iterator() =
+                this@HashMap.nodeIterator()
         }
 
     constructor(vararg entries: Pair<K, V>) : this(entries.size * 2) {
         for (e in entries) {
-            set(e.first, e.second)
+            put(e.first, e.second)
         }
     }
 
     operator fun get(key: K): V {
-        return entry(key)?.value
+        return node(key)?.value
             ?: throw UnknownKeyException(key)
     }
 
-    operator fun set(key: K, value: V) {
-        val idx = index(key)
-        val e = entryInBucket(buckets[idx], key)
-        if (e != null) {
-            e.value = value
+    fun put(key: K, value: V) {
+        val hash = Objects.hashCode(key)
+        val idx = index(hash)
+        val n = nodeInBin(bins[idx], key)
+        if (n != null) {
+            n.value = value
             return
         }
-        buckets[idx].push(Entry(key, value))
-        if (++size > buckets.size / 4 * 3) {
-            rehash(buckets.size * 2)
+        bins[idx] = Node(hash, key, value, bins[idx])
+        if (++size > bins.size / 2) {
+            rehash(bins.size * 2)
         }
     }
 
-    fun remove(key: Any) {
-        val idx = index(key)
-        val e = entryInBucket(buckets[idx], key)
-        if (e != null) {
-            buckets[idx].remove(e)
-        }
-        if (--size < buckets.size / 4) {
-            rehash(buckets.size / 2)
+    fun delete(key: Any) {
+        val hash = Objects.hashCode(key)
+        val idx = index(hash)
+        var prev: Node<K, V>? = null
+        var curr = bins[idx]
+        while (curr != null) {
+            if (curr.key == key) {
+                if (prev == null) {
+                    bins[idx] = curr.next
+                } else {
+                    prev.next = curr.next
+                    curr.next = null
+                }
+                if (--size < bins.size / 8) {
+                    rehash(bins.size / 2)
+                }
+                break
+            }
+            prev = curr
+            curr = curr.next
         }
     }
 
     private fun rehash(cap: Int) {
-        val next = Array<Stack<Entry<K, V>>>(cap) { Stack() }
-        for (e in iterator()) {
-            next[index(e.key)].push(e)
+        val next = Array<Node<K, V>?>(cap) { null }
+        for (n in nodeIterator()) {
+            val idx = index(n.hash)
+            next[idx] = n.copy(next = next[idx])
         }
-        buckets = next
+        bins = next
     }
 
     fun contains(key: Any): Boolean {
-        return entry(key) != null
+        return node(key) != null
     }
 
-    private fun entry(key: Any): Entry<K, V>? {
-        return entryInBucket(buckets[index(key)], key)
-    }
+    private fun node(key: Any): Node<K, V>? =
+        node(Objects.hashCode(key), key)
 
-    private fun entryInBucket(
-        bucket: Stack<Entry<K, V>>,
+    private fun node(hash: Int, key: Any): Node<K, V>? =
+        nodeInBin(bins[index(hash)], key)
+
+    private fun index(hash: Int) =
+        hash % bins.size
+
+    private fun nodeInBin(
+        bin: Node<K, V>?,
         key: Any
-    ): Entry<K, V>? {
-        for (e in bucket) {
-            if (key == e.key) return e
+    ): Node<K, V>? {
+        var curr = bin
+        while (curr != null) {
+            if (key == curr.key) return curr
+            curr = curr.next
         }
-        return null
+        return curr
     }
-
-    private fun index(key: Any) =
-        key.hashCode() % buckets.size
 
     override fun equals(other: Any?): Boolean {
         if (other !is HashMap<*, *>) return false
         if (other.size != size) return false
-        for (a in other) {
-            val b = entry(a.key)
+        for (a in other.nodes) {
+            val b = node(a.hash, a.key)
             if (b == null || a.value != b.value) return false
         }
         return true
     }
 
     override fun hashCode(): Int {
-        var hash = 17
-        for (e in this) {
-            hash = hash * 31 + e.key.hashCode()
-            hash = hash * 31 + e.value.hashCode()
+        var hash = 0
+        for (n in nodes) {
+            hash += n.hash xor Objects.hashCode(n.value)
         }
         return hash
     }
@@ -110,37 +140,47 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Entry<K, V>> {
         buildString {
             var started = false
             append('{')
-            for (e in this@HashMap) {
+            for (n in nodes) {
                 if (started) {
                     append(", ")
                 } else {
                     started = true
                 }
-                append(e.key)
+                append(n.key)
                 append(": ")
-                append(e.value)
+                append(n.value)
             }
             append('}')
         }
 
-    override fun iterator(): Iterator<Entry<K, V>> =
-        object : Iterator<Entry<K, V>> {
-            private var idx = 0
-            private var itr: Iterator<Entry<K, V>> = buckets[idx].iterator()
+    private fun nodeIterator(): Iterator<Node<K, V>> =
+        object : Iterator<Node<K, V>> {
+            private var idx = -1
+            private var curr: Node<K, V>? = null
 
             override fun hasNext(): Boolean {
-                while (!itr.hasNext() && ++idx < buckets.size) {
-                    itr = buckets[idx].iterator()
+                if (curr != null) return true
+                while (curr == null) {
+                    if (++idx >= bins.size) break
+                    curr = bins[idx]
                 }
-                return itr.hasNext()
+                return curr != null
             }
 
-            override fun next(): Entry<K, V> {
-                if (!hasNext()) {
-                    throw NoSuchElementException()
-                }
-                return itr.next()
+            override fun next(): Node<K, V> {
+                if (!hasNext()) throw NoSuchElementException()
+                val c = curr!!
+                curr = c.next
+                return c
             }
         }
 
+    override fun iterator(): Iterator<Pair<K, V>> =
+        MappingIterator(this@HashMap.nodeIterator()) {
+            Pair(it.key, it.value)
+        }
+
 }
+
+operator fun <K : Any, V> HashMap<K, V>.set(key: K, value: V) =
+    put(key, value)

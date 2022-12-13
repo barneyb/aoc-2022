@@ -5,10 +5,10 @@ class HashSet<E : Any> : Iterable<E> {
     private val map = HashMap<E, Unit>()
 
     fun add(element: E) =
-        map.set(element, Unit)
+        map.put(element, Unit)
 
     fun remove(element: E) =
-        map.remove(element)
+        map.delete(element)
 
     fun contains(element: E) =
         map.contains(element)
