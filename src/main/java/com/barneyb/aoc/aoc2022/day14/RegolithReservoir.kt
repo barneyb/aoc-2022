@@ -23,45 +23,65 @@ private val sourceOfSand = Vec2(500, 0)
 
 internal enum class Fill(var indicator: Char) {
     SAND('o'),
-    ROCK('#')
+    ROCK('#'),
+    EDGE('|')
 }
 
 internal class Map(rocks: HashSet<Vec2>) {
     private val sites = HashMap<Vec2, Fill>()
     private val xRange: IntRange
-    private val yRange: IntRange
-    val width: Int
-    val height: Int
+    private val height: Int
 
     init {
-        var minx = 500
-        var maxx = 500
-        var maxy = 0
+        var minx = sourceOfSand.x
+        var maxx = minx
+        var maxy = sourceOfSand.y
         for (r in rocks) {
             minx = min(minx, r.x)
             maxx = max(maxx, r.x)
             maxy = max(maxy, r.y)
             sites[r] = Fill.ROCK
         }
-        xRange = minx - 1..maxx + 1
-        yRange = 0..maxy
-        width = xRange.last - xRange.first + 1
-        height = yRange.last - yRange.first + 1
+        xRange = minx - 2..maxx + 2
+        height = maxy + 1
     }
 
-    var useFloor = false
-        private set
+    private var useFloor = false
 
     fun addFloor() {
         useFloor = true
+        var left = Vec2(xRange.first, sourceOfSand.y)
+        var right = Vec2(xRange.last, sourceOfSand.y)
+        while (left.y <= height) {
+            sites[left] = Fill.EDGE
+            sites[right] = Fill.EDGE
+            left = left.down()
+            right = right.down()
+        }
     }
 
-    var sandAtRest = 0
-        private set
+    private fun areaOutsideCol(x: Int): Int {
+        var curr = Vec2(x, 0)
+        while (curr.y < height && !sites.contains(curr))
+            curr = curr.down()
+        return if (curr.y >= height) 0
+        else (height - curr.y).let { it * (it + 1) / 2 }
+    }
 
-    private fun rest(curr: Vec2) {
-        sites[curr] = Fill.SAND
-        sandAtRest++
+    private var _sandAtRest: Int = 0
+
+    val sandAtRest: Int
+        get() {
+            if (!useFloor) return _sandAtRest
+            val left = areaOutsideCol(xRange.first + 1)
+            val right = areaOutsideCol(xRange.last - 1)
+            return _sandAtRest + left + right
+        }
+
+
+    private fun rest(site: Vec2) {
+        sites[site] = Fill.SAND
+        _sandAtRest++
     }
 
     private val resumeFrom = Stack<Vec2>()
@@ -73,7 +93,7 @@ internal class Map(rocks: HashSet<Vec2>) {
         else resumeFrom.pop()
         while (true) {
             val below = curr.down()
-            if (sites.contains(below)) {
+            curr = if (sites.contains(below)) {
                 resumeFrom.push(curr)
                 val toLeft = below.left()
                 if (sites.contains(toLeft)) {
@@ -83,15 +103,15 @@ internal class Map(rocks: HashSet<Vec2>) {
                         rest(curr)
                         return true
                     } else {
-                        curr = toRight
+                        toRight
                     }
                 } else {
-                    curr = toLeft
+                    toLeft
                 }
             } else {
-                curr = below
+                below
             }
-            if (curr.y !in yRange)
+            if (curr.y >= height)
                 return if (useFloor) {
                     rest(curr)
                     true
@@ -101,7 +121,7 @@ internal class Map(rocks: HashSet<Vec2>) {
 
     override fun toString() =
         buildString {
-            val rowLabelWidth = yRange.last.toString().length
+            val rowLabelWidth = height.toString().length
             var mag = 100
             while (true) {
                 append('\n')
@@ -114,7 +134,7 @@ internal class Map(rocks: HashSet<Vec2>) {
                 if (mag == 1) break
                 mag /= 10
             }
-            for (y in yRange) {
+            for (y in 0..height) {
                 append('\n')
                 append(y.toString().padStart(rowLabelWidth))
                 append(' ')
