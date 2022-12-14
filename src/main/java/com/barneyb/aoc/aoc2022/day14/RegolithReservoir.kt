@@ -185,18 +185,15 @@ internal fun parseFormation(line: Slice) =
     }
 
 internal fun sandAtRestAbyss(rocks: HashSet<Vec2>) =
-    Map(rocks).let { map ->
-        @Suppress("ControlFlowWithEmptyBody")
-        while (map.dropSand()) {
-        }
-        map.sandAtRest
-    }
+    sandAtRest(Map(rocks))
 
 internal fun sandAtRestFloor(rocks: HashSet<Vec2>) =
-    Map(rocks).let { map ->
-        map.addFloor()
-        @Suppress("ControlFlowWithEmptyBody")
-        while (map.dropSand()) {
-        }
-        map.sandAtRest
-    }
+    sandAtRest(Map(rocks).apply {
+        addFloor()
+    })
+
+private fun sandAtRest(map: Map): Int {
+    @Suppress("ControlFlowWithEmptyBody")
+    while (map.dropSand());
+    return map.sandAtRest
+}
