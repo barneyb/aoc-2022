@@ -26,6 +26,10 @@ public final class Input {
                 if (idx >= 0) {
                     name = name.substring(0, idx);
                     res = clazz.getResource(name + ".txt");
+                    if (res == null && name.endsWith("Test")) {
+                        name = name.substring(0, name.length() - 4);
+                        res = clazz.getResource(name + ".txt");
+                    }
                     if (res == null && name.endsWith("Kt")) {
                         name = name.substring(0, name.length() - 2);
                         res = clazz.getResource(name + ".txt");
