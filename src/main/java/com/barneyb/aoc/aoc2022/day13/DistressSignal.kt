@@ -5,12 +5,14 @@ import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.Stack
 
 fun main() {
-    Solver.execute(
+    Solver.benchmark(
         ::parse,
         ::partOne, // 4809
         ::decoderKey, // 22600
     )
 }
+
+typealias Packet = List<*> // List<Int | Packet>
 
 internal fun parse(input: String) =
     input.toSlice()
@@ -19,7 +21,7 @@ internal fun parse(input: String) =
         .filter(CharSequence::isNotBlank)
         .map(::parsePacket)
 
-internal fun parsePacket(str: CharSequence): List<*> {
+internal fun parsePacket(str: CharSequence): Packet {
     val stack = Stack<MutableList<Any>>()
     var n: Int? = null
     for (c in str) {
@@ -55,20 +57,20 @@ internal fun parsePacket(str: CharSequence): List<*> {
     throw IllegalArgumentException("mismatched brackets?")
 }
 
-internal fun comparePackets(left: List<*>, right: List<*>): Int {
+internal fun comparePackets(left: Packet, right: Packet): Int {
     val lItr = left.iterator()
     val rItr = right.iterator()
     while (lItr.hasNext() && rItr.hasNext()) {
         val l = lItr.next()
         val r = rItr.next()
         val c = if (l is Int) {
-            if (r is List<*>) {
+            if (r is Packet) {
                 comparePackets(listOf(l), r)
             } else { // must be Int
                 l - r as Int
             }
-        } else if (l is List<*>) {
-            if (r is List<*>) {
+        } else if (l is Packet) {
+            if (r is Packet) {
                 comparePackets(l, r)
             } else { // must be Int
                 comparePackets(l, listOf(r))
@@ -81,7 +83,7 @@ internal fun comparePackets(left: List<*>, right: List<*>): Int {
     return left.size - right.size
 }
 
-internal fun partOne(packets: List<List<*>>) =
+internal fun partOne(packets: List<Packet>) =
     (packets.indices step 2).map { i ->
         Pair(packets[i], packets[i + 1])
     }
@@ -89,10 +91,10 @@ internal fun partOne(packets: List<List<*>>) =
         .filter { (_, p) -> comparePackets(p.first, p.second) <= 0 }
         .sumOf { (i, _) -> i + 1 }
 
-internal fun decoderKey(packets: List<List<*>>): Int {
+internal fun decoderKey(packets: List<Packet>): Int {
     val one = parsePacket("[[2]]")
     val two = parsePacket("[[6]]")
-    val aug = ArrayList<List<*>>(packets.size + 2)
+    val aug = ArrayList<Packet>(packets.size + 2)
     aug.addAll(packets)
     aug.add(one)
     aug.add(two)
