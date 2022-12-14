@@ -15,27 +15,26 @@ class RegolithReservoirKtTest {
 
     @Test
     fun parseAndDraw() {
-        val actual = parse(EXAMPLE_ONE).toString()
+        val actual = Map(parse(EXAMPLE_ONE)).toString()
         println("=".repeat(80))
         println(actual)
         println("=".repeat(80))
         assertEquals(
             """
 
-               4      5   5
-               9      0   0
-               3      0   4
-             0 .......+....
-             1 ............
-             2 ............
-             3 ............
-             4 .....#...##.
-             5 .....#...#..
-             6 ...###...#..
-             7 .........#..
-             8 .........#..
-             9 .#########..
-            10 ............
+              4      5   5
+              9      0   0
+              3      0   4
+            0 .......+....
+            1 ............
+            2 ............
+            3 ............
+            4 .....#...##.
+            5 .....#...#..
+            6 ...###...#..
+            7 .........#..
+            8 .........#..
+            9 .#########..
             """.trimIndent(), actual
         )
     }
@@ -55,6 +54,11 @@ class RegolithReservoirKtTest {
 
     @Test
     fun exampleOne() {
-        assertEquals(24, sandAtRest(parse(EXAMPLE_ONE)))
+        assertEquals(24, sandAtRestAbyss(parse(EXAMPLE_ONE)))
+    }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(93, sandAtRestFloor(parse(EXAMPLE_ONE)))
     }
 }

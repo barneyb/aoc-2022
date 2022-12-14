@@ -13,7 +13,8 @@ import kotlin.math.min
 fun main() {
     Solver.execute(
         ::parse,
-        ::sandAtRest, // 838
+        ::sandAtRestAbyss, // 838
+        ::sandAtRestFloor, // 27539
     )
 }
 
@@ -42,17 +43,30 @@ internal class Map(rocks: HashSet<Vec2>) {
             sites[r] = Fill.ROCK
         }
         xRange = minx - 1..maxx + 1
-        yRange = 0..maxy + 1
+        yRange = 0..maxy
         width = xRange.last - xRange.first + 1
         height = yRange.last - yRange.first + 1
+    }
+
+    var useFloor = false
+        private set
+
+    fun addFloor() {
+        useFloor = true
     }
 
     var sandAtRest = 0
         private set
 
+    private fun rest(curr: Vec2) {
+        sites[curr] = Fill.SAND
+        sandAtRest++
+    }
+
     /** Drop a unit of sand, and return whether it came to rest. */
     fun dropSand(): Boolean {
         var curr = sourceOfSand
+        if (sites.contains(curr)) return false
         while (true) {
             val below = curr.down()
             if (sites.contains(below)) {
@@ -60,8 +74,7 @@ internal class Map(rocks: HashSet<Vec2>) {
                 if (sites.contains(toLeft)) {
                     val toRight = below.right()
                     if (sites.contains(toRight)) {
-                        sites[curr] = Fill.SAND
-                        sandAtRest++
+                        rest(curr)
                         return true
                     } else {
                         curr = toRight
@@ -72,7 +85,11 @@ internal class Map(rocks: HashSet<Vec2>) {
             } else {
                 curr = below
             }
-            if (curr.y !in yRange) return false
+            if (curr.y !in yRange)
+                return if (useFloor) {
+                    rest(curr)
+                    true
+                } else false
         }
     }
 
@@ -105,17 +122,18 @@ internal class Map(rocks: HashSet<Vec2>) {
                 }
             }
         }
+
 }
 
 internal fun parse(input: String) =
-    Map(input.toSlice()
+    input.toSlice()
         .trim()
         .lines()
         .map(::parseFormation)
         .fold(HashSet<Vec2>()) { agg, it ->
             agg.addAll(it)
             agg
-        })
+        }
 
 // 498,4 -> 498,6 -> 496,6
 internal fun parseFormation(line: Slice) =
@@ -140,9 +158,19 @@ internal fun parseFormation(line: Slice) =
             }
     }
 
-internal fun sandAtRest(map: Map): Int {
-    @Suppress("ControlFlowWithEmptyBody")
-    while (map.dropSand()) {
+internal fun sandAtRestAbyss(rocks: HashSet<Vec2>) =
+    Map(rocks).let { map ->
+        @Suppress("ControlFlowWithEmptyBody")
+        while (map.dropSand()) {
+        }
+        map.sandAtRest
     }
-    return map.sandAtRest
-}
+
+internal fun sandAtRestFloor(rocks: HashSet<Vec2>) =
+    Map(rocks).let { map ->
+        map.addFloor()
+        @Suppress("ControlFlowWithEmptyBody")
+        while (map.dropSand()) {
+        }
+        map.sandAtRest
+    }
