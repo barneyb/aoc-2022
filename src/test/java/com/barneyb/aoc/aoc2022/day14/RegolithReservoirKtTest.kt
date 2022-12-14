@@ -1,7 +1,9 @@
 package com.barneyb.aoc.aoc2022.day14
 
+import com.barneyb.aoc.util.Input
 import com.barneyb.aoc.util.Slice
 import com.barneyb.util.HashSet
+import com.barneyb.util.Timing
 import com.barneyb.util.Vec2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -61,4 +63,14 @@ class RegolithReservoirKtTest {
     fun exampleTwo() {
         assertEquals(93, sandAtRestFloor(parse(EXAMPLE_ONE)))
     }
+
+    @Test
+    fun perf() {
+        val rocks = parse(Input.forProblem(::parse))
+        var r = Timing.benchmark(100) { sandAtRestAbyss(rocks) }
+        assertEquals(838, r.result)
+        r = Timing.benchmark(100) { sandAtRestFloor(rocks) }
+        assertEquals(27539, r.result)
+    }
+
 }

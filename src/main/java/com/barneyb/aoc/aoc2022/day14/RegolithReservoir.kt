@@ -6,6 +6,7 @@ import com.barneyb.aoc.util.toInt
 import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.HashMap
 import com.barneyb.util.HashSet
+import com.barneyb.util.Stack
 import com.barneyb.util.Vec2
 import kotlin.math.max
 import kotlin.math.min
@@ -63,17 +64,22 @@ internal class Map(rocks: HashSet<Vec2>) {
         sandAtRest++
     }
 
+    private val resumeFrom = Stack<Vec2>()
+
     /** Drop a unit of sand, and return whether it came to rest. */
     fun dropSand(): Boolean {
-        var curr = sourceOfSand
-        if (sites.contains(curr)) return false
+        if (sites.contains(sourceOfSand)) return false
+        var curr = if (resumeFrom.isEmpty()) sourceOfSand
+        else resumeFrom.pop()
         while (true) {
             val below = curr.down()
             if (sites.contains(below)) {
+                resumeFrom.push(curr)
                 val toLeft = below.left()
                 if (sites.contains(toLeft)) {
                     val toRight = below.right()
                     if (sites.contains(toRight)) {
+                        resumeFrom.pop()
                         rest(curr)
                         return true
                     } else {
