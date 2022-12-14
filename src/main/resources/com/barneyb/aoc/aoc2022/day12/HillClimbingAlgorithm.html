@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hill Climbing</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            overflow: clip;
+        }
+
+        svg {
+            width: 100vw;
+            height: 100vh;
+            border: 1px solid black;
+        }
+    </style>
+    <script>
+        function* genPaths(grid, [ sr, sc ], [ er, ec ]) {
+            const height = grid.length
+            const width = grid[0].length
+            const start = sr * width + sc
+            const end = er * width + ec
+            const visited = new Set()
+            const queue = [ [ start ] ]
+            const enqueue = (path, currEl, pos) => {
+                const el = grid[Math.floor(pos / width)][pos % width]
+                if (el <= currEl + 1) queue.push(path.concat(pos))
+            }
+            while (queue.length) {
+                const path = queue.shift()
+                const pos = path[path.length - 1]
+                if (visited.has(pos)) continue
+                yield path
+                visited.add(pos)
+                if (pos === end) return
+                const r = Math.floor(pos / width)
+                const c = pos % width
+                const elev = grid[r][c]
+                if (r > 0) { // go up
+                    enqueue(path, elev, pos - width)
+                }
+                if (c > 0) { // go left
+                    enqueue(path, elev, pos - 1)
+                }
+                if (r < height - 1) { // go down
+                    enqueue(path, elev, pos + width)
+                }
+                if (c < width - 1) { // go right
+                    enqueue(path, elev, pos + 1)
+                }
+            }
+        }
+
+        function setup(map) {
+            let start, end
+            const grid = map.trim()
+                .split('\n')
+                .map((l, row) => l.split("")
+                    .map((c, col) => {
+                        if (c === "S") {
+                            start = [ row, col ]
+                            return 0
+                        } else if (c === "E") {
+                            end = [ row, col ]
+                            return 25
+                        } else {
+                            return parseInt(c, 36) - 10
+                        }
+                    }),
+                )
+            const height = grid.length
+            const width = grid[0].length
+            const $map = d3.select("#map")
+                .attr("viewBox", `0 0 ${width * 3} ${height * 3}`)
+            const $rows = $map.selectAll("g")
+                .data(grid.map(l => l.map(h => ({
+                    h,
+                    fill: `hsl(80 ${50 + 50 * h / 26}% ${40 + 50 * h / 26}%)`,
+                }))))
+                .join("g")
+                .attr("data-d", JSON.stringify)
+                .attr("data-i", (_, i) => i)
+                .attr("transform", (_, i) => `translate(0 ${i * 3})`)
+            $rows.selectAll("rect")
+                .data(d => d)
+                .join("rect")
+                .attr("x", (_, i) => i * 3)
+                .attr("width", 3)
+                .attr("height", 3)
+                .style("fill", d => d.fill)
+                .attr("data-i", (_, i) => i)
+                .attr("data-d", JSON.stringify)
+            $map.selectAll("path")
+                .data([ null ])
+                .enter()
+                .append("path")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 1)
+                .attr("fill", "none")
+                .attr("stroke", "#ec0")
+            const iterator = genPaths(grid, start, end)
+            const interval = setInterval(() => {
+                let { value: p, done } = iterator.next()
+                if (done) clearInterval(interval)
+                if (p === undefined) return
+                $map.selectAll("path")
+                    .data([ p ])
+                    .attr("d", d => {
+                        let start
+                        const path = d.map((p, i) => {
+                            const r = Math.floor(p / width)
+                            const c = p % width
+                            const coords = `${c * 3 + 1.5},${r * 3 + 1.5}`
+                            if (i === 0) start = coords
+                            return coords
+                        });
+
+                        return `M${start} L${path.join(" ")}`
+                    })
+            }, 5)
+        }
+
+        // window.addEventListener("DOMContentLoaded", () =>
+        //     setup("Sabqponm\n" +
+        //         "abcryxxl\n" +
+        //         "accszExk\n" +
+        //         "acctuvwj\n" +
+        //         "abdefghi"))
+        fetch("HillClimbingAlgorithm.txt")
+            .then(r => r.text())
+            .then(setup)
+    </script>
+</head>
+<body>
+<svg viewBox="0 0 8 5" preserveAspectRatio="none" id="map">
+</svg>
+</body>
+</html>
