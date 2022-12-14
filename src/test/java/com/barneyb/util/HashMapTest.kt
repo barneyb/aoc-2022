@@ -19,7 +19,7 @@ class HashMapTest {
         m[1] = 'q'
         assertEquals('q', m[1])
         m.remove(1)
-        assertThrows<UnknownKeyException> {
+        assertThrows<HashMap.UnknownKeyException> {
             m[1]
         }
     }

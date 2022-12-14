@@ -46,37 +46,27 @@ public class Vec2 {
         throw new IllegalArgumentException("Unrecognized direction: " + dir);
     }
 
-    public Vec2 north() {
-        return north(1);
-    }
+    // @formatter:off
+    public Vec2 north() { return north(1); }
+    public Vec2 south() { return south(1); }
+    public Vec2  east() { return  east(1); }
+    public Vec2  west() { return  west(1); }
 
-    public Vec2 north(int delta) {
-        return new Vec2(x, y - delta);
-    }
+    public Vec2 north(int delta) { return new Vec2(x,         y - delta); }
+    public Vec2 south(int delta) { return new Vec2(x,         y + delta); }
+    public Vec2  east(int delta) { return new Vec2(x + delta, y        ); }
+    public Vec2  west(int delta) { return new Vec2(x - delta, y        ); }
 
-    public Vec2 south() {
-        return south(1);
-    }
+    public Vec2    up()          { return north(1); }
+    public Vec2  down()          { return south(1); }
+    public Vec2  left()          { return  west(1); }
+    public Vec2 right()          { return  east(1); }
 
-    public Vec2 south(int delta) {
-        return new Vec2(x, y + delta);
-    }
-
-    public Vec2 east() {
-        return east(1);
-    }
-
-    public Vec2 east(int delta) {
-        return new Vec2(x + delta, y);
-    }
-
-    public Vec2 west() {
-        return west(1);
-    }
-
-    public Vec2 west(int delta) {
-        return new Vec2(x - delta, y);
-    }
+    public Vec2    up(int delta) { return north(delta); }
+    public Vec2  down(int delta) { return south(delta); }
+    public Vec2  left(int delta) { return  west(delta); }
+    public Vec2 right(int delta) { return  east(delta); }
+    // @formatter:on
 
     public int getManhattanDistance() {
         return getManhattanDistance(origin());

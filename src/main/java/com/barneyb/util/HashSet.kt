@@ -1,11 +1,21 @@
 package com.barneyb.util
 
-class HashSet<E : Any> : Iterable<E> {
+class HashSet<E : Any>(vararg elements: E) : Iterable<E> {
 
     private val map = HashMap<E, Unit>()
 
+    init {
+        add(*elements)
+    }
+
     fun add(element: E) =
         map.put(element, Unit)
+
+    fun add(vararg elements: E) =
+        elements.forEach(::add)
+
+    fun addAll(other: HashSet<E>) =
+        other.forEach(::add)
 
     fun remove(element: E) =
         map.remove(element)

@@ -2,10 +2,10 @@ package com.barneyb.util
 
 import java.util.*
 
-class UnknownKeyException(key: Any) :
-    IllegalArgumentException("No '$key' is known")
-
 class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
+
+    class UnknownKeyException(key: Any) :
+        IllegalArgumentException("No '$key' is known")
 
     private data class Node<K, V>(
         val hash: Int,
@@ -68,6 +68,9 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
         size++
     }
 
+    operator fun set(key: K, value: V) =
+        put(key, value)
+
     fun remove(key: Any) {
         val hash = Objects.hashCode(key)
         val idx = index(hash)
@@ -123,7 +126,7 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
             if (key == curr.key) return curr
             curr = curr.next
         }
-        return curr
+        return null
     }
 
     override fun equals(other: Any?): Boolean {
@@ -189,6 +192,3 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
         }
 
 }
-
-operator fun <K : Any, V> HashMap<K, V>.set(key: K, value: V) =
-    put(key, value)
