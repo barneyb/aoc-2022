@@ -84,22 +84,27 @@ internal fun comparePackets(left: Packet, right: Packet): Int {
 }
 
 internal fun partOne(packets: List<Packet>) =
-    (packets.indices step 2).map { i ->
-        Pair(packets[i], packets[i + 1])
-    }
+    packets.asSequence()
+        .chunked(2)
         .withIndex()
-        .filter { (_, p) -> comparePackets(p.first, p.second) <= 0 }
-        .sumOf { (i, _) -> i + 1 }
+        .filter { (_, ps) -> comparePackets(ps[0], ps[1]) <= 0 }
+        .map(IndexedValue<*>::index)
+        .map(Int::inc)
+        .sum()
 
-internal fun decoderKey(packets: List<Packet>): Int {
-    val one = parsePacket("[[2]]")
-    val two = parsePacket("[[6]]")
-    val aug = ArrayList<Packet>(packets.size + 2)
-    aug.addAll(packets)
-    aug.add(one)
-    aug.add(two)
-    return aug.sortedWith(::comparePackets)
-        .withIndex()
-        .filter { (_, p) -> p === one || p === two }
-        .fold(1) { r, (i, _) -> r * (i + 1) }
-}
+internal fun decoderKey(packets: List<Packet>) =
+    ArrayList<Packet>(packets.size + 2).run {
+        val one = parsePacket("[[2]]")
+        val two = parsePacket("[[6]]")
+        addAll(packets)
+        add(one)
+        add(two)
+        sortWith(::comparePackets)
+        asSequence()
+            .withIndex()
+            .filter { (_, p) -> p === one || p === two }
+            .take(2)
+            .map(IndexedValue<*>::index)
+            .map(Int::inc)
+            .reduce(Int::times)
+    }
