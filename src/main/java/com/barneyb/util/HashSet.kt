@@ -8,13 +8,16 @@ class HashSet<E : Any>(vararg elements: E) : Iterable<E> {
         add(*elements)
     }
 
+    val size
+        get() = map.size
+
     fun add(element: E) =
         map.put(element, Unit)
 
     fun add(vararg elements: E) =
         elements.forEach(::add)
 
-    fun addAll(other: HashSet<E>) =
+    fun addAll(other: Iterable<E>) =
         other.forEach(::add)
 
     fun remove(element: E) =
