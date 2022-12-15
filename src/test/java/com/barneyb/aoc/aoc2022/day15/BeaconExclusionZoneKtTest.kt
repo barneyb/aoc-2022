@@ -1,5 +1,6 @@
 package com.barneyb.aoc.aoc2022.day15
 
+import com.barneyb.util.HashSet
 import com.barneyb.util.Vec2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -30,7 +31,7 @@ class BeaconExclusionZoneKtTest {
                 listOf(
                     Sensor(Vec2(2, 18), 7)
                 ),
-                listOf(
+                HashSet(
                     Vec2(-2, 15)
                 )
             ),
@@ -39,8 +40,57 @@ class BeaconExclusionZoneKtTest {
     }
 
     @Test
-    fun exampleOne() {
-        assertEquals(26, partOne(parse(EXAMPLE_ONE), 10))
+    fun print() {
+        val actual = parse(EXAMPLE_ONE).toString(/*Rect(0, 0, 20, 20)*/)
+        println("=".repeat(80))
+        println(actual)
+        println("=".repeat(80))
+        assertEquals(
+            """
+            
+                 |0        |10       |20       
+             0 ....S.......................
+             1 ......................S.....
+             2 ...............S............
+             3 ................SB..........
+             4 ............................
+             5 ............................
+             6 ............................
+             7 ..........S.......S.........
+             8 ............................
+             9 ............................
+            10 ....B.......................
+            11 ..S.........................
+            12 ............................
+            13 ............................
+            14 ..............S.......S.....
+            15 B...........................
+            16 ...........SB...............
+            17 ................S..........B
+            18 ....S.......................
+            19 ............................
+            20 ............S......S........
+            21 ............................
+            22 .......................B....
+            """.trimIndent(), actual
+        )
     }
 
+    @Test
+    fun exampleOne() {
+        assertEquals(26, countNonBeaconPositionsOnRow(parse(EXAMPLE_ONE), 10))
+    }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(
+            56000011,
+            distressBeaconTuningFrequency(parse(EXAMPLE_ONE), 0, 20),
+        )
+    }
+
+    @Test
+    fun tuneFreq() {
+        assertEquals(56000011, Vec2(14, 11).tuningFrequency)
+    }
 }

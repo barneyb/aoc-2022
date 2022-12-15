@@ -2,6 +2,10 @@ package com.barneyb.util
 
 class HashSet<E : Any>(vararg elements: E) : Iterable<E> {
 
+    constructor(elements: Iterable<E>) : this() {
+        addAll(elements)
+    }
+
     private val map = HashMap<E, Unit>()
 
     init {
@@ -17,8 +21,8 @@ class HashSet<E : Any>(vararg elements: E) : Iterable<E> {
     fun add(vararg elements: E) =
         elements.forEach(::add)
 
-    fun addAll(other: Iterable<E>) =
-        other.forEach(::add)
+    fun addAll(elements: Iterable<E>) =
+        elements.forEach(::add)
 
     fun remove(element: E) =
         map.remove(element)
