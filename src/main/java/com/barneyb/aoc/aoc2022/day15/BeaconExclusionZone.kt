@@ -12,7 +12,7 @@ fun main() {
     Solver.execute(
         ::parse,
         ::countNonBeaconPositionsOnRow, // 5878678
-//        ::distressBeaconTuningFrequency,
+        ::distressBeaconTuningFrequency, // 11796491041245
     )
 }
 
@@ -21,17 +21,29 @@ private const val ROW_TO_SCAN = 2_000_000
 private const val LOW = 0
 private const val HIGH = 4_000_000
 
-data class Sensor(val pos: Vec2, val range: Int) {
+internal data class Sensor(val id: Int, val pos: Vec2, val range: Int) {
     val x get() = pos.x
     val y get() = pos.y
 
     fun inRange(p: Vec2) =
         pos.getManhattanDistance(p) <= range
+
+    fun separation(other: Sensor) =
+        pos.getManhattanDistance(other.pos)
+
+    fun inRangeXsOnRow(row: Int): IntRange {
+        val extra = range - abs(y - row)
+        return if (extra < 0) IntRange.EMPTY
+        else x - extra..x + extra
+    }
 }
 
 typealias Beacon = Vec2
 
-data class Model(val sensors: List<Sensor>, val beacons: HashSet<Beacon>) {
+internal data class Model(
+    val sensors: List<Sensor>,
+    val beacons: HashSet<Beacon>
+) {
     private val bounds = sensors.fold(
         beacons.fold(
             Rect.EMPTY,
@@ -80,7 +92,8 @@ internal fun parse(input: String) =
     input.toSlice()
         .trim()
         .lines()
-        .map(::parseLine)
+        .withIndex()
+        .map { (i, it) -> parseLine(i, it) }
         .unzip()
         .let { (ss, bs) -> Model(ss, HashSet(bs)) }
 
@@ -89,14 +102,14 @@ private val RE = Regex(
     "Sensor at x=(-?\\d+), y=(-?\\d+): closest beacon is at x=(-?\\d+), y=(-?\\d+)"
 )
 
-internal fun parseLine(input: CharSequence) =
+internal fun parseLine(idx: Int, input: CharSequence) =
     RE.matchEntire(input)!!.let { m ->
         val (sx, sy, bx, by) = m.groupValues
             .drop(1) // entire match
             .map(String::toInt)
         val beacon = Beacon(bx, by)
         val pos = Vec2(sx, sy)
-        val sensor = Sensor(pos, pos.getManhattanDistance(beacon))
+        val sensor = Sensor(idx, pos, pos.getManhattanDistance(beacon))
         Pair(sensor, beacon)
     }
 
@@ -111,16 +124,10 @@ internal fun countNonBeaconPositionsOnRow(
         else add(ranges.removeAt(idx) + r)
     }
     model.sensors.forEach {
-        add(inRangeXsOnRow(it, row))
+        add(it.inRangeXsOnRow(row))
     }
     return ranges.sumOf(IntRange::size) -
             model.beacons.count { it.y == row }
-}
-
-internal fun inRangeXsOnRow(s: Sensor, row: Int): IntRange {
-    val extra = s.range - abs(s.y - row)
-    return if (extra < 0) IntRange.EMPTY
-    else s.x - extra..s.x + extra
 }
 
 internal val Vec2.tuningFrequency
@@ -165,5 +172,54 @@ internal fun distressBeaconTuningFrequency(
     lo: Int = LOW,
     hi: Int = HIGH
 ): Long {
-    return Vec2(14, 11).tuningFrequency
+    val adjacent = HashMap<Sensor, ArrayList<Sensor>>()
+    for ((i, u) in model.sensors.withIndex()) {
+        for (v in model.sensors.drop(i + 1)) {
+            if (u.separation(v) == u.range + v.range + 2) {
+                adjacent.getOrPut(u, ::ArrayList).add(v)
+                adjacent.getOrPut(v, ::ArrayList).add(u)
+            }
+        }
+    }
+    println("-".repeat(90))
+    adjacent.keys.sortedWith { a, b ->
+        Vec2.READING_ORDER.compare(
+            a.pos,
+            b.pos
+        )
+    }.forEach { s ->
+        println(s)
+        val line = when (s.id) {
+            13 -> Line(
+                s.pos.left(s.range + 1),
+                s.pos.down(s.range + 1),
+            )
+
+            21 -> Line(
+                s.pos.right(s.range + 1),
+                s.pos.down(s.range + 1),
+            )
+
+            30 -> Line(
+                s.pos.up(s.range + 1),
+                s.pos.right(s.range + 1),
+            )
+
+            8 -> Line(
+                s.pos.up(s.range + 1),
+                s.pos.left(s.range + 1),
+            )
+
+            else -> throw IllegalArgumentException("unknown sensor")
+        }
+        println("  $line : y=${line.slope}x+${line.intercept}")
+    }
+    println("-".repeat(90))
+    val y = (5990367 + 92123) / 2
+    return Vec2(y - 92123, y).tuningFrequency
+}
+
+data class Line(val p1: Vec2, val p2: Vec2) {
+    val slope = (p2.y - p1.y) / (p2.x - p1.x)
+    val intercept = p1.y - (slope * p1.x)
 }

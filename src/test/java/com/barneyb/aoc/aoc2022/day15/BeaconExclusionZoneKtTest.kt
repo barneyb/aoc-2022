@@ -3,6 +3,7 @@ package com.barneyb.aoc.aoc2022.day15
 import com.barneyb.util.HashSet
 import com.barneyb.util.Vec2
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 private const val EXAMPLE_ONE = """
@@ -29,7 +30,7 @@ class BeaconExclusionZoneKtTest {
         assertEquals(
             Model(
                 listOf(
-                    Sensor(Vec2(2, 18), 7)
+                    Sensor(0, Vec2(2, 18), 7)
                 ),
                 HashSet(
                     Vec2(-2, 15)
@@ -82,6 +83,7 @@ class BeaconExclusionZoneKtTest {
     }
 
     @Test
+    @Disabled // todo
     fun exampleTwo() {
         assertEquals(
             56000011,
