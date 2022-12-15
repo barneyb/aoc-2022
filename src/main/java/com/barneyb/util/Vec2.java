@@ -4,7 +4,6 @@ import lombok.Value;
 
 import java.util.Comparator;
 
-@SuppressWarnings("unused")
 @Value
 public class Vec2 {
 
@@ -18,7 +17,7 @@ public class Vec2 {
                     ? a.y - b.y
                     : a.x - b.x;
 
-    int x, y;
+    public int x, y;
 
     public static Vec2 origin() {
         return new Vec2(0, 0);

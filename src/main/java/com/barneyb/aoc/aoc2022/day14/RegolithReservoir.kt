@@ -4,12 +4,7 @@ import com.barneyb.aoc.util.Slice
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toInt
 import com.barneyb.aoc.util.toSlice
-import com.barneyb.util.HashMap
-import com.barneyb.util.HashSet
-import com.barneyb.util.Stack
-import com.barneyb.util.Vec2
-import kotlin.math.max
-import kotlin.math.min
+import com.barneyb.util.*
 
 fun main() {
     Solver.execute(
@@ -33,17 +28,13 @@ internal class Map(rocks: HashSet<Vec2>) {
     private val height: Int
 
     init {
-        var minx = sourceOfSand.x
-        var maxx = minx
-        var maxy = sourceOfSand.y
+        var bounds = Rect.EMPTY
         for (r in rocks) {
-            minx = min(minx, r.x)
-            maxx = max(maxx, r.x)
-            maxy = max(maxy, r.y)
+            bounds = bounds.coerceToInclude(r)
             sites[r] = Fill.ROCK
         }
-        xRange = minx - 2..maxx + 2
-        height = maxy + 1
+        xRange = bounds.x1 - 2..bounds.x2 + 2
+        height = bounds.y2 + 1
     }
 
     private var useFloor = false
