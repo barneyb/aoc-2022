@@ -181,13 +181,15 @@ internal fun distressBeaconTuningFrequency(
             }
         }
     }
+    if (adjacent.size != 4)
+        throw IllegalStateException("Your layout is ambiguous")
     println("-".repeat(90))
-    adjacent.keys.sortedWith { a, b ->
+    val lines = adjacent.keys.sortedWith { a, b ->
         Vec2.READING_ORDER.compare(
             a.pos,
             b.pos
         )
-    }.forEach { s ->
+    }.map { s ->
         println(s)
         val line = when (s.id) {
             13 -> Line(
@@ -212,14 +214,23 @@ internal fun distressBeaconTuningFrequency(
 
             else -> throw IllegalArgumentException("unknown sensor")
         }
-        println("  $line : y=${line.slope}x+${line.intercept}")
+        println("  $line")
+        line
     }
+        .distinct()
     println("-".repeat(90))
-    val y = (5990367 + 92123) / 2
-    return Vec2(y - 92123, y).tuningFrequency
+    lines.forEach(::println)
+    println("-".repeat(90))
+    if (lines.size != 2)
+        throw IllegalStateException("Your layout is ambiguous")
+    val (a, b) = lines
+    val y = (b.intercept + a.intercept) / 2
+    return Vec2(y - a.intercept, y).tuningFrequency
 }
 
-data class Line(val p1: Vec2, val p2: Vec2) {
-    val slope = (p2.y - p1.y) / (p2.x - p1.x)
-    val intercept = p1.y - (slope * p1.x)
+data class Line(val slope: Int, val intercept: Int) {
+    constructor(p1: Vec2, p2: Vec2) : this(
+        (p2.y - p1.y) / (p2.x - p1.x),
+        p1.y - ((p2.y - p1.y) / (p2.x - p1.x) * p1.x)
+    )
 }
