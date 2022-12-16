@@ -27,9 +27,15 @@ class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
         size++
     }
 
+    fun add(element: E) =
+        enqueue(element)
+
     fun enqueue(vararg elements: E) {
         elements.forEach(this::enqueue)
     }
+
+    fun add(vararg elements: E) =
+        enqueue(*elements)
 
     fun peek(): E {
         val h = head ?: throw NoSuchElementException()
@@ -48,6 +54,9 @@ class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
         size--
         return h.value
     }
+
+    fun remove() =
+        dequeue()
 
     fun isEmpty() =
         head == null

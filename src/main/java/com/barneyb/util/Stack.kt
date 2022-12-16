@@ -20,9 +20,15 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
         size++
     }
 
+    fun add(element: E) =
+        push(element)
+
     fun push(vararg elements: E) {
         elements.forEach(this::push)
     }
+
+    fun add(vararg elements: E) =
+        push(*elements)
 
     fun peek(): E {
         val h = head ?: throw NoSuchElementException()
@@ -35,6 +41,9 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
         size--
         return h.value
     }
+
+    fun remove() =
+        pop()
 
     fun isEmpty() =
         head == null
