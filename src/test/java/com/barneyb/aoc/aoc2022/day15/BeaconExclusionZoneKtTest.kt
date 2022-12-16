@@ -1,9 +1,10 @@
 package com.barneyb.aoc.aoc2022.day15
 
+import com.barneyb.aoc.util.Input
 import com.barneyb.util.HashSet
+import com.barneyb.util.Timing
 import com.barneyb.util.Vec2
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 private const val EXAMPLE_ONE = """
@@ -42,7 +43,7 @@ class BeaconExclusionZoneKtTest {
 
     @Test
     fun print() {
-        val actual = parse(EXAMPLE_ONE).toString(/*Rect(0, 0, 20, 20)*/)
+        val actual = parse(EXAMPLE_ONE).draw(/*Rect(0, 0, 20, 20)*/)
         println("=".repeat(80))
         println(actual)
         println("=".repeat(80))
@@ -83,7 +84,11 @@ class BeaconExclusionZoneKtTest {
     }
 
     @Test
-    @Disabled // todo
+    fun tuneFreq() {
+        assertEquals(56000011, Vec2(14, 11).tuningFrequency)
+    }
+
+    @Test
     fun exampleTwo() {
         assertEquals(
             56000011,
@@ -92,7 +97,12 @@ class BeaconExclusionZoneKtTest {
     }
 
     @Test
-    fun tuneFreq() {
-        assertEquals(56000011, Vec2(14, 11).tuningFrequency)
+    fun perf() {
+        val model = parse(Input.forProblem(::parse))
+        val r1 = Timing.benchmark(100) { countNonBeaconPositionsOnRow(model) }
+        assertEquals(5_878_678, r1.result)
+        val r2 = Timing.benchmark(100) { distressBeaconTuningFrequency(model) }
+        assertEquals(11_796_491_041_245, r2.result)
     }
+
 }

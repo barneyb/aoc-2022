@@ -58,13 +58,13 @@ public class Vec2 {
 
     public Vec2    up()          { return north(1); }
     public Vec2  down()          { return south(1); }
-    public Vec2  left()          { return  west(1); }
     public Vec2 right()          { return  east(1); }
+    public Vec2  left()          { return  west(1); }
 
     public Vec2    up(int delta) { return north(delta); }
     public Vec2  down(int delta) { return south(delta); }
-    public Vec2  left(int delta) { return  west(delta); }
     public Vec2 right(int delta) { return  east(delta); }
+    public Vec2  left(int delta) { return  west(delta); }
     // @formatter:on
 
     public int getManhattanDistance() {

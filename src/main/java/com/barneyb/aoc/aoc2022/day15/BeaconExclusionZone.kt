@@ -53,10 +53,7 @@ internal data class Model(
         r.coerceToInclude(s.pos)
     }
 
-    override fun toString() =
-        toString(bounds)
-
-    fun toString(bounds: Rect) =
+    fun draw(bounds: Rect = this.bounds) =
         buildString {
             val rowLabelWidth = max(
                 bounds.y1.toString().length,
@@ -172,65 +169,66 @@ internal fun distressBeaconTuningFrequency(
     lo: Int = LOW,
     hi: Int = HIGH
 ): Long {
-    val adjacent = HashMap<Sensor, ArrayList<Sensor>>()
+    val lines = mutableListOf<Line>()
     for ((i, u) in model.sensors.withIndex()) {
         for (v in model.sensors.drop(i + 1)) {
             if (u.separation(v) == u.range + v.range + 2) {
-                adjacent.getOrPut(u, ::ArrayList).add(v)
-                adjacent.getOrPut(v, ::ArrayList).add(u)
+                lines.add(
+                    Line.between(
+                        u.pos.north(u.range + 1),
+                        u.pos.west(u.range + 1),
+                    )
+                )
+                lines.add(
+                    Line.between(
+                        u.pos.north(u.range + 1),
+                        u.pos.east(u.range + 1),
+                    )
+                )
+                lines.add(
+                    Line.between(
+                        u.pos.south(u.range + 1),
+                        u.pos.west(u.range + 1),
+                    )
+                )
+                lines.add(
+                    Line.between(
+                        u.pos.south(u.range + 1),
+                        u.pos.east(u.range + 1),
+                    )
+                )
             }
         }
     }
-    if (adjacent.size != 4)
-        throw IllegalStateException("Your layout is ambiguous")
-    println("-".repeat(90))
-    val lines = adjacent.keys.sortedWith { a, b ->
-        Vec2.READING_ORDER.compare(
-            a.pos,
-            b.pos
-        )
-    }.map { s ->
-        println(s)
-        val line = when (s.id) {
-            13 -> Line(
-                s.pos.left(s.range + 1),
-                s.pos.down(s.range + 1),
-            )
-
-            21 -> Line(
-                s.pos.right(s.range + 1),
-                s.pos.down(s.range + 1),
-            )
-
-            30 -> Line(
-                s.pos.up(s.range + 1),
-                s.pos.right(s.range + 1),
-            )
-
-            8 -> Line(
-                s.pos.up(s.range + 1),
-                s.pos.left(s.range + 1),
-            )
-
-            else -> throw IllegalArgumentException("unknown sensor")
-        }
-        println("  $line")
-        line
-    }
+    val bySlope = lines
         .distinct()
-    println("-".repeat(90))
-    lines.forEach(::println)
-    println("-".repeat(90))
-    if (lines.size != 2)
-        throw IllegalStateException("Your layout is ambiguous")
-    val (a, b) = lines
-    val y = (b.intercept + a.intercept) / 2
-    return Vec2(y - a.intercept, y).tuningFrequency
+        .groupBy(Line::slope)
+    val points = HashSet<Vec2>()
+    bySlope[1]!!.forEach { a ->
+        bySlope[-1]!!.forEach { b ->
+            points.add(a.intersection(b))
+        }
+    }
+    return points
+        .filter { it.x >= lo && it.y >= lo }
+        .filter { it.x <= hi && it.y <= hi }
+        .filter { !model.beacons.contains(it) }
+        .first { p -> model.sensors.none { it.inRange(p) } }
+        .tuningFrequency
 }
 
-data class Line(val slope: Int, val intercept: Int) {
-    constructor(p1: Vec2, p2: Vec2) : this(
-        (p2.y - p1.y) / (p2.x - p1.x),
-        p1.y - ((p2.y - p1.y) / (p2.x - p1.x) * p1.x)
-    )
+internal data class Line(val slope: Int, val intercept: Int) {
+
+    companion object {
+        fun between(p1: Vec2, p2: Vec2) =
+            ((p2.y - p1.y) / (p2.x - p1.x)).let { slope ->
+                Line(slope, p1.y - slope * p1.x)
+            }
+    }
+
+    fun intersection(other: Line) =
+        ((other.intercept + intercept) / 2).let { y ->
+            Vec2(y - intercept, y)
+        }
+
 }
