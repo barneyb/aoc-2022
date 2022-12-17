@@ -15,7 +15,7 @@ internal data class Team(
         get() = valves[idx]
 
     override fun canOpen() =
-        valves[idx].rate > 0 && !open.contains(valves[idx])
+        minutesLeft > 1 && valves[idx].rate > 0 && !isOpen(valves[idx])
 
     override fun open(): Team {
         val mls = minutesLefts.copyOf()
@@ -29,6 +29,9 @@ internal data class Team(
         )
     }
 
+    override fun isOpen(v: Valve) =
+        open.contains(v)
+
     private fun nextIdx(mls: IntArray) =
         if (mls[0] >= mls[1]) 0 else 1
 
@@ -40,6 +43,20 @@ internal data class Team(
             valves = valves.copyOf().apply {
                 this[idx] = v
             },
+            idx = nextIdx(mls),
+        )
+    }
+
+    override fun moveAndOpen(v: Valve, dist: Int): Team {
+        val idx = idx
+        val n = moveTo(v, dist)
+        val mls = n.minutesLefts.copyOf()
+        mls[idx] -= 1
+        return n.copy(
+            minutesLefts = mls,
+            projected = n.projected + n.valves[idx].rate * n.minutesLefts[idx],
+            open = n.open + n.valves[idx],
+            rate = n.rate + n.valves[idx].rate,
             idx = nextIdx(mls),
         )
     }

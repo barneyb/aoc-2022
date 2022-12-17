@@ -8,7 +8,8 @@ fun main() {
     Solver.execute(
         ::parse,
         ::maximumPressureRelease, // 1880
-    ) { maximumPressureReleaseWithElephant(it, 1880) } // 2520
+        ::maximumPressureReleaseWithElephant, // 2520
+    )
 }
 
 internal data class Valve(
@@ -40,11 +41,12 @@ private fun buildGraph(valves: List<Valve>): Graph {
     for (v in valves) {
         index[v.name] = v
     }
-    val adjacent = HashMap<Valve, MutableMap<Valve, Int>>()
+    val adjacent = Graph()
     for (v in valves) {
         adjacent[v] = v.tunnels
             .associateByTo(mutableMapOf(), index::get) { 1 }
     }
+//    printGraphviz(adjacent)
     for (v in valves) {
         if (v.rate > 0 || v.name == START_VALVE) continue
         val adj = adjacent[v]
@@ -62,18 +64,46 @@ private fun buildGraph(valves: List<Valve>): Graph {
         }
         adjacent.remove(v)
     }
-//    println(buildString {
-//        append("graph {\n")
-//        for ((v, adj) in adjacent) {
-//            append("  ${v.name} [label=\"${v.name} (${v.rate})\"]\n")
-//            for ((o, d) in adj) {
+//    printGraphviz(adjacent)
+    val again = Graph()
+    for (v in adjacent.keys) {
+        val temp = mutableMapOf<Valve, Int>()
+        val queue = com.barneyb.util.Queue(Pair(v, 0))
+        while (queue.isNotEmpty()) {
+            val (s, d) = queue.remove()
+            if (!temp.contains(s) || temp.getValue(s) > d) {
+                temp[s] = d
+                s.tunnels.forEach {
+                    queue.enqueue(Pair(index[it], d + 1))
+                }
+            }
+        }
+        val adj = temp.filter { (s, _) ->
+            s !== v && s.rate > 0
+        }
+            .toMutableMap()
+        if (adj.isNotEmpty())
+            again[v] =
+                adj.toSortedMap(Comparator.comparingInt(Valve::rate))
+    }
+//    printGraphviz(again)
+    return again
+}
+
+@Suppress("unused")
+private fun printGraphviz(adjacent: HashMap<Valve, MutableMap<Valve, Int>>) {
+    println(buildString {
+        append("digraph {\n")
+        for ((v, adj) in adjacent) {
+            append("  ${v.name} [label=\"${v.name} (${v.rate})\"${if (v.name == START_VALVE) ",style=filled,fillcolor=lightgreen" else ""}];")
+            for ((o, d) in adj) {
 //                if (v.name < o.name)
-//                    append("  ${v.name} -- ${o.name} [label=$d]\n")
-//            }
-//        }
-//        append("}\n")
-//    })
-    return adjacent
+                append("${v.name} -> ${o.name} [label=$d];")
+            }
+            append('\n')
+        }
+        append("}\n")
+    })
 }
 
 private fun walk(
@@ -81,12 +111,12 @@ private fun walk(
     start: Step<*>,
     minimum: Int = Int.MIN_VALUE
 ): Int {
+//    printGraphviz(adjacent)
     val queue =
+//        com.barneyb.util.Queue<Step<*>>()
         com.barneyb.util.Stack<Step<*>>()
 //        java.util.PriorityQueue(
 //            Comparator.comparingInt(Step<*>::rate).reversed()
-//        )
-//        java.util.PriorityQueue(
 //            Comparator.comparingInt(Step<*>::projected).reversed()
 //        )
     queue.add(start)
@@ -96,23 +126,23 @@ private fun walk(
     while (queue.isNotEmpty()) {
         val step = queue.remove()
         val remaining = step.minutesLeft
+        if (++itr % 10_000_000 == 0L) println("${itr / 1000_000}M:${queue.size}) ${step.projected}:${step.projected + remaining * (maxRate - step.rate)} $step")
 //        if (itr > 1000_000_000) break
         if (remaining < 0) continue
         if (step.projected > best) {
             best = step.projected
-            println("  $best ($itr)")
+//            println("  $best ($itr)")
         }
         if (remaining == 0 || step.rate == maxRate) continue
         else if (step.projected + remaining * (maxRate - step.rate) < best) {
             continue
         }
-        if (++itr % 10_000_000 == 0L) println("${itr / 1000_000}M:${queue.size}) ${step.projected}:${step.projected + remaining * (maxRate - step.rate)} $step")
         for ((v, d) in adjacent[step.valve])
-            if (remaining - d >= 1)
-                queue.add(step.moveTo(v, d))
-        if (remaining > 1 && step.canOpen()) {
-            queue.add(step.open())
-        }
+            if (remaining - d > 1 && !step.isOpen(v))
+                queue.add(step.moveAndOpen(v, d))
+//        if (step.canOpen()) {
+//            queue.add(step.open())
+//        }
     }
     return best
 }
