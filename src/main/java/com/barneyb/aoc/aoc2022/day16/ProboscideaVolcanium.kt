@@ -34,7 +34,7 @@ internal fun parse(input: String) =
 
 private const val START_VALVE = "AA"
 
-internal typealias Graph = HashMap<Valve, MutableMap<Valve, Int>>
+private typealias Graph = HashMap<Valve, MutableMap<Valve, Int>>
 
 private fun buildGraph(valves: List<Valve>): Graph {
     val index = HashMap<String, Valve>()
@@ -91,13 +91,12 @@ private fun buildGraph(valves: List<Valve>): Graph {
 }
 
 @Suppress("unused")
-private fun printGraphviz(adjacent: HashMap<Valve, MutableMap<Valve, Int>>) {
+private fun printGraphviz(adjacent: Graph) {
     println(buildString {
         append("digraph {\n")
         for ((v, adj) in adjacent) {
             append("  ${v.name} [label=\"${v.name} (${v.rate})\"${if (v.name == START_VALVE) ",style=filled,fillcolor=lightgreen" else ""}];")
             for ((o, d) in adj) {
-//                if (v.name < o.name)
                 append("${v.name} -> ${o.name} [label=$d];")
             }
             append('\n')
@@ -112,26 +111,15 @@ private fun walk(
     minimum: Int = Int.MIN_VALUE
 ): Int {
 //    printGraphviz(adjacent)
-    val queue =
-//        com.barneyb.util.Queue<Step<*>>()
-        com.barneyb.util.Stack<Step<*>>()
-//        java.util.PriorityQueue(
-//            Comparator.comparingInt(Step<*>::rate).reversed()
-//            Comparator.comparingInt(Step<*>::projected).reversed()
-//        )
-    queue.add(start)
+    val queue = com.barneyb.util.Stack(start)
     val maxRate = adjacent.keys.sumOf(Valve::rate)
     var best = minimum
-    var itr = 0L
     while (queue.isNotEmpty()) {
         val step = queue.remove()
         val remaining = step.minutesLeft
-        if (++itr % 10_000_000 == 0L) println("${itr / 1000_000}M:${queue.size}) ${step.projected}:${step.projected + remaining * (maxRate - step.rate)} $step")
-//        if (itr > 1000_000_000) break
         if (remaining < 0) continue
         if (step.projected > best) {
             best = step.projected
-//            println("  $best ($itr)")
         }
         if (remaining == 0 || step.rate == maxRate) continue
         else if (step.projected + remaining * (maxRate - step.rate) < best) {
@@ -140,9 +128,6 @@ private fun walk(
         for ((v, d) in adjacent[step.valve])
             if (remaining - d > 1 && !step.isOpen(v))
                 queue.add(step.moveAndOpen(v, d))
-//        if (step.canOpen()) {
-//            queue.add(step.open())
-//        }
     }
     return best
 }

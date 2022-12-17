@@ -14,28 +14,13 @@ internal data class Team(
     override val valve
         get() = valves[idx]
 
-    override fun canOpen() =
-        minutesLeft > 1 && valves[idx].rate > 0 && !isOpen(valves[idx])
-
-    override fun open(): Team {
-        val mls = minutesLefts.copyOf()
-        mls[idx] -= 1
-        return copy(
-            minutesLefts = mls,
-            projected = projected + valves[idx].rate * minutesLefts[idx],
-            open = open + valves[idx],
-            rate = rate + valves[idx].rate,
-            idx = nextIdx(mls),
-        )
-    }
-
     override fun isOpen(v: Valve) =
         open.contains(v)
 
     private fun nextIdx(mls: IntArray) =
         if (mls[0] >= mls[1]) 0 else 1
 
-    override fun moveTo(v: Valve, dist: Int): Team {
+    private fun moveTo(v: Valve, dist: Int): Team {
         val mls = minutesLefts.copyOf()
         mls[idx] -= dist
         return copy(
