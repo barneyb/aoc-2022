@@ -41,4 +41,12 @@ class ProboscideaVolcaniumKtTest {
         assertEquals(1651, maximumPressureRelease(parse(EXAMPLE_ONE)))
     }
 
+    @Test
+    fun exampleTwo() {
+        assertEquals(
+            1707,
+            maximumPressureReleaseWithElephant(parse(EXAMPLE_ONE))
+        )
+    }
+
 }

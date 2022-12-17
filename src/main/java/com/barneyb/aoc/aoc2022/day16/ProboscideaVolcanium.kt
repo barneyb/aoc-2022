@@ -3,13 +3,12 @@ package com.barneyb.aoc.aoc2022.day16
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.HashMap
-import com.barneyb.util.Stack
 
 fun main() {
     Solver.execute(
         ::parse,
         ::maximumPressureRelease, // 1880
-    )
+    ) { maximumPressureReleaseWithElephant(it, 1880) } // 2520
 }
 
 internal data class Valve(
@@ -32,35 +31,11 @@ internal fun parse(input: String) =
             Valve(name, rate.toInt(), tunnels.split(',').map(String::trim))
         }
 
-private data class Step(
-    val minutesLeft: Int,
-    val valve: Valve,
-    val projected: Int = 0,
-    val open: Set<Valve> = emptySet(),
-    val rate: Int = 0,
-) {
-    fun canOpen() =
-        valve.rate > 0 && !open.contains(valve)
-
-    fun open() =
-        copy(
-            minutesLeft = minutesLeft - 1,
-            projected = projected + valve.rate * minutesLeft,
-            open = open + valve,
-            rate = rate + valve.rate
-        )
-
-    fun moveTo(v: Valve, dist: Int) =
-        copy(
-            valve = v,
-            minutesLeft = minutesLeft - dist,
-        )
-
-}
-
 private const val START_VALVE = "AA"
 
-private fun buildGraph(valves: List<Valve>): HashMap<Valve, MutableMap<Valve, Int>> {
+internal typealias Graph = HashMap<Valve, MutableMap<Valve, Int>>
+
+private fun buildGraph(valves: List<Valve>): Graph {
     val index = HashMap<String, Valve>()
     for (v in valves) {
         index[v.name] = v
@@ -101,25 +76,63 @@ private fun buildGraph(valves: List<Valve>): HashMap<Valve, MutableMap<Valve, In
     return adjacent
 }
 
-internal fun maximumPressureRelease(valves: List<Valve>): Int {
-    val adjacent = buildGraph(valves)
-    val queue = Stack(Step(29, valves.first { it.name == START_VALVE }))
-    val maxRate = valves.sumOf(Valve::rate)
-    var best = Int.MIN_VALUE
+private fun walk(
+    adjacent: Graph,
+    start: Step<*>,
+    minimum: Int = Int.MIN_VALUE
+): Int {
+    val queue =
+        com.barneyb.util.Stack<Step<*>>()
+//        java.util.PriorityQueue(
+//            Comparator.comparingInt(Step<*>::rate).reversed()
+//        )
+//        java.util.PriorityQueue(
+//            Comparator.comparingInt(Step<*>::projected).reversed()
+//        )
+    queue.add(start)
+    val maxRate = adjacent.keys.sumOf(Valve::rate)
+    var best = minimum
+    var itr = 0L
     while (queue.isNotEmpty()) {
         val step = queue.remove()
         val remaining = step.minutesLeft
+//        if (itr > 1000_000_000) break
         if (remaining < 0) continue
-        if (step.projected > best) best = step.projected
-        if (remaining == 0) continue
+        if (step.projected > best) {
+            best = step.projected
+            println("  $best ($itr)")
+        }
+        if (remaining == 0 || step.rate == maxRate) continue
         else if (step.projected + remaining * (maxRate - step.rate) < best) {
             continue
         }
-        if (remaining > 1 && step.canOpen())
-            queue.add(step.open())
+        if (++itr % 10_000_000 == 0L) println("${itr / 1000_000}M:${queue.size}) ${step.projected}:${step.projected + remaining * (maxRate - step.rate)} $step")
         for ((v, d) in adjacent[step.valve])
             if (remaining - d >= 1)
                 queue.add(step.moveTo(v, d))
+        if (remaining > 1 && step.canOpen()) {
+            queue.add(step.open())
+        }
     }
     return best
+}
+
+internal fun maximumPressureRelease(valves: List<Valve>) =
+    walk(
+        buildGraph(valves),
+        Solo(29, valves.first { it.name == START_VALVE })
+    )
+
+internal fun maximumPressureReleaseWithElephant(
+    valves: List<Valve>,
+    minimum: Int = Int.MIN_VALUE
+): Int {
+    val min = 25
+    val start = valves.first { it.name == START_VALVE }
+    val graph = buildGraph(valves)
+    return walk(
+        graph,
+        Team(intArrayOf(min, min), arrayOf(start, start)),
+        minimum,
+    )
 }
