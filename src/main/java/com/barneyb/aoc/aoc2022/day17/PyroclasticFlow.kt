@@ -70,19 +70,22 @@ internal fun heightOfTower(jets: CharSequence, rockCount: Int = 2022): Int {
     var heightOfTower = 0
 
     @Suppress("unused")
-    fun draw(rock: Rock?) =
+    fun draw(rock: Rock? = null) =
         buildString {
-            for (y in min(heightOfTower, rock?.top ?: 0)..0) {
+            for (y in min(-heightOfTower, rock?.top ?: 0)..0) {
                 for (x in -1..WIDTH) {
-                    if (x !in 0 until WIDTH) append('|')
+                    if (x < 0 || x == WIDTH) append('|')
                     else if (atRest.contains(Vec2(x, y))) append('#')
-                    else if (rock != null)
-                        if (rock.parts.contains(Vec2(x, y))) append('@')
-                        else append('.')
+                    else if (rock == null) append('.')
+                    else if (rock.parts.contains(Vec2(x, y))) append('@')
+                    else append('.')
                 }
                 append('\n')
             }
-            append("+-------+\n")
+            append('+')
+            append("-".repeat(WIDTH))
+            append('+')
+            append('\n')
         }
 
     fun valid(r: Rock) =
