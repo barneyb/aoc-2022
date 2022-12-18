@@ -30,4 +30,10 @@ class PyroclasticFlowKtTest {
     fun exampleOne() {
         assertEquals(3068, heightOfTower(parse(EXAMPLE_ONE)))
     }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(1514285714288, heightOfReallyTallTower(parse(EXAMPLE_ONE)))
+    }
+
 }

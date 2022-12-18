@@ -3,6 +3,7 @@ package com.barneyb.aoc.aoc2022.day17
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.Dir
+import com.barneyb.util.HashMap
 import com.barneyb.util.HashSet
 import com.barneyb.util.Vec2
 import kotlin.math.max
@@ -12,10 +13,13 @@ fun main() {
     Solver.execute(
         ::parse,
         ::heightOfTower, // 3161
+        ::heightOfReallyTallTower // 1575931232076
     )
 }
 
 private const val WIDTH = 7
+
+private const val ROCK_COUNT = 1_000_000_000_000
 
 internal data class Rock(
     val parts: List<Vec2>,
@@ -63,11 +67,12 @@ internal val rocks = listOf(
 internal fun parse(input: String) =
     input.toSlice().trim()
 
-internal fun heightOfTower(jets: CharSequence, rockCount: Int = 2022): Int {
+internal fun heightOfTower(jets: CharSequence, rockCount: Long = 2022): Long {
     var idxRock = 0
     var idxJet = 0
     val atRest = HashSet<Vec2>()
     var heightOfTower = 0
+    val shapesOfTops = HashMap<List<Int>, Pair<Int, Int>>()
 
     @Suppress("unused")
     fun draw(rock: Rock? = null) =
@@ -95,12 +100,14 @@ internal fun heightOfTower(jets: CharSequence, rockCount: Int = 2022): Int {
                     !atRest.contains(it)
         }
 
-    repeat(rockCount) {
-        var rock = rocks[idxRock++ % rocks.size]
+    while (idxRock < rockCount) {
+        val ir = idxRock++ % rocks.size
+        var rock = rocks[ir]
         rock = rock.move(Dir.NORTH, heightOfTower + rock.height + 2)
         rock = rock.move(Dir.EAST, 2)
         while (true) {
-            val jet = when (jets[idxJet++ % jets.length]) {
+            val ij = idxJet++ % jets.length
+            val jet = when (jets[ij]) {
                 '<' -> rock.move(Dir.WEST)
                 '>' -> rock.move(Dir.EAST)
                 else -> throw IllegalArgumentException("bad jet")
@@ -111,10 +118,31 @@ internal fun heightOfTower(jets: CharSequence, rockCount: Int = 2022): Int {
             else {
                 atRest.addAll(rock.parts)
                 heightOfTower = max(heightOfTower, -rock.top)
+                val shape = (0 until WIDTH).map { x ->
+                    var v = Vec2(x, -heightOfTower)
+                    while (!atRest.contains(v) && v.y <= 0) {
+                        v = v.south()
+                    }
+                    heightOfTower + v.y - 1
+                } + listOf(ir, ij)
+                if (shapesOfTops.contains(shape)) {
+                    val (preIdx, preHeight) = shapesOfTops[shape]
+                    val cycleLen = idxRock - preIdx
+                    val heightPerCycle = heightOfTower - preHeight
+                    val remaining = rockCount - preIdx
+                    return heightOfTower(
+                        jets,
+                        preIdx.toLong() + remaining % cycleLen
+                    ) + (remaining / cycleLen) * heightPerCycle
+                } else {
+                    shapesOfTops[shape] = Pair(idxRock, heightOfTower)
+                }
                 break
             }
         }
     }
-
-    return heightOfTower
+    return heightOfTower.toLong()
 }
+
+internal fun heightOfReallyTallTower(jets: CharSequence): Long =
+    heightOfTower(jets, ROCK_COUNT)
