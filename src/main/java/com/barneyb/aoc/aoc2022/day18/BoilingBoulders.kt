@@ -1,9 +1,6 @@
 package com.barneyb.aoc.aoc2022.day18
 
-import com.barneyb.aoc.util.Slice
-import com.barneyb.aoc.util.Solver
-import com.barneyb.aoc.util.toInt
-import com.barneyb.aoc.util.toSlice
+import com.barneyb.aoc.util.*
 import com.barneyb.util.HashSet
 import com.barneyb.util.Queue
 import com.barneyb.util.Vec3
@@ -41,12 +38,17 @@ internal fun externalSurfaceArea(cubes: HashSet<Vec3>): Int {
     val visited = HashSet<Vec3>()
     var faces = 0
     val queue = Queue<Vec3>()
-    val lo = -1
-    val hi = 20
+    // this assumes the droplet is "against" the origin and cubic-ish.
+    val range = cubes.fold(1..1) { r, v ->
+        r + v.x + v.y + v.z
+    }.let { r ->
+        r.first - 1..r.last + 1
+    }
+
     fun check(v: Vec3) {
-        if (v.x !in lo..hi) return
-        if (v.y !in lo..hi) return
-        if (v.z !in lo..hi) return
+        if (v.x !in range) return
+        if (v.y !in range) return
+        if (v.z !in range) return
         if (visited.contains(v)) return
         if (cubes.contains(v)) {
             faces++
@@ -55,7 +57,8 @@ internal fun externalSurfaceArea(cubes: HashSet<Vec3>): Int {
             queue.enqueue(v)
         }
     }
-    check(Vec3(lo, lo, lo))
+
+    check(Vec3(range.first, range.first, range.first))
     while (!queue.isEmpty()) {
         val curr = queue.dequeue()
         check(curr.mx(1))

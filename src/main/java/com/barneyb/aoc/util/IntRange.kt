@@ -16,6 +16,9 @@ fun IntRange.abuts(other: IntRange): Boolean =
     other.first == last + 1 ||
             other.last == first - 1
 
+operator fun IntRange.plus(n: Int): IntRange =
+    if (contains(n)) this else min(n, first)..max(n, last)
+
 operator fun IntRange.plus(other: IntRange): IntRange {
     if (fullyContains(other)) return this
     if (overlaps(other) || abuts(other)) {
