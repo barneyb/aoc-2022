@@ -11,6 +11,22 @@ public class Vec3 implements Comparable<Vec3> {
         return Math.abs(x - dest.x) + Math.abs(y - dest.y) + Math.abs(z - dest.z);
     }
 
+    public Vec3 mx(int delta) {
+        return m(delta, 0, 0);
+    }
+
+    public Vec3 my(int delta) {
+        return m(0, delta, 0);
+    }
+
+    public Vec3 mz(int delta) {
+        return m(0, 0, delta);
+    }
+
+    public Vec3 m(int dx, int dy, int dz) {
+        return new Vec3(x + dx, y + dy, z + dz);
+    }
+
     @Override
     public int compareTo(Vec3 o) {
         if (x != o.x) return x - o.x;
