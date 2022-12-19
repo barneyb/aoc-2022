@@ -30,9 +30,11 @@ class Queue<E>(vararg elements: E) : Iterable<E>, Cloneable {
     fun add(element: E) =
         enqueue(element)
 
-    fun enqueue(vararg elements: E) {
+    fun addAll(elements: Collection<E>) =
+        elements.forEach(this::add)
+
+    fun enqueue(vararg elements: E) =
         elements.forEach(this::enqueue)
-    }
 
     fun add(vararg elements: E) =
         enqueue(*elements)

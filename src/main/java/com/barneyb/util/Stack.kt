@@ -23,9 +23,11 @@ class Stack<E>(vararg elements: E) : Iterable<E>, Cloneable {
     fun add(element: E) =
         push(element)
 
-    fun push(vararg elements: E) {
+    fun addAll(elements: Collection<E>) =
+        elements.forEach(this::add)
+
+    fun push(vararg elements: E) =
         elements.forEach(this::push)
-    }
 
     fun add(vararg elements: E) =
         push(*elements)
