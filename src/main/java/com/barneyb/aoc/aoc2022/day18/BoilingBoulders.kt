@@ -14,14 +14,16 @@ fun main() {
 }
 
 internal fun parse(input: String) =
-    HashSet(input.toSlice()
-        .trim()
-        .lines()
-        .map {
-            val (x, y, z) = it.split(",")
-                .map(Slice::toInt)
-            Vec3(x, y, z)
-        })
+    HashSet<Vec3>().apply {
+        input.toSlice()
+            .trim()
+            .lines()
+            .forEach {
+                val (x, y, z) = it.split(",")
+                    .map(Slice::toInt)
+                add(Vec3(x, y, z))
+            }
+    }
 
 internal fun surfaceArea(cubes: HashSet<Vec3>): Int {
     val v = cubes.size
