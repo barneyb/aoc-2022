@@ -1,7 +1,5 @@
 package com.barneyb.aoc.aoc2022.day19
 
-private const val MINUTES = 24
-
 data class Step(
     val minute: Int,
     val rate: IntArray,
@@ -14,8 +12,6 @@ data class Step(
         intArrayOf(0, 0, 0, 0), // an empty pool
     )
 
-    val done get() = minute == MINUTES
-    val remaining get() = MINUTES - minute
     val geodeCount get() = pool[3]
 
     fun tick() =
@@ -25,7 +21,11 @@ data class Step(
             parent = this,
         )
 
-    fun build(cost: IntArray, robot: IntArray): Step? {
+    fun build(
+        cost: IntArray,
+        robot: IntArray,
+        withinMinutes: Int = 99999
+    ): Step? {
         // building takes a turn after all resources are available
         val readyIn = 1 + cost.indices.maxOf { i ->
             val needed = cost[i] - pool[i]
@@ -36,7 +36,7 @@ data class Step(
             if (turns == 0 || needed % rate > 0) turns++
             turns.coerceAtLeast(0)
         }
-        return if (readyIn < remaining)
+        return if (readyIn <= withinMinutes)
             copy(
                 minute = minute + readyIn,
                 rate = rate + robot,

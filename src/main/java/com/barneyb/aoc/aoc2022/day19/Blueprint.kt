@@ -42,41 +42,43 @@ data class Blueprint(
             }
     }
 
-    val maxGeodes by lazy {
-        var best = Step()
+    private val bestsByMinute = Array<Step?>(MINUTES_PART_TWO + 1) { null }
+
+    fun maxGeodesIn(minutes: Int): Int {
+        if (bestsByMinute[minutes] != null)
+            return bestsByMinute[minutes]!!.geodeCount
+        bestsByMinute[minutes] = Step()
         val queue = Stack<Step>()
-        queue.add(best)
+        queue.add(bestsByMinute[minutes]!!)
         var itr = 0L
         while (queue.isNotEmpty()) {
             var curr = queue.remove()
             itr++
 
-            if (curr.remaining == 1) {
+            val timeLeft = minutes - curr.minute - 1
+            if (timeLeft == 0) {
                 // can't build anything useful the final minute, so short circuit
                 curr = curr.tick()
                 itr++
             }
 
-            if (curr.done) {
-                if (curr.geodeCount > best.geodeCount)
-                    best = curr
+            if (curr.minute == minutes) {
+                if (curr.geodeCount > bestsByMinute[curr.minute]!!.geodeCount)
+                    bestsByMinute[curr.minute] = curr
                 continue
             }
 
             val before = queue.size
-            curr.build(costOfOre, oneOre)?.also(queue::add)
-            curr.build(costOfClay, oneClay)?.also(queue::add)
-            curr.build(costOfObsidian, oneObsidian)?.also(queue::add)
-            curr.build(costOfGeode, oneGeode)?.also(queue::add)
+            curr.build(costOfOre, oneOre, timeLeft)?.also(queue::add)
+            curr.build(costOfClay, oneClay, timeLeft)?.also(queue::add)
+            curr.build(costOfObsidian, oneObsidian, timeLeft)?.also(queue::add)
+            curr.build(costOfGeode, oneGeode, timeLeft)?.also(queue::add)
             if (queue.size == before)
                 queue.add(curr.tick())
         }
 
-        best.geodeCount
+        return bestsByMinute[minutes]!!.geodeCount
     }
-
-    val qualityLevel
-        get() = id * maxGeodes
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -6,11 +6,6 @@ import org.junit.jupiter.api.Test
 class StepTest {
 
     @Test
-    fun gues() {
-        println((1..30).sumOf { it * 10 })
-    }
-
-    @Test
     fun bunchaSteps() {
         Assertions.assertEquals(
             Step(13, intArrayOf(2, 1, 1, 1), intArrayOf(5, 3, 1, 3)),

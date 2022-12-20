@@ -38,16 +38,16 @@ class NotEnoughMineralsKtTest {
     fun blueprintOne() {
         val line = EXAMPLE_ONE.trim().lines()[0]
         val bp = Blueprint.parse(line)
-        assertEquals(9, bp.maxGeodes)
-        assertEquals(9, bp.qualityLevel)
+        assertEquals(9, bp.maxGeodesIn(MINUTES_PART_ONE))
+//        assertEquals(56, bp.maxGeodesIn(MINUTES_PART_TWO))
     }
 
     @Test
     fun blueprintTwo() {
         val line = EXAMPLE_ONE.trim().lines()[1]
         val bp = Blueprint.parse(line)
-        assertEquals(12, bp.maxGeodes)
-        assertEquals(24, bp.qualityLevel)
+        assertEquals(12, bp.maxGeodesIn(MINUTES_PART_ONE))
+//        assertEquals(62, bp.maxGeodesIn(MINUTES_PART_TWO))
     }
 
     @Test
@@ -55,7 +55,7 @@ class NotEnoughMineralsKtTest {
         val line =
             "Blueprint 2: Each ore robot costs 4 ore. Each clay robot costs 4 ore. Each obsidian robot costs 2 ore and 16 clay. Each geode robot costs 4 ore and 16 obsidian."
         val bp = Blueprint.parse(line)
-        assertEquals(0, bp.maxGeodes) // a legit zero
+        assertEquals(0, bp.maxGeodesIn(MINUTES_PART_ONE)) // a legit zero
     }
 
     @Test
@@ -79,13 +79,13 @@ class NotEnoughMineralsKtTest {
         // @formatter:on
 
         fun Step.build(type: IntArray) =
-            build(type, costs[type])!!
+            build(type, costs[type], 1)!!
 
         var s = Step().also(::println) // 0
         s = s.tick().also(::println)
         s = s.tick().also(::println)
 
-        val expected = costs.map { s.build(it.first, it.second) }
+        val expected = costs.map { s.build(it.first, it.second, 1) }
         s = s.build(clay).also(::println) // 3
         assertContains(expected, s)
 
@@ -111,11 +111,6 @@ class NotEnoughMineralsKtTest {
         s = s.tick().also(::println)
         s = s.tick().also(::println)
         assertEquals(9, s.geodeCount)
-    }
-
-    @Test
-    fun exampleOne() {
-        assertEquals(33, totalQualityLevel(parse(EXAMPLE_ONE)))
     }
 
 }

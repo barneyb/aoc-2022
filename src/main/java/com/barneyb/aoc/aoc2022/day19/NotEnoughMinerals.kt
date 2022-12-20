@@ -10,6 +10,10 @@ fun main() {
     )
 }
 
+internal const val MINUTES_PART_ONE = 24
+
+internal const val MINUTES_PART_TWO = 32
+
 internal fun parse(input: String) =
     input.toSlice()
         .trim()
@@ -17,4 +21,9 @@ internal fun parse(input: String) =
         .map(Blueprint::parse)
 
 internal fun totalQualityLevel(bps: List<Blueprint>) =
-    bps.sumOf(Blueprint::qualityLevel)
+    bps.sumOf { it.id * it.maxGeodesIn(MINUTES_PART_ONE) }
+
+internal fun maxFromThree(bps: List<Blueprint>) =
+    bps.take(3)
+        .map { it.maxGeodesIn(MINUTES_PART_TWO) }
+        .fold(1, Int::times)
