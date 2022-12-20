@@ -71,14 +71,14 @@ class NotEnoughMineralsKtTest {
         // @formatter:off
         // cost to harvest
         val costs = HashMap(
-            ore       to intArrayOf(1, 0, 0, 0),
-            clay      to intArrayOf(0, 1, 0, 0),
-            obsidian  to intArrayOf(0, 0, 1, 0),
-            geode     to intArrayOf(0, 0, 0, 1),
+            ore       to oneOre,
+            clay      to oneClay,
+            obsidian  to oneObsidian,
+            geode     to oneGeode,
         )
         // @formatter:on
 
-        fun Step.build(type: IntArray) =
+        fun Step.build(type: Long) =
             build(type, costs[type], 1)!!
 
         var s = Step().also(::println) // 0

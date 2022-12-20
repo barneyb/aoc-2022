@@ -6,7 +6,7 @@ import com.barneyb.aoc.util.toSlice
 fun main() {
     Solver.execute(
         ::parse,
-        ::totalQualityLevel, // 1703 (24 sec)
+        ::totalQualityLevel, // 1703 (6 sec)
     )
 }
 
@@ -26,4 +26,4 @@ internal fun totalQualityLevel(bps: List<Blueprint>) =
 internal fun maxFromThree(bps: List<Blueprint>) =
     bps.take(3)
         .map { it.maxGeodesIn(MINUTES_PART_TWO) }
-        .fold(1, Int::times)
+        .fold(1, Long::times)

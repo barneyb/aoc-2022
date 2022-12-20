@@ -2,41 +2,65 @@ package com.barneyb.aoc.aoc2022.day19
 
 data class Step(
     val minute: Int,
-    val rate: IntArray,
-    val pool: IntArray,
+    val rate: Long,
+    val pool: Long,
     val parent: Step? = null, // NOT PART OF EQUALITY!
 ) {
-    constructor() : this(
-        0, // start with
-        intArrayOf(1, 0, 0, 0), // one ore bot
-        intArrayOf(0, 0, 0, 0), // an empty pool
-    )
+    // start with one ore bot and an empty pool
+    constructor() : this(0, oneOre, 0)
 
-    val geodeCount get() = pool[3]
+    constructor(
+        minute: Int,
+        rate: IntArray,
+        pool: IntArray,
+    ) : this(minute, compress(rate), compress(pool))
 
-    fun tick() =
+    @Suppress("unused")
+    val oreCount get() = (pool shr 0) and 0xFFFF
+
+    @Suppress("unused")
+    val clayCount get() = (pool shr 16) and 0xFFFF
+
+    @Suppress("unused")
+    val obsidianCount get() = (pool shr 32) and 0xFFFF
+
+    val geodeCount get() = (pool shr 48) and 0xFFFF
+
+    fun tick(n: Int = 1) =
         copy(
-            minute = minute + 1,
-            pool = pool + rate,
+            minute = minute + n,
+            pool = pool + rate * n,
             parent = this,
         )
 
     fun build(
         cost: IntArray,
         robot: IntArray,
-        withinMinutes: Int = 99999
+        withinMinutes: Int = 99999,
+    ) =
+        build(compress(cost), compress(robot), withinMinutes)
+
+    private fun turnsFor(cost: Long, shift: Int): Int {
+        val needed = ((cost shr shift) and 0xFFFF) -
+                ((pool shr shift) and 0xFFFF)
+        if (needed <= 0) return 0
+        val rate = (rate shr shift) and 0xFFFF
+        if (rate == 0L) return 99999
+        var turns = needed / rate
+        if (turns == 0L || needed % rate > 0) turns++
+        return turns.toInt().coerceAtLeast(0)
+    }
+
+    fun build(
+        cost: Long,
+        robot: Long,
+        withinMinutes: Int = 99999,
     ): Step? {
+        var readyIn = turnsFor(cost, 0)
+        readyIn = readyIn.coerceAtLeast(turnsFor(cost, 16))
+        readyIn = readyIn.coerceAtLeast(turnsFor(cost, 32))
         // building takes a turn after all resources are available
-        val readyIn = 1 + cost.indices.maxOf { i ->
-            val needed = cost[i] - pool[i]
-            if (needed <= 0) return@maxOf 0
-            val rate = rate[i]
-            if (rate == 0) return@maxOf 99999
-            var turns = needed / rate
-            if (turns == 0 || needed % rate > 0) turns++
-            turns.coerceAtLeast(0)
-        }
-        return if (readyIn <= withinMinutes)
+        return if (++readyIn <= withinMinutes)
             copy(
                 minute = minute + readyIn,
                 rate = rate + robot,
@@ -54,25 +78,16 @@ data class Step(
         other as Step
 
         if (minute != other.minute) return false
-        if (!rate.contentEquals(other.rate)) return false
-        if (!pool.contentEquals(other.pool)) return false
+        if (rate != other.rate) return false
+        if (pool != other.pool) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = minute
-        result = 31 * result + rate.contentHashCode()
-        result = 31 * result + pool.contentHashCode()
+        result = 31 * result + rate.hashCode()
+        result = 31 * result + pool.hashCode()
         return result
     }
 }
-
-internal operator fun IntArray.plus(other: IntArray) =
-    copyOf().apply { indices.forEach { set(it, get(it) + other[it]) } }
-
-internal operator fun IntArray.minus(other: IntArray) =
-    copyOf().apply { indices.forEach { set(it, get(it) - other[it]) } }
-
-internal operator fun IntArray.times(scalar: Int) =
-    copyOf().apply { indices.forEach { set(it, get(it) * scalar) } }
