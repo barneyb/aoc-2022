@@ -93,13 +93,12 @@ internal fun sumOfCoords(
 //        println(draw(zero))
     }
     var curr = zero!!
-    repeat(1000) { curr = curr.next }
-    val one = curr.value
-    repeat(1000) { curr = curr.next }
-    val two = curr.value
-    repeat(1000) { curr = curr.next }
-    val three = curr.value
-    return one + two + three
+    var sum = 0L
+    repeat(3) {
+        repeat(1000) { curr = curr.next }
+        sum += curr.value
+    }
+    return sum
 }
 
 @Suppress("unused")
