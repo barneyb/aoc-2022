@@ -4,11 +4,19 @@ import com.barneyb.aoc.util.toInt
 import com.barneyb.util.Queue
 import com.barneyb.util.Stack
 
-internal fun compress(parts: IntArray): Long =
+internal fun compress(parts: IntArray) =
     (parts[0].toLong() shl 0) +
             (parts[1].toLong() shl 16) +
             (parts[2].toLong() shl 32) +
             (parts[3].toLong() shl 48)
+
+internal fun decompress(n: Long) =
+    intArrayOf(
+        ((n shr 0) and 0xFFFF).toInt(),
+        ((n shr 16) and 0xFFFF).toInt(),
+        ((n shr 32) and 0xFFFF).toInt(),
+        ((n shr 48) and 0xFFFF).toInt(),
+    )
 
 // @formatter:off
 internal val oneOre      = 1L shl 0
@@ -70,21 +78,24 @@ data class Blueprint(
         bestsByMinute[minutes] = Step()
         val queue = Stack<Step>()
         queue.add(bestsByMinute[minutes]!!)
-        var itr = 0L
         while (queue.isNotEmpty()) {
             var curr = queue.remove()
-            itr++
 
             val timeLeft = minutes - curr.minute - 1
             if (timeLeft == 0) {
                 // can't build anything useful the final minute, so short circuit
                 curr = curr.tick()
-                itr++
             }
 
+            val best = bestsByMinute[minutes]!!
             if (curr.minute == minutes) {
-                if (curr.pool > bestsByMinute[curr.minute]!!.pool)
+                if (curr.pool > best.pool)
                     bestsByMinute[curr.minute] = curr
+                continue
+            }
+
+            if (curr.getPotentialGeodeCount(timeLeft + 1) < best.geodeCount) {
+                // even a new geode bot per turn won't catch us up
                 continue
             }
 
@@ -97,7 +108,9 @@ data class Blueprint(
                 queue.add(curr.tick(timeLeft + 1))
         }
 
-        return bestsByMinute[minutes]!!.geodeCount
+        return bestsByMinute[minutes]!!
+//            .also(::println)
+            .geodeCount
     }
 
 }

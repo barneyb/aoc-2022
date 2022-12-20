@@ -39,7 +39,7 @@ class NotEnoughMineralsKtTest {
         val line = EXAMPLE_ONE.trim().lines()[0]
         val bp = Blueprint.parse(line)
         assertEquals(9, bp.maxGeodesIn(MINUTES_PART_ONE))
-//        assertEquals(56, bp.maxGeodesIn(MINUTES_PART_TWO))
+        assertEquals(56, bp.maxGeodesIn(MINUTES_PART_TWO))
     }
 
     @Test
@@ -47,7 +47,7 @@ class NotEnoughMineralsKtTest {
         val line = EXAMPLE_ONE.trim().lines()[1]
         val bp = Blueprint.parse(line)
         assertEquals(12, bp.maxGeodesIn(MINUTES_PART_ONE))
-//        assertEquals(62, bp.maxGeodesIn(MINUTES_PART_TWO))
+        assertEquals(62, bp.maxGeodesIn(MINUTES_PART_TWO))
     }
 
     @Test

@@ -4,7 +4,7 @@ data class Step(
     val minute: Int,
     val rate: Long,
     val pool: Long,
-    val parent: Step? = null, // NOT PART OF EQUALITY!
+//    val parent: Step? = null, // NOT PART OF EQUALITY!
 ) {
     // start with one ore bot and an empty pool
     constructor() : this(0, oneOre, 0)
@@ -15,22 +15,23 @@ data class Step(
         pool: IntArray,
     ) : this(minute, compress(rate), compress(pool))
 
-    @Suppress("unused")
-    val oreCount get() = (pool shr 0) and 0xFFFF
-
-    @Suppress("unused")
-    val clayCount get() = (pool shr 16) and 0xFFFF
-
-    @Suppress("unused")
-    val obsidianCount get() = (pool shr 32) and 0xFFFF
-
     val geodeCount get() = (pool shr 48) and 0xFFFF
+
+    fun getPotentialGeodeCount(minutes: Int): Long {
+        // assume we'll get a new geode bot every minute
+        var result = geodeCount
+        var rate = rate shr 48
+        repeat(minutes) {
+            result += rate++
+        }
+        return result
+    }
 
     fun tick(n: Int = 1) =
         copy(
             minute = minute + n,
             pool = pool + rate * n,
-            parent = this,
+//            parent = this,
         )
 
     fun build(
@@ -65,7 +66,7 @@ data class Step(
                 minute = minute + readyIn,
                 rate = rate + robot,
                 pool = pool + rate * readyIn - cost,
-                parent = this,
+//                parent = this,
             )
         else
             null
@@ -90,4 +91,16 @@ data class Step(
         result = 31 * result + pool.hashCode()
         return result
     }
+
+    override fun toString() =
+        buildString {
+            append("Step(")
+            append(minute)
+            append(" rate:")
+            append(decompress(rate).contentToString())
+            append(" pool:")
+            append(decompress(pool).contentToString())
+            append(')')
+        }
+
 }
