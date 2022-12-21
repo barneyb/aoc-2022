@@ -3,6 +3,7 @@ package com.barneyb.aoc.aoc2022.day21
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toLong
 import com.barneyb.aoc.util.toSlice
+import com.barneyb.util.HashSet
 
 fun main() {
     Solver.execute(
@@ -12,19 +13,18 @@ fun main() {
     )
 }
 
-sealed interface Monkey
+internal sealed interface Monkey
 
 private typealias Op = Char
 
-data class Yell(
+internal data class Yell(
     val n: Long,
 ) : Monkey
 
-data class Operation(
+internal data class Operation(
     val a: CharSequence,
     val b: CharSequence,
     val op: Op,
-    var hasHuman: Boolean = false,
 ) : Monkey
 
 // dbpl: 5
@@ -56,7 +56,7 @@ private fun doOp(a: Long, op: Op, b: Long) =
         else -> throw IllegalStateException("Unknown '$op' operator")
     }
 
-internal fun whoYellsWhat(
+private fun whoYellsWhat(
     who: CharSequence,
     byName: Map<CharSequence, Monkey>
 ): Long {
@@ -75,9 +75,8 @@ internal fun whoYellsWhat(
     return compute(who)
 }
 
-internal fun rootYellsWhat(byName: Map<CharSequence, Monkey>): Long {
-    return whoYellsWhat(ROOT, byName)
-}
+internal fun rootYellsWhat(byName: Map<CharSequence, Monkey>) =
+    whoYellsWhat(ROOT, byName)
 
 // r = x + b, what is x?
 private fun invOp(r: Long, op: Op, b: Long) =
@@ -100,56 +99,45 @@ private fun invOp(r: Long, a: Long, op: Op) =
     }
 
 internal fun whatToYell(byName: Map<CharSequence, Monkey>): Long {
+    val humanBased = HashSet<CharSequence>(HUMAN)
+
     fun hasHuman(name: CharSequence): Boolean {
         return when (val it = byName[name]!!) {
             is Yell -> name == HUMAN
-            is Operation -> {
-                it.hasHuman = hasHuman(it.a) || hasHuman(it.b)
-                it.hasHuman
-            }
+            is Operation ->
+                if (hasHuman(it.a) || hasHuman(it.b)) {
+                    humanBased.add(name)
+                    true
+                } else false
         }
     }
 
     fun toYell(name: CharSequence, answer: Long): Long {
         return when (val it = byName[name]!!) {
             is Yell ->
-                if (name != HUMAN) it.n
-                else throw IllegalStateException("You can't request human?")
+                if (name == HUMAN) answer else it.n
             is Operation -> {
-                val sub = byName[it.a]
-                if (it.a == HUMAN || (sub is Operation && sub.hasHuman)) {
+                if (humanBased.contains(it.a)) {
                     val other = whoYellsWhat(it.b, byName)
                     val next = invOp(answer, it.op, other)
-                    println("$answer = ?? ${it.op} $other :: $next")
-                    val actual = doOp(next, it.op, other)
-                    if (actual != answer) {
-                        println("expected $answer, but got $actual")
-                        throw IllegalStateException("expected $answer, but got $actual")
-                    }
-                    if (it.a == HUMAN) next else toYell(it.a, next)
+//                    println("$answer = x ${it.op} $other :: x=$next")
+                    toYell(it.a, next)
                 } else { // b has/is the human
                     val other = whoYellsWhat(it.a, byName)
                     val next = invOp(answer, other, it.op)
-                    println("$answer = $other ${it.op} ??:: $next")
-                    val actual = doOp(other, it.op, next)
-                    if (actual != answer) {
-                        println("expected $answer, but got $actual")
-                        throw IllegalStateException("expected $answer, but got $actual")
-                    }
-                    if (it.b == HUMAN) next else toYell(it.b, next)
+//                    println("$answer = $other ${it.op} x :: x=$next")
+                    toYell(it.b, next)
                 }
             }
         }
     }
 
     val root = byName[ROOT] as Operation
-    val a = hasHuman(root.a)
-    val (base, goal) = if (a) Pair(root.a, whoYellsWhat(root.b, byName))
-    else Pair(root.b, whoYellsWhat(root.a, byName))
-    if (a) println("human on left vs ${whoYellsWhat(root.b, byName)}")
-    else println("human on right vs ${whoYellsWhat(root.a, byName)}")
-    println("base: $base (curr: ${whoYellsWhat(base, byName)})")
-    println("goal: $goal")
-    println("$base must yell $goal")
+    val (base, other) = if (hasHuman(root.a))
+        Pair(root.a, root.b)
+    else
+        Pair(root.b, root.a)
+    val goal = whoYellsWhat(other, byName)
+//    println("$base must yell $goal (like ${other})")
     return toYell(base, goal)
 }
