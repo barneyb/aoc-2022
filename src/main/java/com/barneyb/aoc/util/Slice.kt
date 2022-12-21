@@ -8,12 +8,7 @@ class Slice(
     private val end: Int
 ) : CharSequence, Iterable<Char> {
 
-    private val hash: Int by lazy {
-        var result = 1
-        for (i in start until end)
-            result = 31 * result + arr[i].code
-        result
-    }
+    private var hash: Int = 0
 
     constructor(arr: CharArray) : this(arr, 0, arr.size)
 
@@ -50,8 +45,15 @@ class Slice(
                     other.end
                 )
 
-    override fun hashCode() =
-        hash
+    override fun hashCode(): Int {
+        if (hash == 0) {
+            var result = 1
+            for (i in start until end)
+                result = 31 * result + arr[i].code
+            hash = result
+        }
+        return hash
+    }
 
     override fun iterator() =
         object : Iterator<Char> {
