@@ -62,15 +62,23 @@ public final class Solver {
         val result = Timing.timed(() -> {
             val parsed = init.apply(input);
             if (partOne == null) {
-                System.out.printf("%-10s : %s%n", "Parsed", parsed);
+                printResult("Parsed", parsed);
             } else {
-                System.out.printf("%-10s : %s%n", "Part One", partOne.apply(parsed));
+                printResult("Part One", partOne.apply(parsed));
                 if (partTwo != null)
-                    System.out.printf("%-10s : %s%n", "Part Two", partTwo.apply(parsed));
+                    printResult("Part Two", partTwo.apply(parsed));
             }
             return null;
         }).humanize();
-        System.out.printf("%-10s : %s%n", "Total Time", result.toDurationString());
+        printResult("Total Time", result.toDurationString());
+    }
+
+    private static void printResult(String label, Object v) {
+        if ((v instanceof Integer || v instanceof Long) && Math.abs(((Number) v).longValue()) > 1000)
+            //noinspection MalformedFormatString
+            System.out.printf("%-10s : %s (%,d)%n", label, v, v);
+        else
+            System.out.printf("%-10s : %s%n", label, v);
     }
 
     private static String labelForClass(Class<?> cls) {
