@@ -71,7 +71,7 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
     operator fun set(key: K, value: V) =
         put(key, value)
 
-    fun remove(key: Any) {
+    fun remove(key: Any): V {
         val hash = Objects.hashCode(key)
         val idx = index(hash)
         var prev: Node<K, V>? = null
@@ -93,6 +93,8 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
             prev = curr
             curr = curr.next
         }
+        return curr?.value
+            ?: throw UnknownKeyException(key)
     }
 
     private fun resize(cap: Int) {

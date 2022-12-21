@@ -35,7 +35,7 @@ class HashMapTest {
         assertEquals(2, m.size)
         m[26] = 'z'
         assertEquals(3, m.size)
-        m.remove(1)
+        assertEquals('q', m.remove(1))
         assertEquals(2, m.size)
     }
 
