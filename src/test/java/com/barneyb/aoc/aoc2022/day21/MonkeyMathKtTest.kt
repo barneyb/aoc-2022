@@ -48,4 +48,9 @@ class MonkeyMathKtTest {
     fun exampleOne() {
         assertEquals(152, rootYellsWhat(parse(EXAMPLE_ONE)))
     }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(301, whatToYell(parse(EXAMPLE_ONE)))
+    }
 }
