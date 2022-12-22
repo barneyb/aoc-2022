@@ -192,92 +192,21 @@ internal data class Edge(
         }
 
     fun crossTo(other: Edge, pos: Vec2): State {
-        return when (dir) {
-            NORTH -> when (other.dir) {
-                NORTH -> TODO()
-                SOUTH -> State( // 2 -> 6
-                    Vec2(
-                        map(pos.x, range, other.range.reversed()),
-                        other.start.y,
-                    ),
-                    other.dir.reversed()
-                )
-                EAST -> TODO()
-                WEST -> State( // 4 -> 3
-                    Vec2(
-                        other.start.x,
-                        map(pos.x, range, other.range.reversed()),
-                    ),
-                    other.dir.reversed()
-                )
-            }
-            SOUTH -> when (other.dir) {
-                NORTH -> State( // 6 -> 2
-                    Vec2(
-                        map(pos.x, range, other.range.reversed()),
-                        other.start.y,
-                    ),
-                    other.dir.reversed()
-                )
-                SOUTH -> State( // example 5 -> 2
-                    Vec2(
-                        map(pos.x, range, other.range.reversed()),
-                        other.start.y,
-                    ),
-                    other.dir.reversed()
-                )
-                EAST -> State( // 5 -> 6
-                    Vec2(
-                        other.start.x,
-                        map(pos.x, range, other.range.reversed()),
-                    ),
-                    other.dir.reversed()
-                )
-                WEST -> TODO()
-            }
-            EAST -> when (other.dir) {
-                NORTH -> State( // example 4 -> 6
-                    Vec2(
-                        map(pos.y, range, other.range.reversed()),
-                        other.start.y,
-                    ),
-                    other.dir.reversed()
-                )
-                SOUTH -> State( // 6 -> 5 and 3 -> 2
-                    Vec2(
-                        map(pos.y, range, other.range.reversed()),
-                        other.start.y,
-                    ),
-                    other.dir.reversed()
-                )
-                EAST -> State( // 2 -> 5
-                    Vec2(
-                        other.start.x,
-                        map(pos.y, range, other.range.reversed()),
-                    ),
-                    other.dir.reversed()
-                )
-                WEST -> TODO()
-            }
-            WEST -> when (other.dir) {
-                NORTH -> State( // 3 -> 4
-                    Vec2(
-                        map(pos.y, range, other.range.reversed()),
-                        other.start.y,
-                    ),
-                    other.dir.reversed()
-                )
-                SOUTH -> TODO()
-                EAST -> TODO()
-                WEST -> State( // 1 -> 4
-                    Vec2(
-                        other.start.x,
-                        map(pos.y, range, other.range.reversed()),
-                    ),
-                    other.dir.reversed()
-                )
-            }
-        }
+        fun map(c: Int) =
+            map(c, range, other.range.reversed())
+        return State(
+            when (dir) {
+                NORTH, SOUTH -> when (other.dir) {
+                    NORTH, SOUTH -> Vec2(map(pos.x), other.start.y)
+                    EAST, WEST -> Vec2(other.start.x, map(pos.x))
+                }
+                EAST, WEST -> when (other.dir) {
+                    NORTH, SOUTH -> Vec2(map(pos.y), other.start.y)
+                    EAST, WEST -> Vec2(other.start.x, map(pos.y))
+                }
+            },
+            other.dir.reversed()
+        )
     }
 }
 
