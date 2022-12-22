@@ -45,6 +45,9 @@ internal data class Map(
     val steps: List<Step>,
 ) {
 
+    val width = bounds.width
+    val height = bounds.height
+
     fun contains(pos: Vec2) =
         tiles.contains(pos)
 
@@ -74,7 +77,7 @@ internal fun parse(input: String): Map {
     var start: Vec2 = Vec2.ORIGIN
     val tiles = HashMap<Vec2, Tile>()
     val steps = mutableListOf<Step>()
-    var maxx = Int.MIN_VALUE
+    var maxX = Int.MIN_VALUE
     var n = 0
     fun walk(turn: Turn) {
         if (n > 0) {
@@ -94,7 +97,7 @@ internal fun parse(input: String): Map {
                 tiles[Vec2(x, y)] = WALL
             '\n' -> {
                 if (n == 0) // still in the map portion
-                    maxx = maxx.coerceAtLeast(x)
+                    maxX = maxX.coerceAtLeast(x)
                 walk(Turn.NONE)
                 x = 0
                 y++
@@ -112,7 +115,7 @@ internal fun parse(input: String): Map {
         Rect(
             1,
             1,
-            maxx - 1, // the newline
+            maxX - 1, // the newline
             y - 3, // final newline, directions, blank
         ),
         start,
@@ -128,11 +131,11 @@ private fun walk(map: Map, crossEdge: (State) -> State) =
             if (!map.contains(next)) {
                 crossEdge(State(curr, facing)).also {
                     if (map[it.pos] != WALL) {
-                        println("$facing of $curr is ${it.pos} facing ${it.facing}")
+//                        println("$facing of $curr is ${it.pos} facing ${it.facing}")
                         next = it.pos
                         facing = it.facing
                     } else {
-                        println("$facing of $curr is ${it.pos}, which is blocked")
+//                        println("$facing of $curr is ${it.pos}, which is blocked")
                     }
                 }
             }
@@ -140,7 +143,7 @@ private fun walk(map: Map, crossEdge: (State) -> State) =
                 break
             curr = next
         }
-        println("at $curr, turn $turn to face ${turn.execute(facing)}")
+//        println("at $curr, turn $turn to face ${turn.execute(facing)}")
         State(curr, turn.execute(facing))
     }
 
@@ -161,107 +164,196 @@ internal fun finalPasswordTorus(map: Map) =
         State(next, facing)
     }.password
 
-/*
-              11  1
-   1  45  89  23  6
-  +----------------
- 1|        1111
-  |        1111
-  |        1111
- 4|        1111
- 5|222233334444
-  |222233334444
-  |222233334444
- 8|222233334444
- 9|        55556666
-  |        55556666
-  |        55556666
-12|        55556666
-  +----------------
-   1  45  89  11  1
-              23  6
+internal data class Edge(
+    val leg: Int,
+    val square: Int, // 0..15, on a 4x4 grid
+    val dir: Dir,
+) {
+    val start: Vec2 = when (dir) {
+        NORTH -> Vec2(1 + leg * (square % 4), 1 + leg * (square / 4))
+        EAST -> Vec2(leg * (square % 4 + 1), 1 + leg * (square / 4))
+        SOUTH -> Vec2(leg * (square % 4 + 1), leg * (square / 4 + 1))
+        WEST -> Vec2(1 + leg * (square % 4), leg * (square / 4 + 1))
+    }
 
-  1<  3v -  CCW  x ->
-  1^  2v - flip
-  1>  6< - flip
-  2^  1v - flip
-  2<  6^ -   CW
-  2v  5^ - flip
-  3^  1> -   CW
-  3v  5> -  CCW
-  4>  6v -   CW
-  5<  3^ -   CW
-  5v  2^ - flip
-  6^  4< -  CCW
-  6>  1< - flip
-  6v  2> -  CCW
+    val range = when (dir) {
+        NORTH -> start.x until start.x + leg
+        SOUTH -> start.x downTo start.x - leg + 1
+        EAST -> start.y until start.y + leg
+        WEST -> start.y downTo start.y - leg + 1
+    }
 
- */
-internal fun finalPasswordCube(map: Map): Int {
-    return walk(map) { (pos, facing) ->
-        when {
-
-            /* EXAMPLE */
-
-            // 4 -> 6
-            pos.x == 12 && pos.y in 5..8 && facing == EAST ->
-                State(Vec2(map(pos.y, 5..8, 16 downTo 13), 9), SOUTH)
-            // 5 -> 2
-            pos.x in 9..12 && pos.y == 12 && facing == SOUTH ->
-                State(Vec2(map(pos.x, 9..12, 4 downTo 1), 8), NORTH)
-            // 3 -> 1
-            pos.x in 5..8 && pos.y == 5 && facing == NORTH ->
-                State(Vec2(9, map(pos.x, 5..8, 1..4)), EAST)
-
-            /* MY INPUT */
-
-            // 1 -> 4
-            pos.x == 51 && pos.y in 1..50 && facing == WEST ->
-                State(Vec2(1, map(pos.y, 1..50, 150 downTo 101)), EAST)
-            // 4 -> 3
-            pos.x in 1..50 && pos.y == 101 && facing == NORTH ->
-                State(Vec2(51, map(pos.x, 1..50, 51..100)), EAST)
-            // 3 -> 4
-            pos.x == 51 && pos.y in 51..100 && facing == WEST ->
-                State(Vec2(map(pos.y, 51..100, 1..50), 101), SOUTH)
-            // 5 -> 6
-            pos.x in 51..100 && pos.y == 150 && facing == SOUTH ->
-                State(Vec2(50, map(pos.x, 51..100, 151..200)), WEST)
-            // 6 -> 5
-            pos.x == 50 && pos.y in 151..200 && facing == EAST ->
-                State(Vec2(map(pos.y, 151..200, 51..100), 150), NORTH)
-            // 4 -> 1
-            pos.x == 1 && pos.y in 101..150 && facing == WEST ->
-                State(Vec2(51, map(pos.y, 101..150, 50 downTo 1)), EAST)
-            // 1 -> 6
-            pos.x in 51..100 && pos.y == 1 && facing == NORTH ->
-                State(Vec2(1, map(pos.x, 51..100, 151..200)), EAST)
-            // 6 -> 2
-            pos.x in 1..50 && pos.y == 200 && facing == SOUTH ->
-                State(Vec2(map(pos.x, 1..50, 101..150), 1), SOUTH)
-            // 2 -> 3
-            pos.x in 101..150 && pos.y == 50 && facing == SOUTH ->
-                State(Vec2(100, map(pos.x, 101..150, 51..100)), WEST)
-            // 3 -> 2
-            pos.x == 100 && pos.y in 50..100 && facing == EAST ->
-                State(Vec2(map(pos.y, 50..100, 101..150), 50), NORTH)
-            // 2 -> 6
-            pos.x in 101..150 && pos.y == 1 && facing == NORTH ->
-                State(Vec2(map(pos.x, 101..150, 1..50), 200), NORTH)
-            // 2 -> 5
-            pos.x == 150 && pos.y in 1..50 && facing == EAST ->
-                State(Vec2(100, map(pos.y, 1..50, 150 downTo 101)), WEST)
-            // 6 -> 1
-            pos.x == 1 && pos.y in 151..200 && facing == WEST ->
-                State(Vec2(map(pos.y, 151..200, 51..100), 1), SOUTH)
-            // 5 -> 2
-            pos.x == 100 && pos.y in 101..150 && facing == EAST ->
-                State(Vec2(150, map(pos.y, 101..150, 50 downTo 1)), WEST)
-//            //  ->
-//            pos.x && pos.y && facing == ->
-//                State(Vec2(), )
-            else -> throw IllegalArgumentException("Unknown edge at $pos facing $facing")
+    fun contains(p: Vec2) =
+        when (dir) {
+            NORTH -> p.x in range && p.y == start.y
+            SOUTH -> p.x in range && p.y == start.y
+            EAST -> p.x == start.x && p.y in range
+            WEST -> p.x == start.x && p.y in range
         }
+
+    fun crossTo(other: Edge, pos: Vec2): State {
+        return when (dir) {
+            NORTH -> when (other.dir) {
+                NORTH -> TODO()
+                SOUTH -> State( // 2 -> 6
+                    Vec2(
+                        map(pos.x, range, other.range.reversed()),
+                        other.start.y,
+                    ),
+                    other.dir.reversed()
+                )
+                EAST -> TODO()
+                WEST -> State( // 4 -> 3
+                    Vec2(
+                        other.start.x,
+                        map(pos.x, range, other.range.reversed()),
+                    ),
+                    other.dir.reversed()
+                )
+            }
+            SOUTH -> when (other.dir) {
+                NORTH -> State( // 6 -> 2
+                    Vec2(
+                        map(pos.x, range, other.range.reversed()),
+                        other.start.y,
+                    ),
+                    other.dir.reversed()
+                )
+                SOUTH -> State( // example 5 -> 2
+                    Vec2(
+                        map(pos.x, range, other.range.reversed()),
+                        other.start.y,
+                    ),
+                    other.dir.reversed()
+                )
+                EAST -> State( // 5 -> 6
+                    Vec2(
+                        other.start.x,
+                        map(pos.x, range, other.range.reversed()),
+                    ),
+                    other.dir.reversed()
+                )
+                WEST -> TODO()
+            }
+            EAST -> when (other.dir) {
+                NORTH -> State( // example 4 -> 6
+                    Vec2(
+                        map(pos.y, range, other.range.reversed()),
+                        other.start.y,
+                    ),
+                    other.dir.reversed()
+                )
+                SOUTH -> State( // 6 -> 5 and 3 -> 2
+                    Vec2(
+                        map(pos.y, range, other.range.reversed()),
+                        other.start.y,
+                    ),
+                    other.dir.reversed()
+                )
+                EAST -> State( // 2 -> 5
+                    Vec2(
+                        other.start.x,
+                        map(pos.y, range, other.range.reversed()),
+                    ),
+                    other.dir.reversed()
+                )
+                WEST -> TODO()
+            }
+            WEST -> when (other.dir) {
+                NORTH -> State( // 3 -> 4
+                    Vec2(
+                        map(pos.y, range, other.range.reversed()),
+                        other.start.y,
+                    ),
+                    other.dir.reversed()
+                )
+                SOUTH -> TODO()
+                EAST -> TODO()
+                WEST -> State( // 1 -> 4
+                    Vec2(
+                        other.start.x,
+                        map(pos.y, range, other.range.reversed()),
+                    ),
+                    other.dir.reversed()
+                )
+            }
+        }
+    }
+}
+
+internal fun finalPasswordCube(map: Map): Int {
+    val leg = if (map.width % 3 == 0) map.width / 3 else map.width / 4
+    assert(map.height % leg == 0)
+    assert(map.topLeft.x % leg == 1)
+
+    val pairs = buildMap {
+        val pairs = when (leg) {
+            50 -> {
+                val oneNorth = Edge(leg, 1, NORTH)
+                val twoNorth = Edge(leg, 2, NORTH)
+                val twoEast = Edge(leg, 2, EAST)
+                val twoSouth = Edge(leg, 2, SOUTH)
+                val threeEast = Edge(leg, 5, EAST)
+                val fiveEast = Edge(leg, 9, EAST)
+                val fiveSouth = Edge(leg, 9, SOUTH)
+                val sixEast = Edge(leg, 12, EAST)
+                val sixSouth = Edge(leg, 12, SOUTH)
+                val sixWest = Edge(leg, 12, WEST)
+                val fourWest = Edge(leg, 8, WEST)
+                val fourNorth = Edge(leg, 8, NORTH)
+                val threeWest = Edge(leg, 5, WEST)
+                val oneWest = Edge(leg, 1, WEST)
+
+                listOf(
+                    oneNorth to sixWest,
+                    twoNorth to sixSouth,
+                    twoEast to fiveEast,
+                    twoSouth to threeEast,
+                    fiveSouth to sixEast,
+                    fourWest to oneWest,
+                    fourNorth to threeWest,
+                )
+            }
+            4 -> {
+                val oneNorth = Edge(leg, 2, NORTH)
+                val oneEast = Edge(leg, 2, EAST)
+                val fourEast = Edge(leg, 6, EAST)
+                val sixNorth = Edge(leg, 11, NORTH)
+                val sixEast = Edge(leg, 11, EAST)
+                val sixSouth = Edge(leg, 11, SOUTH)
+                val fiveSouth = Edge(leg, 10, SOUTH)
+                val fiveWest = Edge(leg, 10, WEST)
+                val threeSouth = Edge(leg, 5, SOUTH)
+                val twoSouth = Edge(leg, 4, SOUTH)
+                val twoWest = Edge(leg, 4, WEST)
+                val twoNorth = Edge(leg, 4, NORTH)
+                val threeNorth = Edge(leg, 5, NORTH)
+                val oneWest = Edge(leg, 2, WEST)
+                listOf(
+                    oneNorth to twoNorth,
+                    oneEast to sixEast,
+                    fourEast to sixNorth,
+                    sixSouth to twoWest,
+                    fiveSouth to twoSouth,
+                    fiveWest to threeSouth,
+                    threeNorth to oneWest,
+                )
+            }
+            else -> {
+                throw IllegalStateException("Unsupported $leg-length leg?!")
+            }
+        }
+        pairs.forEach {
+            put(it.first, it.second)
+            put(it.second, it.first)
+        }
+    }
+
+    return walk(map) { (pos, facing) ->
+        val (edge, other) = pairs.entries.first { (k, _) ->
+            k.contains(pos) && k.dir == facing
+        }
+        edge.crossTo(other, pos)
     }.password
 }
 

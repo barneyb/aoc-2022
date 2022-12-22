@@ -63,4 +63,18 @@ public enum Dir {
         }
         throw new IllegalArgumentException("Unrecognized direction: " + this);
     }
+
+    public Dir reversed() {
+        switch (this) {
+            case NORTH:
+                return SOUTH;
+            case SOUTH:
+                return NORTH;
+            case EAST:
+                return WEST;
+            case WEST:
+                return EAST;
+        }
+        throw new IllegalArgumentException("Unrecognized direction: " + this);
+    }
 }
