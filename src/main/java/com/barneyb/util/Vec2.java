@@ -8,6 +8,12 @@ import java.util.Comparator;
 public class Vec2 {
 
     /**
+     * A <tt>Vec2</tt> instance representing the origin. If you don't want
+     * identity semantics, use the {@link #origin()} factory.
+     */
+    public static final Vec2 ORIGIN = new Vec2(0, 0);
+
+    /**
      * Note that this uses "graphic" coordinates, not "math" coordinates. That
      * is, "rightward" is positive-x and "downward" is positive-y. Math treats
      * "upward" as positive-y.
@@ -17,8 +23,13 @@ public class Vec2 {
                     ? a.y - b.y
                     : a.x - b.x;
 
+
     public int x, y;
 
+    /**
+     * Get a new <tt>Vec2</tt> instance representing the origin. If you need
+     * identity (not value) semantics, use the {@link #ORIGIN} constant.
+     */
     public static Vec2 origin() {
         return new Vec2(0, 0);
     }
