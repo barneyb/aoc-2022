@@ -138,6 +138,3 @@ internal fun finalPasswordCube(map: Map): Int {
     map.foldIntoCube()
     return walk(map, map::crossEdge).password
 }
-
-internal fun map(n: Int, from: IntProgression, to: IntProgression) =
-    to.first + ((n - from.first) / from.step) * to.step

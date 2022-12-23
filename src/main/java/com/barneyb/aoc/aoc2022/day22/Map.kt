@@ -6,6 +6,12 @@ import com.barneyb.util.HashMap
 import com.barneyb.util.Rect
 import com.barneyb.util.Vec2
 
+private fun IntProgression.indexOf(n: Int) =
+    (n - first) / step
+
+private operator fun IntProgression.get(i: Int) =
+    first + i * step
+
 internal class Map(
     val tiles: HashMap<Vec2, Tile>,
     val bounds: Rect,
@@ -50,7 +56,7 @@ internal class Map(
 
         fun crossTo(other: Edge, pos: Vec2): State {
             fun map(c: Int) =
-                map(c, range, other.range.reversed())
+                other.range.reversed()[range.indexOf(c)]
             return State(
                 when (dir) {
                     NORTH, SOUTH -> when (other.dir) {

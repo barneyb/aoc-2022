@@ -45,17 +45,6 @@ class MonkeyMapKtTest {
     }
 
     @Test
-    fun mapRangeFourSix() {
-        val from = 5..8
-        val to = 16 downTo 13
-        for ((i, n) in from.withIndex()) {
-            val ans = to.elementAt(i)
-            assertEquals(ans, map(n, from, to))
-            println("mapped $n -> $ans")
-        }
-    }
-
-    @Test
     fun exampleTwo() {
         assertEquals(5031, finalPasswordCube(parse(EXAMPLE_ONE)))
     }
