@@ -24,11 +24,13 @@ class Game private constructor(
         }
     })
 
-    private val bounds =
+    private val bounds by lazy {
         elves.fold(Rect.of(elves.first()), Rect::coerceToInclude)
+    }
 
-    val emptySpaceCount =
-        bounds.width * bounds.height - elves.size
+    val emptySpaceCount by lazy {
+        bounds.let { it.width * it.height - elves.size }
+    }
 
 //    init {
 //        val msg = if (rounds == 0) "Initial State"
@@ -60,7 +62,7 @@ class Game private constructor(
                 elvesInMotion++
             }
         }
-        for (e in elves) {
+        perElf@ for (e in elves) {
 //            println(e)
             val positions = traversal.map { e + it }
             val scan = positions.map(elves::contains)
@@ -69,27 +71,24 @@ class Game private constructor(
                 proposal[e] = e
                 continue
             }
-            var found = false
             for (i in 0..9 step 3) {
 //                println(" check ${positions[i]}")
                 if (scan.subList(i, i + 3).all { !it }) {
 //                    println("  -> ${positions[i]}")
                     propose(e, positions[i])
-                    found = true
-                    break
+                    continue@perElf
                 }
             }
-            if (!found)
-                proposal[e] = e
+            proposal[e] = e
         }
-        val next = HashSet<Vec2>()
-        next.addAll(proposal.keys)
-        assert(elves.size == next.size) {
-            "Went from ${elves.size} elves in round $rounds, to ${next.size} in ${rounds + 1}?!"
+        val newElves = HashSet<Vec2>()
+        newElves.addAll(proposal.keys)
+        assert(elves.size == newElves.size) {
+            "Went from ${elves.size} elves in round $rounds, to ${newElves.size} in ${rounds + 1}?!"
         }
         return Pair(
             Game(
-                next,
+                newElves,
                 rounds + 1,
                 traversal.drop(3) + traversal.take(3)
             ),
