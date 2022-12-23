@@ -15,7 +15,7 @@ private const val EXAMPLE_ONE = """
 .#..#..
 """
 
-private const val EXAMPLE_TWO = """
+private const val SMALLER_EXAMPLE = """
 .....
 ..##.
 ..#..
@@ -36,7 +36,7 @@ class UnstableDiffusionKtTest {
                 Vec2(2, 4),
                 Vec2(3, 4),
             ),
-            parse(EXAMPLE_TWO)
+            parse(SMALLER_EXAMPLE)
         )
     }
 
@@ -50,19 +50,19 @@ class UnstableDiffusionKtTest {
             ..
             ##
             """.trimIndent(),
-            Game(parse(EXAMPLE_TWO)).toString()
+            Game(parse(SMALLER_EXAMPLE)).toString()
         )
     }
 
     @Test
     fun emptySpaces() {
         assertEquals(27, Game(parse(EXAMPLE_ONE)).emptySpaceCount)
-        assertEquals(3, Game(parse(EXAMPLE_TWO)).emptySpaceCount)
+        assertEquals(3, Game(parse(SMALLER_EXAMPLE)).emptySpaceCount)
     }
 
     @Test
     fun simpleExample() {
-        var game = Game(parse(EXAMPLE_TWO))
+        var game = Game(parse(SMALLER_EXAMPLE))
         assertEquals(0, game.rounds)
         assertEquals(
             """
@@ -146,4 +146,10 @@ class UnstableDiffusionKtTest {
     fun exampleTwo() {
         assertEquals(20, firstNoOpRound(parse(EXAMPLE_ONE)))
     }
+
+    @Test
+    fun smaller() {
+        assertEquals(4, firstNoOpRound(parse(SMALLER_EXAMPLE)))
+    }
+
 }

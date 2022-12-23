@@ -24,8 +24,8 @@ class Game private constructor(
         }
     })
 
-    private val bounds by lazy {
-        elves.fold(Rect.of(elves.first()), Rect::coerceToInclude)
+    val bounds by lazy {
+        elves.fold(Rect.EMPTY, Rect::coerceToInclude)
     }
 
     val emptySpaceCount by lazy {
@@ -86,6 +86,17 @@ class Game private constructor(
         assert(elves.size == newElves.size) {
             "Went from ${elves.size} elves in round $rounds, to ${newElves.size} in ${rounds + 1}?!"
         }
+//        println(
+//            "${if (rounds > 0) "," else ""}{   \"moves\": ${
+//                proposal.filter { (a, b) -> a != b }
+//                    .map { (b, a) -> "[${a.x},${a.y},${if (a.x == b.x) if (a.y > b.y) 0 else 2 else if (a.x > b.x) 3 else 1}]" }
+//            },\n    \"conflicts\": ${
+//                conflicts.map { "[${it.x},${it.y}]" }
+//            },\n    \"stationary\": ${
+//                proposal.filter { (a, b) -> a == b }
+//                    .map { (it, _) -> "[${it.x},${it.y}]" }
+//            }\n}"
+//        )
         return Pair(
             Game(
                 newElves,

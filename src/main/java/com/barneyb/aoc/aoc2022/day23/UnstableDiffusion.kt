@@ -34,11 +34,13 @@ internal fun openSpacesAfterTenRounds(elves: HashSet<Vec2>): Int {
 
 internal fun firstNoOpRound(elves: HashSet<Vec2>): Int {
     var game = Game(elves)
+//    println("{\"rounds\":[")
     while (true) {
         val next = game.tickWithMotionCount()
         game = next.first
         if (next.second == 0)
             break
     }
+//    println("], \"bounds\": [${game.bounds.let { b -> "${b.x1},${b.y1},${b.width},${b.height}" }}]}")
     return game.rounds
 }

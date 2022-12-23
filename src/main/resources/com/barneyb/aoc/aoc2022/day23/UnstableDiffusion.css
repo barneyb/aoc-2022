@@ -1,0 +1,27 @@
+html, body, svg {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    box-sizing: border-box;
+    overflow: clip;
+    background-color: #d4dce0;
+}
+
+svg {
+    width: calc(100% - 1px);
+    height: calc(100% - 1px);
+}
+
+.stationary {
+    fill: green;
+}
+
+.conflict {
+    fill: red;
+}
+
+.moving {
+    fill: #8faf00;
+}
