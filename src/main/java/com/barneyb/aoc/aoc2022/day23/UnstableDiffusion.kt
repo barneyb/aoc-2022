@@ -9,6 +9,7 @@ fun main() {
     Solver.execute(
         ::parse,
         ::openSpacesAfterTenRounds, // 3,684
+        ::firstNoOpRound, // 862
     )
 }
 
@@ -29,4 +30,15 @@ internal fun openSpacesAfterTenRounds(elves: HashSet<Vec2>): Int {
     var game = Game(elves)
     repeat(10) { game = game.tick() }
     return game.emptySpaceCount
+}
+
+internal fun firstNoOpRound(elves: HashSet<Vec2>): Int {
+    var game = Game(elves)
+    while (true) {
+        val next = game.tickWithMotionCount()
+        game = next.first
+        if (next.second == 0)
+            break
+    }
+    return game.rounds
 }

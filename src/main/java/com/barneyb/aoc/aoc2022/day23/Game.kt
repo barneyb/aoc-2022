@@ -36,15 +36,20 @@ class Game private constructor(
 //        println("== $msg ==$this\n")
 //    }
 
-    fun tick(): Game {
+    fun tick(): Game =
+        tickWithMotionCount().first
+
+    fun tickWithMotionCount(): Pair<Game, Int> {
 //        println("\nDuring round ${rounds + 1}:")
         val proposal = HashMap<Vec2, Vec2>() // proposed -> current
         val conflicts = HashSet<Vec2>() // doubled proposals
+        var elvesInMotion = 0
         fun propose(curr: Vec2, prop: Vec2) {
             if (proposal.contains(prop)) {
                 val old = proposal.remove(prop)
 //                println("  $old's proposal rejected; stay put")
                 proposal[old] = old
+                elvesInMotion--
                 conflicts.add(prop)
             }
             if (conflicts.contains(prop)) {
@@ -52,6 +57,7 @@ class Game private constructor(
                 proposal[curr] = curr
             } else {
                 proposal[prop] = curr
+                elvesInMotion++
             }
         }
         for (e in elves) {
@@ -81,10 +87,13 @@ class Game private constructor(
         assert(elves.size == next.size) {
             "Went from ${elves.size} elves in round $rounds, to ${next.size} in ${rounds + 1}?!"
         }
-        return Game(
-            next,
-            rounds + 1,
-            traversal.drop(3) + traversal.take(3)
+        return Pair(
+            Game(
+                next,
+                rounds + 1,
+                traversal.drop(3) + traversal.take(3)
+            ),
+            elvesInMotion
         )
     }
 

@@ -141,4 +141,9 @@ class UnstableDiffusionKtTest {
             """.trimIndent(), game.toString()
         )
     }
+
+    @Test
+    fun exampleTwo() {
+        assertEquals(20, firstNoOpRound(parse(EXAMPLE_ONE)))
+    }
 }
