@@ -53,4 +53,9 @@ class BlizzardBasinKtTest {
         assertEquals(18, parse(EXAMPLE_TWO).stepsToGoal())
     }
 
+    @Test
+    fun exampleThree() {
+        assertEquals(54, parse(EXAMPLE_TWO).stepsToGoalStartGoal())
+    }
+
 }

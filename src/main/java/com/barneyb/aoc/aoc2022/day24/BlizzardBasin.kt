@@ -11,6 +11,7 @@ fun main() {
     Solver.execute(
         ::parse,
         Valley::stepsToGoal, // 299
+        Valley::stepsToGoalStartGoal, // 899
     )
 }
 

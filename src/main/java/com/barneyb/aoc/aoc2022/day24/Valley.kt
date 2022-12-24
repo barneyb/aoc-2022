@@ -68,23 +68,21 @@ internal class Valley(
         val n: Int,
     )
 
-    fun stepsToGoal(): Int {
-//        println(draw(getBlizState(0)))
-        var best = Int.MAX_VALUE
+    private fun walk(init: Step, target: Vec2): Step {
         val visited = HashSet<Vec3>()
         val queue = Queue<Step>()
-        queue.add(Step(start, 0))
+        queue.add(init)
         while (queue.isNotEmpty()) {
             val (pos, n) = queue.remove()
-            if (pos == goal) {
-                best = n
-                break
+            if (pos == target) {
+                println("from $init to $target took ${n - init.n}")
+                return Step(pos, n)
             }
             val bi = (n + 1) % blizStates.size
             val bliz = getBlizState(bi)
             fun tryMovingTo(pos: Vec2) {
                 if (bliz.contains(pos)) return
-                if (pos != goal && !bounds.contains(pos)) return
+                if (pos != target && pos != init.pos && !bounds.contains(pos)) return
                 val key = Vec3(pos.x, pos.y, bi)
                 if (visited.contains(key)) return
                 visited.add(key)
@@ -96,8 +94,14 @@ internal class Valley(
             tryMovingTo(pos.move(Dir.EAST))
             tryMovingTo(pos.move(Dir.WEST))
         }
-        return best
+        throw IllegalArgumentException("No route found from $init to $target")
     }
+
+    fun stepsToGoal() =
+        walk(Step(start, 0), goal).n
+
+    fun stepsToGoalStartGoal() =
+        walk(walk(walk(Step(start, 0), goal), start), goal).n
 
     @Suppress("unused")
     private fun draw(bliz: BlizState) =
