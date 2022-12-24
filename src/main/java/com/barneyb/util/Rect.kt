@@ -31,7 +31,7 @@ data class Rect(val x1: Int, val y1: Int, val x2: Int, val y2: Int) {
     val yRange get() = y1..y2
 
     fun contains(p: Vec2) =
-        p.x in x1..x2 && p.y in y1..y2
+        p.x in xRange && p.y in yRange
 
     fun coerceToInclude(p: Vec2) =
         if (this === EMPTY) of(p)
