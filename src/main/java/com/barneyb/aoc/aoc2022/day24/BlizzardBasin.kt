@@ -10,7 +10,7 @@ import com.barneyb.util.Vec2
 fun main() {
     Solver.execute(
         ::parse,
-        Valley::stepsToGoal, // todo
+        Valley::stepsToGoal, // 299
     )
 }
 

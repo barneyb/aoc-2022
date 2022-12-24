@@ -66,31 +66,29 @@ internal class Valley(
     private data class Step(
         val pos: Vec2,
         val n: Int,
-        val toGo: Int,
     )
 
     fun stepsToGoal(): Int {
 //        println(draw(getBlizState(0)))
         var best = Int.MAX_VALUE
-        val queue = java.util.PriorityQueue(
-            Comparator.comparingInt(Step::toGo)
-        )
-        queue.add(Step(start, 0, start.getManhattanDistance(goal)))
+        val visited = HashSet<Vec3>()
+        val queue = Queue<Step>()
+        queue.add(Step(start, 0))
         while (queue.isNotEmpty()) {
-            val (pos, n, toGo) = queue.remove()
-            if (n + toGo >= best) continue
+            val (pos, n) = queue.remove()
             if (pos == goal) {
                 best = n
-                println("NEW BEST: $best (${queue.size} left)")
-                continue
+                break
             }
-            val bliz = getBlizState((n + 1) % blizStates.size)
+            val bi = (n + 1) % blizStates.size
+            val bliz = getBlizState(bi)
             fun tryMovingTo(pos: Vec2) {
-                val left = pos.getManhattanDistance(goal)
-                if (n + 1 + left >= best) return
                 if (bliz.contains(pos)) return
-                if (pos == start || pos == goal || bounds.contains(pos))
-                    queue.add(Step(pos, n + 1, left))
+                if (pos != goal && !bounds.contains(pos)) return
+                val key = Vec3(pos.x, pos.y, bi)
+                if (visited.contains(key)) return
+                visited.add(key)
+                queue.add(Step(pos, n + 1))
             }
             tryMovingTo(pos) // wait
             tryMovingTo(pos.move(Dir.NORTH))
@@ -134,4 +132,5 @@ internal class Valley(
             append(WALL)
             append('\n')
         }
+
 }
