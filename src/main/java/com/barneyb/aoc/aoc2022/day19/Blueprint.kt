@@ -70,7 +70,7 @@ data class Blueprint(
             }
     }
 
-    private val bestsByMinute = Array<Step?>(MINUTES_PART_TWO + 1) { null }
+    private val bestsByMinute = arrayOfNulls<Step>(MINUTES_PART_TWO + 1)
 
     fun maxGeodesIn(minutes: Int): Long {
         if (bestsByMinute[minutes] != null)

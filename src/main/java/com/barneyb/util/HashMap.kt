@@ -14,7 +14,7 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
         var next: Node<K, V>? = null,
     )
 
-    private var bins = Array<Node<K, V>?>(initialCapacity) { null }
+    private var bins = arrayOfNulls<Node<K, V>>(initialCapacity)
     var size = 0
         private set
 
@@ -98,7 +98,7 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
     }
 
     private fun resize(cap: Int) {
-        val next = Array<Node<K, V>?>(cap) { null }
+        val next = arrayOfNulls<Node<K, V>>(cap)
         for (n in nodeIterator()) {
             val idx = index(n.hash, next.size)
             next[idx] = n.copy(next = next[idx])
