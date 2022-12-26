@@ -22,20 +22,20 @@ class GrovePositioningSystemKtTest {
 
     @Test
     fun sumOfCoords() {
-        assertEquals(3, sumOfCoords(parse(EXAMPLE_ONE)))
+        assertEquals(3, sumOfCoords_arr(parse(EXAMPLE_ONE)))
     }
 
     @Test
     fun oneFullRound() {
         assertEquals(
             2434767459 + 1623178306 + 811589153,
-            sumOfCoords(parse(EXAMPLE_ONE), DECRYPTION_KEY)
+            sumOfCoords_arr(parse(EXAMPLE_ONE), DECRYPTION_KEY)
         )
     }
 
     @Test
     fun fullDecrypt() {
-        assertEquals(1623178306, fullDecryption(parse(EXAMPLE_ONE)))
+        assertEquals(1623178306, fullDecryption_arr(parse(EXAMPLE_ONE)))
     }
 
 }

@@ -8,8 +8,13 @@ import com.barneyb.aoc.util.toSlice
 fun main() {
     Solver.execute(
         ::parse,
-        ::sumOfCoords, // 14888
-        ::fullDecryption, // 3760092545849
+        ::sumOfCoords_ptr, // 14888
+        ::fullDecryption_ptr, // 3760092545849
+    )
+    Solver.execute(
+        ::parse,
+        ::sumOfCoords_arr, // 14888
+        ::fullDecryption_arr, // 3760092545849
     )
 }
 
@@ -22,6 +27,32 @@ internal fun parse(input: String) =
         .trim()
         .lines()
         .map(Slice::toLong)
+
+internal fun sumOfCoords_arr(
+    list: List<Long>,
+    key: Long = 1,
+    rounds: Int = 1
+): Long {
+    val arr = ArrayList<Pair<Int, Long>>(list.size)
+    arr.addAll(list.mapIndexed { i, n ->
+        Pair(i, n * key)
+    })
+    repeat(rounds) { _ ->
+        for (n in 0 until arr.size) {
+            val src = arr.indexOfFirst { (i, _) -> i == n }
+            val it = arr.removeAt(src)
+            val tgt = (src + it.second) % arr.size
+            arr.add(tgt.toInt() + if (tgt < 0) arr.size else 0, it)
+        }
+    }
+    val idx = arr.indexOfFirst { (_, n) -> n == 0L }
+    return listOf(1000, 2000, 3000).sumOf {
+        arr[(idx + it) % arr.size].second
+    }
+}
+
+internal fun fullDecryption_arr(list: List<Long>) =
+    sumOfCoords_arr(list, DECRYPTION_KEY, ROUNDS)
 
 private class Node(
     val value: Long,
@@ -46,7 +77,7 @@ private class Node(
 
 }
 
-internal fun sumOfCoords(
+internal fun sumOfCoords_ptr(
     list: List<Long>,
     key: Long = 1,
     rounds: Int = 1
@@ -108,5 +139,5 @@ private fun draw(zero: Node) =
     }.map(Node::value)
         .joinToString(", ")
 
-internal fun fullDecryption(list: List<Long>) =
-    sumOfCoords(list, DECRYPTION_KEY, ROUNDS)
+internal fun fullDecryption_ptr(list: List<Long>) =
+    sumOfCoords_ptr(list, DECRYPTION_KEY, ROUNDS)
