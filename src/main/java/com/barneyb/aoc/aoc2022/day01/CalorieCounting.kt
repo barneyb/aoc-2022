@@ -4,7 +4,7 @@ import com.barneyb.aoc.util.Slice
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toLong
 import com.barneyb.aoc.util.toSlice
-import java.util.*
+import com.barneyb.util.MinPQ
 
 fun main() {
     Solver.benchmark(
@@ -32,7 +32,7 @@ internal fun topOne(elves: List<Long>) =
     elves.max()
 
 internal fun topThree(elves: List<Long>) =
-    PriorityQueue<Long>().apply {
+    MinPQ<Long>().apply {
         for (e in elves) {
             add(e)
             if (size > 3) remove()

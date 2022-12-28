@@ -1,6 +1,7 @@
 package com.barneyb.aoc.aoc2018.day15;
 
 import com.barneyb.util.Dir;
+import com.barneyb.util.MinPQ;
 import com.barneyb.util.Vec2;
 import lombok.Value;
 import lombok.val;
@@ -104,7 +105,7 @@ public class Battlefield {
      * @return Whether the full round was completed.
      */
     public boolean doRound() {
-        val queue = new PriorityQueue<>(Comparator.comparing(Turn::getPosition, Vec2.READING_ORDER));
+        val queue = new MinPQ<>(Comparator.comparing(Turn::getPosition, Vec2.READING_ORDER));
         goblins.forEach((p, u) ->
                 queue.add(new Turn(p, u, goblins, elves)));
         elves.forEach((p, u) ->
@@ -156,7 +157,7 @@ public class Battlefield {
                 .collect(Collectors.toSet());
         int distance = Integer.MAX_VALUE;
         Set<Vec2> visited = new HashSet<>();
-        Queue<Step> nearest = new PriorityQueue<>(Comparator.comparing(Step::getFirstStep, Vec2.READING_ORDER));
+        val nearest = new MinPQ<>(Comparator.comparing(Step::getFirstStep, Vec2.READING_ORDER));
         Queue<Step> queue = new LinkedList<>();
         adjacentOpenPositions(t.position)
                 .forEach(s ->
@@ -181,7 +182,7 @@ public class Battlefield {
             // nothing's available...
             return t;
         }
-        return t.move(nearest.element().firstStep);
+        return t.move(nearest.peek().firstStep);
     }
 
 }
