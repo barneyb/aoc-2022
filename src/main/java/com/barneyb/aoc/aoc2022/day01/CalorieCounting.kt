@@ -1,25 +1,40 @@
 package com.barneyb.aoc.aoc2022.day01
 
+import com.barneyb.aoc.util.Slice
 import com.barneyb.aoc.util.Solver
+import com.barneyb.aoc.util.toLong
+import com.barneyb.aoc.util.toSlice
 import java.util.*
 
 fun main() {
-    Solver.execute(
+    Solver.benchmark(
         ::parse,
-        PriorityQueue<*>::peek,
-        { pq -> pq.remove() + pq.remove() + pq.peek() }
+        ::topOne, // 70,296
+        ::topThree, // 205,381
     )
 }
 
-internal fun parse(input: String): PriorityQueue<Long> =
-    PriorityQueue(Comparator.naturalOrder<Long>().reversed()).apply {
-        input.trim()
+internal fun parse(input: String) =
+    buildList {
+        input.toSlice()
+            .trim()
             .split("\n\n")
             .forEach() {
                 add(
                     it.split("\n")
-                        .map(String::toLong)
+                        .map(Slice::toLong)
                         .reduce(Long::plus)
                 )
             }
     }
+
+internal fun topOne(elves: List<Long>) =
+    elves.max()
+
+internal fun topThree(elves: List<Long>) =
+    PriorityQueue<Long>().apply {
+        for (e in elves) {
+            add(e)
+            if (size > 3) remove()
+        }
+    }.sum()
