@@ -31,7 +31,7 @@ public final class Solver {
                                      int oneIterations, Function<T, ?> partOne,
                                      int twoIterations, Function<T, ?> partTwo) {
         val result = Timing.timed(() -> {
-            val input = Input.forProblem(init.getClass());
+            val input = Input.forProblem(partOne.getClass());
             val parsed = Timing.benchmark(initIterations, () ->
                     init.apply(input)).getResult();
             Timing.benchmark(oneIterations, () ->

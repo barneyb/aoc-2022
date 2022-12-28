@@ -19,14 +19,6 @@ public class Battlefield {
     public Battlefield() {
     }
 
-    public Battlefield(Battlefield basis) {
-        field.addAll(basis.field);
-        basis.goblins.forEach((p, u) ->
-                goblins.put(p, new Unit(u)));
-        basis.elves.forEach((p, u) ->
-                elves.put(p, new Unit(u)));
-    }
-
     @Override
     protected Battlefield clone() throws CloneNotSupportedException {
         val clone = (Battlefield) super.clone();
@@ -34,18 +26,16 @@ public class Battlefield {
         return clone;
     }
 
-    public void addSpace(int x, int y) {
-        field.add(new Vec2(x, y));
+    public void addSpace(Vec2 p) {
+        field.add(p);
     }
 
-    public void addGoblin(int x, int y) {
-        val p = new Vec2(x, y);
+    public void addGoblin(Vec2 p) {
         field.add(p);
         goblins.put(p, new Unit(Species.GOBLIN));
     }
 
-    public void addElf(int x, int y) {
-        val p = new Vec2(x, y);
+    public void addElf(Vec2 p) {
         field.add(p);
         elves.put(p, new Unit(Species.ELF));
     }

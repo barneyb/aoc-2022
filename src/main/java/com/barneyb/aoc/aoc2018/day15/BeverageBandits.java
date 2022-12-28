@@ -6,20 +6,23 @@ import lombok.Value;
 import lombok.val;
 
 import java.util.ArrayList;
-import java.util.function.Function;
 
 @Value
 public class BeverageBandits {
 
     public static void main(String[] args) {
         Solver.execute(
-                Function.identity(), // mutable state needs reparse
-                BeverageBandits::partOne,
-                BeverageBandits::partTwo);
+                BeverageBandits::parse,
+                BeverageBandits::partOne, // 198,531
+                BeverageBandits::partTwo); // 90,420
     }
 
     public static int partOne(String input) {
         return partOne(parse(input));
+    }
+
+    public static int partOne(Parse parse) {
+        return partOne(parse.toBattlefield());
     }
 
     public static int partOne(Battlefield battlefield) {
@@ -38,11 +41,11 @@ public class BeverageBandits {
         return partTwo(parse(input));
     }
 
-    public static int partTwo(Battlefield battlefield) {
+    public static int partTwo(Parse parse) {
         var hasWon = false;
+        val elfCount = parse.getElves().size();
         for (var power = 4; ; power++) {
-            val bf = new Battlefield(battlefield);
-            val elfCount = bf.getElves().size();
+            val bf = parse.toBattlefield();
             for (Unit e : bf.getElves().values()) {
                 e.setAttackPower(power);
             }
@@ -59,8 +62,8 @@ public class BeverageBandits {
         }
     }
 
-    private static Battlefield parse(String input) {
-        val field = new Battlefield();
+    static Parse parse(String input) {
+        val result = new Parse();
         int x = 0, y = 0;
         for (char c : input.toCharArray()) {
             if (c == '\n') {
@@ -69,15 +72,15 @@ public class BeverageBandits {
                 continue;
             }
             if (c == 'E') {
-                field.addElf(x, y);
+                result.addElf(x, y);
             } else if (c == 'G') {
-                field.addGoblin(x, y);
+                result.addGoblin(x, y);
             } else if (c == '.') {
-                field.addSpace(x, y);
+                result.addSpace(x, y);
             }
             x += 1;
         }
-        return field;
+        return result;
     }
 
     @SuppressWarnings("unused")
