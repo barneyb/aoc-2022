@@ -51,6 +51,9 @@ internal data class State(
                     WEST -> 2
                     NORTH -> 3
                 }
+
+    fun move() =
+        State(pos.move(facing), facing)
 }
 
 internal fun parse(input: String): Map {
@@ -107,26 +110,16 @@ internal fun parse(input: String): Map {
 
 private fun walk(map: Map, crossEdge: (State) -> State) =
     map.steps.fold(State(map.topLeft, EAST)) { state, (n, turn) ->
-        var (curr, facing) = state
+        var curr = state
         for (i in 0 until n) {
-            var next = curr.move(facing)
-            if (!map.contains(next)) {
-                crossEdge(State(curr, facing)).also {
-                    if (map[it.pos] != WALL) {
-//                        println("$facing of $curr is ${it.pos} facing ${it.facing}")
-                        next = it.pos
-                        facing = it.facing
-                    } else {
-//                        println("$facing of $curr is ${it.pos}, which is blocked")
-                    }
-                }
-            }
-            if (!map.contains(next) || map[next] == WALL)
+            var next = curr.move()
+            if (!map.contains(next.pos))
+                next = crossEdge(curr)
+            if (map[next.pos] == WALL)
                 break
             curr = next
         }
-//        println("at $curr, turn $turn to face ${turn.execute(facing)}")
-        State(curr, turn.execute(facing))
+        State(curr.pos, turn.execute(curr.facing))
     }
 
 internal fun finalPasswordTorus(map: Map): Int {
