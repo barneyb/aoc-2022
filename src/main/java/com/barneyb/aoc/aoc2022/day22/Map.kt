@@ -20,6 +20,7 @@ internal class Map(
     val width = bounds.width
     val height = bounds.height
     val leg = sqrt(tiles.size / 6.0).toInt().also {
+        assert(it * it * 6 == tiles.size) { "$it doesn't multiply out to tile count" }
         assert(height % it == 0) { "$it doesn't divide height $height evenly" }
         assert(topLeft.x % it == 1) { "$it leaves $topLeft not in a corner" }
     }
@@ -151,75 +152,48 @@ internal class Map(
 
     fun foldIntoCube() {
         adjacentEdges = HashMap<Edge, Edge>().apply {
-            val squares = HashSet<Int>().apply {
-                for (sqr in 0..15)
-                    if (tiles.contains(
-                            Vec2(
-                                1 + sqr % 4 * leg,
-                                1 + sqr / 4 * leg
-                            )
-                        )
-                    )
-                        add(sqr)
+            fun halfJoin(a: Edge, b: Edge) {
+                if (contains(a)) {
+                    val it = get(a)
+                    throw IllegalArgumentException("can't remap $a to $b (mapped to $it)")
+                }
+                put(a, b)
             }
 
-            fun exists(sqr: Int) =
-                squares.contains(sqr)
-
-            fun known(e: Edge) =
-                contains(e)
-
             fun join(a: Edge, z: Edge) {
-                if (contains(a))
-                    throw IllegalArgumentException(
-                        "can't remap $a to $z (mapped to ${
-                            get(
-                                a
-                            )
-                        })"
-                    )
-                put(a, z)
-                if (contains(z))
-                    throw IllegalArgumentException(
-                        "can't remap $z to $a (mapped to ${
-                            get(
-                                z
-                            )
-                        })"
-                    )
-                put(z, a)
+                halfJoin(a, z)
+                halfJoin(z, a)
             }
 
             // first, all the "internal" edges
-            for (s in squares) {
-                fun up(sqr: Int) =
-                    if (sqr >= 4) sqr - 4 else -1
-
-                fun left(sqr: Int) =
-                    if (sqr % 4 > 0) sqr - 1 else -1
-                if (exists(up(s))) join(Edge(s, NORTH), Edge(up(s), SOUTH))
-                if (exists(left(s))) join(Edge(s, WEST), Edge(left(s), EAST))
+            with(HashSet<Int>()) {
+                (0 until 15).filter {
+                    tiles.contains(Vec2(1 + it % 4 * leg, 1 + it / 4 * leg))
+                }.forEach(this::add)
+                for (s in this) {
+                    val up = if (s >= 4) s - 4 else -1
+                    if (contains(up))
+                        join(Edge(s, NORTH), Edge(up, SOUTH))
+                    val left = if (s % 4 > 0) s - 1 else -1
+                    if (contains(left))
+                        join(Edge(s, WEST), Edge(left, EAST))
+                }
             }
 
-            // Now start wrapping, which always takes multiple passes. It'll
-            // always take at least two, but depending on the traversal order
-            // (which depends on the HashMap's undefined iteration order), I
-            // believe it may take a third.
-            val queue = Queue<Edge>()
+            // Now start wrapping. Depending on the traversal order (which
+            // depends on the HashMap's undefined iteration order), it may take
+            // multiple passes. Note that this wouldn't work w/ Java's HashMap,
+            // as it protects against concurrent modification, by mine doesn't.
             while (size < 24) {
-                queue.addAll(keys)
-                while (queue.isNotEmpty()) {
-                    val a = queue.remove()
+                for (a in keys) {
                     val b = get(a)
-                    if (known(Edge(a.square, a.dir.turnRight()))) {
-                        if (!known(Edge(b.square, b.dir.turnLeft()))) {
-                            val e1 =
-                                get(Edge(a.square, a.dir.turnRight())).let {
-                                    Edge(it.square, it.dir.turnRight())
-                                }
-                            val e2 = Edge(b.square, b.dir.turnLeft())
-                            join(e1, e2)
-                            queue.add(e1, e2)
+                    val aPrime = Edge(a.square, a.dir.turnRight())
+                    if (contains(aPrime)) {
+                        val bPrime = Edge(b.square, b.dir.turnLeft())
+                        if (!contains(bPrime)) {
+                            val aPrimePrime = get(aPrime)
+                                .let { Edge(it.square, it.dir.turnRight()) }
+                            join(aPrimePrime, bPrime)
                         }
                     }
                 }

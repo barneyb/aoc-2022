@@ -108,13 +108,13 @@ internal fun parse(input: String): Map {
     )
 }
 
-private fun walk(map: Map, crossEdge: (State) -> State) =
+private fun walk(map: Map) =
     map.steps.fold(State(map.topLeft, EAST)) { state, (n, turn) ->
         var curr = state
         for (i in 0 until n) {
             var next = curr.move()
             if (!map.contains(next.pos))
-                next = crossEdge(curr)
+                next = map.crossEdge(curr)
             if (map[next.pos] == WALL)
                 break
             curr = next
@@ -124,10 +124,10 @@ private fun walk(map: Map, crossEdge: (State) -> State) =
 
 internal fun finalPasswordTorus(map: Map): Int {
     map.foldIntoTorus()
-    return walk(map, map::crossEdge).password
+    return walk(map).password
 }
 
 internal fun finalPasswordCube(map: Map): Int {
     map.foldIntoCube()
-    return walk(map, map::crossEdge).password
+    return walk(map).password
 }
