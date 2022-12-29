@@ -1,10 +1,8 @@
 package com.barneyb.aoc.aoc2022.day22
 
-import com.barneyb.util.Dir
+import com.barneyb.util.*
 import com.barneyb.util.Dir.*
-import com.barneyb.util.HashMap
-import com.barneyb.util.Rect
-import com.barneyb.util.Vec2
+import kotlin.math.sqrt
 
 private fun IntProgression.indexOf(n: Int) =
     (n - first) / step
@@ -21,12 +19,12 @@ internal class Map(
 
     val width = bounds.width
     val height = bounds.height
-    val leg = (if (width % 3 == 0) width / 3 else width / 4).also {
+    val leg = sqrt(tiles.size / 6.0).toInt().also {
         assert(height % it == 0) { "$it doesn't divide height $height evenly" }
         assert(topLeft.x % it == 1) { "$it leaves $topLeft not in a corner" }
     }
 
-    private var adjacentEdges: HashMap<Edge, Edge>? = null
+    var adjacentEdges: HashMap<Edge, Edge>? = null
 
     inner class Edge(
         val square: Int, // 0..15, on a 4x4 grid
@@ -38,21 +36,25 @@ internal class Map(
          * edge will start at the top-left of the square, and a SOUTH edge will
          * start at the bottom-right.
          */
-        val start: Vec2 = when (dir) {
-            NORTH -> Vec2(1 + leg * (square % 4), 1 + leg * (square / 4))
-            EAST -> Vec2(leg * (square % 4 + 1), 1 + leg * (square / 4))
-            SOUTH -> Vec2(leg * (square % 4 + 1), leg * (square / 4 + 1))
-            WEST -> Vec2(1 + leg * (square % 4), leg * (square / 4 + 1))
+        val start: Vec2 by lazy {
+            when (dir) {
+                NORTH -> Vec2(1 + leg * (square % 4), 1 + leg * (square / 4))
+                EAST -> Vec2(leg * (square % 4 + 1), 1 + leg * (square / 4))
+                SOUTH -> Vec2(leg * (square % 4 + 1), leg * (square / 4 + 1))
+                WEST -> Vec2(1 + leg * (square % 4), leg * (square / 4 + 1))
+            }
         }
 
         /**
          * The range of the dynamic coordinate from [start] along the edge.
          */
-        val range = when (dir) {
-            NORTH -> start.x until start.x + leg
-            SOUTH -> start.x downTo start.x - leg + 1
-            EAST -> start.y until start.y + leg
-            WEST -> start.y downTo start.y - leg + 1
+        val range by lazy {
+            when (dir) {
+                NORTH -> start.x until start.x + leg
+                SOUTH -> start.x downTo start.x - leg + 1
+                EAST -> start.y until start.y + leg
+                WEST -> start.y downTo start.y - leg + 1
+            }
         }
 
         /** Whether the given point is on this edge. */
@@ -86,7 +88,23 @@ internal class Map(
         }
 
         override fun toString(): String {
-            return "Edge(dir=$dir, start=$start, range=$range)"
+            return "Edge(sqr=$square, dir=$dir)"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Edge) return false
+
+            if (square != other.square) return false
+            if (dir != other.dir) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = square
+            result = 31 * result + dir.hashCode()
+            return result
         }
 
     }
@@ -133,31 +151,80 @@ internal class Map(
 
     fun foldIntoCube() {
         adjacentEdges = HashMap<Edge, Edge>().apply {
-            when (leg) {
-                4 -> listOf(
-                    Edge(2, NORTH) to Edge(4, NORTH),
-                    Edge(2, EAST) to Edge(11, EAST),
-                    Edge(6, EAST) to Edge(11, NORTH),
-                    Edge(11, SOUTH) to Edge(4, WEST),
-                    Edge(10, SOUTH) to Edge(4, SOUTH),
-                    Edge(10, WEST) to Edge(5, SOUTH),
-                    Edge(5, NORTH) to Edge(2, WEST),
-                )
-                50 -> listOf(
-                    Edge(1, NORTH) to Edge(12, WEST),
-                    Edge(2, NORTH) to Edge(12, SOUTH),
-                    Edge(2, EAST) to Edge(9, EAST),
-                    Edge(2, SOUTH) to Edge(5, EAST),
-                    Edge(9, SOUTH) to Edge(12, EAST),
-                    Edge(8, WEST) to Edge(1, WEST),
-                    Edge(8, NORTH) to Edge(5, WEST),
-                )
-                else ->
-                    throw IllegalStateException("Unsupported $leg-length leg?!")
-            }.forEach {
-                put(it.first, it.second)
-                put(it.second, it.first)
+            val squares = HashSet<Int>().apply {
+                for (sqr in 0..15)
+                    if (tiles.contains(
+                            Vec2(
+                                1 + sqr % 4 * leg,
+                                1 + sqr / 4 * leg
+                            )
+                        )
+                    )
+                        add(sqr)
             }
+
+            fun exists(sqr: Int) =
+                squares.contains(sqr)
+
+            fun known(e: Edge) =
+                contains(e)
+
+            fun join(a: Edge, z: Edge) {
+                if (contains(a))
+                    throw IllegalArgumentException(
+                        "can't remap $a to $z (mapped to ${
+                            get(
+                                a
+                            )
+                        })"
+                    )
+                put(a, z)
+                if (contains(z))
+                    throw IllegalArgumentException(
+                        "can't remap $z to $a (mapped to ${
+                            get(
+                                z
+                            )
+                        })"
+                    )
+                put(z, a)
+            }
+
+            // first, all the "internal" edges
+            for (s in squares) {
+                fun up(sqr: Int) =
+                    if (sqr >= 4) sqr - 4 else -1
+
+                fun left(sqr: Int) =
+                    if (sqr % 4 > 0) sqr - 1 else -1
+                if (exists(up(s))) join(Edge(s, NORTH), Edge(up(s), SOUTH))
+                if (exists(left(s))) join(Edge(s, WEST), Edge(left(s), EAST))
+            }
+
+            // Now start wrapping, which always takes multiple passes. It'll
+            // always take at least two, but depending on the traversal order
+            // (which depends on the HashMap's undefined iteration order), I
+            // believe it may take a third.
+            val queue = Queue<Edge>()
+            while (size < 24) {
+                queue.addAll(keys)
+                while (queue.isNotEmpty()) {
+                    val a = queue.remove()
+                    val b = get(a)
+                    if (known(Edge(a.square, a.dir.turnRight()))) {
+                        if (!known(Edge(b.square, b.dir.turnLeft()))) {
+                            val e1 =
+                                get(Edge(a.square, a.dir.turnRight())).let {
+                                    Edge(it.square, it.dir.turnRight())
+                                }
+                            val e2 = Edge(b.square, b.dir.turnLeft())
+                            join(e1, e2)
+                            queue.add(e1, e2)
+                        }
+                    }
+                }
+            }
+
         }
     }
 
