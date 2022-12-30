@@ -12,6 +12,12 @@ public final class Solver {
         throw new UnsupportedOperationException("really?");
     }
 
+    private static final boolean ALLOW_BENCHMARK;
+
+    static {
+        ALLOW_BENCHMARK = !"false".equals(System.getProperty("benchmark", "true"));
+    }
+
     @SuppressWarnings("unused")
     public static <T> void benchmark(Function<String, T> init,
                                      Function<T, ?> partOne,
@@ -30,6 +36,10 @@ public final class Solver {
     public static <T> void benchmark(int initIterations, Function<String, T> init,
                                      int oneIterations, Function<T, ?> partOne,
                                      int twoIterations, Function<T, ?> partTwo) {
+        if (!ALLOW_BENCHMARK) {
+            execute(init, partOne, partTwo);
+            return;
+        }
         val result = Timing.timed(() -> {
             val input = Input.forProblem(partOne.getClass());
             val parsed = Timing.benchmark(initIterations, () ->

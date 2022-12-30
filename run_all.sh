@@ -8,7 +8,7 @@ if [[ $SCRIPT != .* ]]; then
   exec "./.$SCRIPT" "$@"
 fi
 
-(
+time (
     find src/main/java -name '*.java' -print0 \
         | xargs -0 grep -l 'void main(' \
         | sed -e 's/\.java$//'
@@ -21,7 +21,7 @@ fi
     | grep '.aoc.' \
     | sort \
     | sed -e 's/\(.*\)/-Dexec.mainClass="\1"/' \
-    | xargs -n 1 mvn -q -B exec:java
+    | xargs -n 1 mvn -q -B -Dbenchmark=false exec:java
 
 if [[ $SCRIPT = .* ]]; then
   rm "$SCRIPT"
