@@ -13,6 +13,9 @@ class MinPQ<E : Any>(
     fun isEmpty() =
         size == 0
 
+    fun isNotEmpty() =
+        !isEmpty()
+
     private var heap = arrayOfNulls<Any>(11) as Array<E?>
 
     fun add(element: E) {
