@@ -70,16 +70,13 @@ data class Blueprint(
             }
     }
 
-    private val bestsByMinute = arrayOfNulls<Step>(MINUTES_PART_TWO + 1)
-
     fun maxGeodesIn(minutes: Int): Long {
-        if (bestsByMinute[minutes] != null)
-            return bestsByMinute[minutes]!!.geodeCount
-        bestsByMinute[minutes] = Step()
+        var best = Step()
         val queue = Stack<Step>()
-        queue.add(bestsByMinute[minutes]!!)
+        queue.add(best)
         while (queue.isNotEmpty()) {
             var curr = queue.remove()
+            assert(curr.minute <= minutes)
 
             val timeLeft = minutes - curr.minute - 1
             if (timeLeft == 0) {
@@ -87,10 +84,9 @@ data class Blueprint(
                 curr = curr.tick()
             }
 
-            val best = bestsByMinute[minutes]!!
             if (curr.minute == minutes) {
                 if (curr.pool > best.pool)
-                    bestsByMinute[curr.minute] = curr
+                    best = curr
                 continue
             }
 
@@ -104,11 +100,12 @@ data class Blueprint(
             curr.build(costOfClay, oneClay, timeLeft)?.also(queue::add)
             curr.build(costOfObsidian, oneObsidian, timeLeft)?.also(queue::add)
             curr.build(costOfGeode, oneGeode, timeLeft)?.also(queue::add)
+            // don't have time to build anything; skip to the end
             if (queue.size == before)
                 queue.add(curr.tick(timeLeft + 1))
         }
 
-        return bestsByMinute[minutes]!!
+        return best
 //            .also(::println)
             .geodeCount
     }

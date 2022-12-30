@@ -6,8 +6,8 @@ import com.barneyb.aoc.util.toSlice
 fun main() {
     Solver.execute(
         ::parse,
-        ::totalQualityLevel, // 1703
-        ::maxFromThree, // 5301
+        ::totalQualityLevel, // 1,703
+        ::maxFromThree, // 5,301
     )
 }
 
