@@ -3,6 +3,8 @@ package com.barneyb.aoc.aoc2022.day16
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
 import com.barneyb.util.HashMap
+import com.barneyb.util.Queue
+import com.barneyb.util.Stack
 
 fun main() {
     Solver.execute(
@@ -22,7 +24,7 @@ internal data class Valve(
 private val lineMatcher =
     Regex("Valve ([A-Z]+) has flow rate=(\\d+); tunnels? leads? to valves? ([A-Z]+(, [A-Z]+)*)")
 
-internal fun parse(input: String) =
+internal fun parseValves(input: String) =
     input.toSlice()
         .trim()
         .lines()
@@ -32,19 +34,28 @@ internal fun parse(input: String) =
             Valve(name, rate.toInt(), tunnels.split(',').map(String::trim))
         }
 
+internal fun parse(input: String) =
+    buildGraph(parseValves(input))
+
 private const val START_VALVE = "AA"
 
-private typealias Graph = HashMap<Valve, MutableMap<Valve, Int>>
+private typealias Graph = HashMap<Valve, HashMap<Valve, Int>>
+
+private val Graph.startValve
+    get() = keys.first { it.name == START_VALVE }
 
 private fun buildGraph(valves: List<Valve>): Graph {
-    val index = HashMap<String, Valve>()
-    for (v in valves) {
-        index[v.name] = v
+    val index = HashMap<String, Valve>().apply {
+        for (v in valves)
+            put(v.name, v)
     }
-    val adjacent = Graph()
-    for (v in valves) {
-        adjacent[v] = v.tunnels
-            .associateByTo(mutableMapOf(), index::get) { 1 }
+    val adjacent = Graph().apply {
+        for (v in valves) {
+            put(v, HashMap<Valve, Int>().apply {
+                for (t in v.tunnels)
+                    put(index[t], 1)
+            })
+        }
     }
 //    printGraphviz(adjacent)
     for (v in valves) {
@@ -53,7 +64,8 @@ private fun buildGraph(valves: List<Valve>): Graph {
         for ((a, ad) in adj) {
             for ((b, bd) in adj) {
                 if (a == b) continue
-                val curr = adjacent[a].getOrDefault(b, Int.MAX_VALUE)
+                val curr = if (adjacent[a].contains(b)) adjacent[a][b]
+                else Int.MAX_VALUE
                 val new = ad + bd
                 if (new < curr) {
                     adjacent[a][b] = new
@@ -67,24 +79,22 @@ private fun buildGraph(valves: List<Valve>): Graph {
 //    printGraphviz(adjacent)
     val again = Graph()
     for (v in adjacent.keys) {
-        val temp = mutableMapOf<Valve, Int>()
-        val queue = com.barneyb.util.Queue(Pair(v, 0))
+        val temp = HashMap<Valve, Int>()
+        val queue = Queue(Pair(v, 0))
         while (queue.isNotEmpty()) {
             val (s, d) = queue.remove()
-            if (!temp.contains(s) || temp.getValue(s) > d) {
+            if (!temp.contains(s) || temp[s] > d) {
                 temp[s] = d
                 s.tunnels.forEach {
                     queue.enqueue(Pair(index[it], d + 1))
                 }
             }
         }
-        val adj = temp.filter { (s, _) ->
-            s !== v && s.rate > 0
+        again[v] = HashMap<Valve, Int>().apply {
+            temp.filter { (s, _) ->
+                s !== v && s.rate > 0
+            }.forEach(this::put)
         }
-            .toMutableMap()
-        if (adj.isNotEmpty())
-            again[v] =
-                adj.toSortedMap(Comparator.comparingInt(Valve::rate))
     }
 //    printGraphviz(again)
     return again
@@ -105,49 +115,35 @@ private fun printGraphviz(adjacent: Graph) {
     })
 }
 
-private fun walk(
-    adjacent: Graph,
-    start: Step<*>,
-    minimum: Int = Int.MIN_VALUE
-): Int {
+private fun walk(adjacent: Graph, start: Step): Int {
 //    printGraphviz(adjacent)
-    val queue = com.barneyb.util.Stack(start)
+    val queue = Stack(start)
     val maxRate = adjacent.keys.sumOf(Valve::rate)
-    var best = minimum
+    var best = Int.MIN_VALUE
+    val visited = HashMap<Set<Valve>, Int>()
     while (queue.isNotEmpty()) {
         val step = queue.remove()
         val remaining = step.minutesLeft
         if (remaining < 0) continue
-        if (step.projected > best) {
+        if (step.projected > best)
             best = step.projected
-        }
-        if (remaining == 0 || step.rate == maxRate) continue
-        else if (step.projected + remaining * (maxRate - step.rate) < best) {
+        else if (visited.contains(step.open))
+            if (visited[step.open] >= step.projected)
+                continue
+        visited[step.open] = step.projected
+        if (step.rate == maxRate)
             continue
-        }
+        else if (step.projected + remaining * (maxRate - step.rate) <= best)
+            continue
         for ((v, d) in adjacent[step.valve])
-            if (remaining - d > 1 && !step.isOpen(v))
+            if (remaining - 1 > d && !step.isOpen(v))
                 queue.add(step.moveAndOpen(v, d))
     }
     return best
 }
 
-internal fun maximumPressureRelease(valves: List<Valve>) =
-    walk(
-        buildGraph(valves),
-        Solo(29, valves.first { it.name == START_VALVE })
-    )
+internal fun maximumPressureRelease(graph: Graph) =
+    walk(graph, Solo(29, graph.startValve))
 
-internal fun maximumPressureReleaseWithElephant(
-    valves: List<Valve>,
-    minimum: Int = Int.MIN_VALUE
-): Int {
-    val min = 25
-    val start = valves.first { it.name == START_VALVE }
-    val graph = buildGraph(valves)
-    return walk(
-        graph,
-        Team(intArrayOf(min, min), arrayOf(start, start)),
-        minimum,
-    )
-}
+internal fun maximumPressureReleaseWithElephant(graph: Graph) =
+    walk(graph, Team(25, graph.startValve))

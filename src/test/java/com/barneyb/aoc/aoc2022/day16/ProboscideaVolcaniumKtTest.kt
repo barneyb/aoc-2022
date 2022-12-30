@@ -1,5 +1,6 @@
 package com.barneyb.aoc.aoc2022.day16
 
+import com.barneyb.aoc.util.Input
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -32,7 +33,8 @@ class ProboscideaVolcaniumKtTest {
                 Valve("HH", 22, listOf("GG")),
                 Valve("II", 0, listOf("AA", "JJ")),
                 Valve("JJ", 21, listOf("II")),
-            ), parse(EXAMPLE_ONE)
+            ),
+            parseValves(EXAMPLE_ONE)
         )
     }
 
@@ -47,6 +49,13 @@ class ProboscideaVolcaniumKtTest {
             1707,
             maximumPressureReleaseWithElephant(parse(EXAMPLE_ONE))
         )
+    }
+
+    @Test
+    fun theRealDeal() {
+        val parsed = parse(Input.forProblem(::parse))
+        assertEquals(1880, maximumPressureRelease(parsed))
+        assertEquals(2520, maximumPressureReleaseWithElephant(parsed))
     }
 
 }

@@ -4,10 +4,18 @@ internal data class Team(
     val minutesLefts: IntArray,
     val valves: Array<Valve>,
     override val projected: Int = 0,
-    val open: Set<Valve> = emptySet(),
+    override val open: Set<Valve> = emptySet(),
     override val rate: Int = 0,
-    val idx: Int = 0,
-) : Step<Team> {
+) : Step {
+
+    constructor(minLeft: Int, valve: Valve) : this(
+        intArrayOf(minLeft, minLeft),
+        arrayOf(valve, valve)
+    )
+
+    val idx: Int =
+        if (minutesLefts[0] >= minutesLefts[1]) 0 else 1
+
     override val minutesLeft
         get() = minutesLefts[idx]
 
@@ -17,32 +25,16 @@ internal data class Team(
     override fun isOpen(v: Valve) =
         open.contains(v)
 
-    private fun nextIdx(mls: IntArray) =
-        if (mls[0] >= mls[1]) 0 else 1
-
-    private fun moveTo(v: Valve, dist: Int): Team {
-        val mls = minutesLefts.copyOf()
-        mls[idx] -= dist
-        return copy(
-            minutesLefts = mls,
+    override fun moveAndOpen(v: Valve, dist: Int) =
+        copy(
+            minutesLefts = minutesLefts.copyOf().apply {
+                this[idx] -= dist + 1
+            },
             valves = valves.copyOf().apply {
                 this[idx] = v
             },
-            idx = nextIdx(mls),
+            projected = projected + v.rate * (minutesLefts[idx] - dist),
+            open = open + v,
+            rate = rate + v.rate,
         )
-    }
-
-    override fun moveAndOpen(v: Valve, dist: Int): Team {
-        val idx = idx
-        val n = moveTo(v, dist)
-        val mls = n.minutesLefts.copyOf()
-        mls[idx] -= 1
-        return n.copy(
-            minutesLefts = mls,
-            projected = n.projected + n.valves[idx].rate * n.minutesLefts[idx],
-            open = n.open + n.valves[idx],
-            rate = n.rate + n.valves[idx].rate,
-            idx = nextIdx(mls),
-        )
-    }
 }

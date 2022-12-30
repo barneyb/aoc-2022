@@ -53,6 +53,9 @@ class HashMap<K : Any, V>(initialCapacity: Int = 10) : Iterable<Pair<K, V>> {
             ?: throw UnknownKeyException(key)
     }
 
+    fun put(pair: Pair<K, V>) =
+        put(pair.first, pair.second)
+
     fun put(key: K, value: V) {
         if (size >= bins.size / 4 * 3) {
             resize(bins.size * 2)
