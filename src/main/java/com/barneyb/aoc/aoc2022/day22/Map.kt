@@ -38,6 +38,12 @@ internal class Map(
         val dir: Dir,
     ) {
 
+        /** Construct from any point in the square. */
+        constructor(pos: Vec2, dir: Dir) : this(
+            pos.y / leg * 4 + pos.x / leg,
+            dir
+        )
+
         /**
          * The corner where the edge starts, moving clockwise. E.g., a NORTH
          * edge will start at the top-left of the square, and a SOUTH edge will
@@ -127,35 +133,42 @@ internal class Map(
 
     fun foldIntoTorus() {
         edgePairs = HashMap<Edge, Edge>().apply {
-            fun walk(
-                dir: Dir,
-                pt: (major: Int, minor: Int) -> Vec2,
-                sqr: (major: Int, minor: Int) -> Int,
-            ) {
-                for (major in 0 until 4) {
-                    var first: Int? = null
-                    var last: Int? = null
-                    for (minor in 0 until 4) {
-                        val p = pt(
-                            1 + major * leg,
-                            1 + minor * leg
-                        )
-                        if (tiles.contains(p)) {
+            fun walk(step: Dir) {
+                fun nextEchelon(curr: Vec2) =
+                    when (step) {
+                        SOUTH -> Vec2(curr.x + leg, bounds.y1)
+                        EAST -> Vec2(bounds.x1, curr.y + leg)
+                        else -> throw IllegalArgumentException("Cannot walk $step, only in positive directions")
+                    }
+
+                var curr = Vec2(bounds.x1, bounds.y1)
+                while (bounds.contains(curr)) {
+                    var first: Vec2? = null
+                    var last: Vec2? = null
+                    // This is only guaranteed to work after knowing what part
+                    // two holds. With only the torus rules, nothing precluded
+                    // the map from having a "U" inlet, though that would have
+                    // needed some more instructions. But since it folds into a
+                    // cube as well, a "U" is impossible.
+                    while (bounds.contains(curr)) {
+                        if (tiles.contains(curr)) {
                             if (first == null)
-                                first = minor
-                            last = minor
+                                first = curr
+                            last = curr
                         }
+                        curr = curr.move(step, leg)
                     }
-                    if (first != null) { // square(s) in this row/column exist!
-                        val a = Edge(sqr(major, first), dir.reversed())
-                        val z = Edge(sqr(major, last!!), dir)
-                        put(a, z)
-                        put(z, a)
+                    if (first != null) { // one or more squares exist!
+                        val a = Edge(first, step.reversed())
+                        val b = Edge(last!!, step)
+                        put(a, b)
+                        put(b, a)
                     }
+                    curr = nextEchelon(curr)
                 }
             }
-            walk(EAST, { y, x -> Vec2(x, y) }, { y, x -> y * 4 + x })
-            walk(SOUTH, { x, y -> Vec2(x, y) }, { x, y -> y * 4 + x })
+            walk(EAST)
+            walk(SOUTH)
         }
     }
 
@@ -169,9 +182,9 @@ internal class Map(
                 put(a, b)
             }
 
-            fun join(a: Edge, z: Edge) {
-                halfJoin(a, z)
-                halfJoin(z, a)
+            fun join(a: Edge, b: Edge) {
+                halfJoin(a, b)
+                halfJoin(b, a)
             }
 
             // first, all the "internal" edges
