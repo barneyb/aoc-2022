@@ -79,27 +79,6 @@ internal class Map(
                 WEST -> p.x == start.x && p.y in range
             }
 
-        /**
-         * Cross to the edge's dual, and return the resulting [State].
-         */
-        fun crossTo(dual: Edge, pos: Vec2): State {
-            fun map(c: Int) =
-                dual.range.reversed()[range.indexOf(c)]
-            return State(
-                when (dir) {
-                    NORTH, SOUTH -> when (dual.dir) {
-                        NORTH, SOUTH -> Vec2(map(pos.x), dual.start.y)
-                        EAST, WEST -> Vec2(dual.start.x, map(pos.x))
-                    }
-                    EAST, WEST -> when (dual.dir) {
-                        NORTH, SOUTH -> Vec2(map(pos.y), dual.start.y)
-                        EAST, WEST -> Vec2(dual.start.x, map(pos.y))
-                    }
-                },
-                dual.dir.reversed()
-            )
-        }
-
         fun toThe(turn: Turn) =
             Edge(square, turn.execute(dir))
 
@@ -228,12 +207,32 @@ internal class Map(
         }
     }
 
+    /**
+     * From the given state, which must be facing an edge, step over it to the
+     * next face of the map, and return the resulting [State]. Note that a wall
+     * check is NOT performed, so it may not be possible to actually move to the
+     * returned `State`.
+     */
     fun crossEdge(state: State): State {
         val (pos, facing) = state
-        val (edge, dual) = edgePairs!!.firstOrNull { (k, _) ->
-            k.contains(pos) && k.dir == facing
-        }
+        val (edge, dual) = edgePairs!!
+            .firstOrNull { (k, _) -> k.contains(pos) && k.dir == facing }
             ?: throw IllegalArgumentException("Unknown edge facing $facing from $pos.")
-        return edge.crossTo(dual, pos)
+
+        fun map(c: Int) =
+            dual.range.reversed()[edge.range.indexOf(c)]
+        return State(
+            when (edge.dir) {
+                NORTH, SOUTH -> when (dual.dir) {
+                    NORTH, SOUTH -> Vec2(map(pos.x), dual.start.y)
+                    EAST, WEST -> Vec2(dual.start.x, map(pos.x))
+                }
+                EAST, WEST -> when (dual.dir) {
+                    NORTH, SOUTH -> Vec2(map(pos.y), dual.start.y)
+                    EAST, WEST -> Vec2(dual.start.x, map(pos.y))
+                }
+            },
+            dual.dir.reversed()
+        )
     }
 }
