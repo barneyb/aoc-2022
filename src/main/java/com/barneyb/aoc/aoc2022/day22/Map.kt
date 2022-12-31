@@ -1,5 +1,7 @@
 package com.barneyb.aoc.aoc2022.day22
 
+import com.barneyb.aoc.aoc2022.day22.Turn.LEFT
+import com.barneyb.aoc.aoc2022.day22.Turn.RIGHT
 import com.barneyb.util.*
 import com.barneyb.util.Dir.*
 import kotlin.math.sqrt
@@ -25,7 +27,12 @@ internal class Map(
         assert(topLeft.x % it == 1) { "$it leaves $topLeft not in a corner" }
     }
 
-    var adjacentEdges: HashMap<Edge, Edge>? = null
+    /**
+     * Pairs of edges which are "the same", but from each of the viewpoints of
+     * the two squares being joined. Pairs are recorded both ways, so every
+     * Edge is present twice: once as a key and once as a value.
+     */
+    var edgePairs: HashMap<Edge, Edge>? = null
 
     inner class Edge(
         val square: Int, // 0..15, on a 4x4 grid
@@ -68,25 +75,28 @@ internal class Map(
             }
 
         /**
-         * Cross to the other (adjacent) edge, and return the resulting [State].
+         * Cross to the edge's dual, and return the resulting [State].
          */
-        fun crossTo(other: Edge, pos: Vec2): State {
+        fun crossTo(dual: Edge, pos: Vec2): State {
             fun map(c: Int) =
-                other.range.reversed()[range.indexOf(c)]
+                dual.range.reversed()[range.indexOf(c)]
             return State(
                 when (dir) {
-                    NORTH, SOUTH -> when (other.dir) {
-                        NORTH, SOUTH -> Vec2(map(pos.x), other.start.y)
-                        EAST, WEST -> Vec2(other.start.x, map(pos.x))
+                    NORTH, SOUTH -> when (dual.dir) {
+                        NORTH, SOUTH -> Vec2(map(pos.x), dual.start.y)
+                        EAST, WEST -> Vec2(dual.start.x, map(pos.x))
                     }
-                    EAST, WEST -> when (other.dir) {
-                        NORTH, SOUTH -> Vec2(map(pos.y), other.start.y)
-                        EAST, WEST -> Vec2(other.start.x, map(pos.y))
+                    EAST, WEST -> when (dual.dir) {
+                        NORTH, SOUTH -> Vec2(map(pos.y), dual.start.y)
+                        EAST, WEST -> Vec2(dual.start.x, map(pos.y))
                     }
                 },
-                other.dir.reversed()
+                dual.dir.reversed()
             )
         }
+
+        fun toThe(turn: Turn) =
+            Edge(square, turn.execute(dir))
 
         override fun toString(): String {
             return "Edge(sqr=$square, dir=$dir)"
@@ -117,7 +127,7 @@ internal class Map(
         tiles[pos]
 
     fun foldIntoTorus() {
-        adjacentEdges = HashMap<Edge, Edge>().apply {
+        edgePairs = HashMap<Edge, Edge>().apply {
             fun walk(
                 dir: Dir,
                 pt: (major: Int, minor: Int) -> Vec2,
@@ -151,7 +161,7 @@ internal class Map(
     }
 
     fun foldIntoCube() {
-        adjacentEdges = HashMap<Edge, Edge>().apply {
+        edgePairs = HashMap<Edge, Edge>().apply {
             fun halfJoin(a: Edge, b: Edge) {
                 if (contains(a)) {
                     val it = get(a)
@@ -167,7 +177,7 @@ internal class Map(
 
             // first, all the "internal" edges
             with(HashSet<Int>()) {
-                (0 until 15).filter {
+                (1 until 15).filter {
                     tiles.contains(Vec2(1 + it % 4 * leg, 1 + it / 4 * leg))
                 }.forEach(this::add)
                 for (s in this) {
@@ -185,15 +195,19 @@ internal class Map(
             // multiple passes. Note that this wouldn't work w/ Java's HashMap,
             // as it protects against concurrent modification, by mine doesn't.
             while (size < 24) {
-                for (a in keys) {
-                    val b = get(a)
-                    val aPrime = Edge(a.square, a.dir.turnRight())
-                    if (contains(aPrime)) {
-                        val bPrime = Edge(b.square, b.dir.turnLeft())
-                        if (!contains(bPrime)) {
-                            val aPrimePrime = get(aPrime)
-                                .let { Edge(it.square, it.dir.turnRight()) }
-                            join(aPrimePrime, bPrime)
+                for (edge in keys) {
+                    // if the edge "to the right" is paired...
+                    val right = edge.toThe(RIGHT)
+                    if (contains(right)) {
+                        // but the edge "to the left" its dual doesn't...
+                        val dual = get(edge)
+                        val left = dual.toThe(LEFT)
+                        if (!contains(left)) {
+                            // ...we have an internal corner between left and
+                            // the edge "to the right" of right's dual.
+                            val aPrimePrime = get(right).toThe(RIGHT)
+                            // join them!
+                            join(aPrimePrime, left)
                         }
                     }
                 }
@@ -204,10 +218,10 @@ internal class Map(
 
     fun crossEdge(state: State): State {
         val (pos, facing) = state
-        val (edge, other) = adjacentEdges!!.firstOrNull { (k, _) ->
+        val (edge, dual) = edgePairs!!.firstOrNull { (k, _) ->
             k.contains(pos) && k.dir == facing
         }
             ?: throw IllegalArgumentException("Unknown edge facing $facing from $pos.")
-        return edge.crossTo(other, pos)
+        return edge.crossTo(dual, pos)
     }
 }

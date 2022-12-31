@@ -57,8 +57,8 @@ class MapTest {
     }
 
     @Suppress("unused")
-    private fun printAdjacent(map: Map) {
-        map.adjacentEdges!!.let { edges ->
+    private fun printEdgePairs(map: Map) {
+        map.edgePairs!!.let { edges ->
             println("${edges.size} known edges")
             edges
                 .filter { (a, b) -> a.square < b.square }
@@ -67,7 +67,7 @@ class MapTest {
     }
 
     private fun assertEdge(map: Map, a: Map.Edge, b: Map.Edge) {
-        val edges = map.adjacentEdges!!
+        val edges = map.edgePairs!!
         assertTrue(edges.contains(a), "$a is not known")
         assertTrue(edges.contains(b), "$b is not known")
         assertEquals(b, edges[a])
