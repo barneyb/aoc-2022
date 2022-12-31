@@ -51,7 +51,7 @@ class MapTest {
             (raw.replace(Regex("[0-9a-f]"), ".")
                 .lines()
                 .filter(String::isNotBlank) +
-                    listOf("", "movement", ""))
+                    listOf("", "1", ""))
                 .joinToString("\n")
         ).map
 

@@ -4,8 +4,7 @@ import com.barneyb.aoc.aoc2022.day22.Tile.OPEN
 import com.barneyb.aoc.aoc2022.day22.Tile.WALL
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
-import com.barneyb.util.Dir
-import com.barneyb.util.Dir.*
+import com.barneyb.util.Dir.EAST
 import com.barneyb.util.HashMap
 import com.barneyb.util.Rect
 import com.barneyb.util.Vec2
@@ -20,41 +19,10 @@ fun main() {
 
 internal enum class Tile { OPEN, WALL }
 
-internal enum class Turn {
-    LEFT,
-    RIGHT,
-    NONE; // sort of a kludge, but neatly sidesteps the fencepost problem
-
-    fun execute(d: Dir): Dir =
-        when (this) {
-            LEFT -> d.turnLeft()
-            RIGHT -> d.turnRight()
-            NONE -> d
-        }
-}
-
 internal data class Step(
     val n: Int,
     val dir: Turn,
 )
-
-internal data class State(
-    val pos: Vec2,
-    val facing: Dir,
-) {
-    val password
-        get() = pos.y * 1000 +
-                pos.x * 4 +
-                when (facing) {
-                    EAST -> 0
-                    SOUTH -> 1
-                    WEST -> 2
-                    NORTH -> 3
-                }
-
-    fun move() =
-        State(pos.move(facing), facing)
-}
 
 internal data class Parsed(
     val map: Map,
@@ -62,40 +30,37 @@ internal data class Parsed(
 )
 
 internal fun parse(input: String): Parsed {
-    var y = 1 // one-indexed
-    var x = 0
+    // one-indexed
+    var y = 1
+    var x = 1
     var startX = 0
     val tiles = HashMap<Vec2, Tile>()
     val steps = mutableListOf<Step>()
     var maxX = Int.MIN_VALUE
     var n = 0
     fun walk(turn: Turn) {
-        if (n > 0) {
-            steps.add(Step(n, turn))
-            n = 0
-        }
+        steps.add(Step(n, turn))
+        n = 0
     }
     for (c in input.toSlice()) {
-        x++
         when (c) {
+            ' ' -> x++
             '.' -> {
                 if (startX == 0)
                     startX = x
-                tiles[Vec2(x, y)] = OPEN
+                tiles[Vec2(x++, y)] = OPEN
             }
-            '#' ->
-                tiles[Vec2(x, y)] = WALL
+            '#' -> tiles[Vec2(x++, y)] = WALL
             '\n' -> {
-                if (n == 0) // still in the map portion
+                if (x > 1) { // still in the map portion
                     maxX = maxX.coerceAtLeast(x)
-                walk(Turn.NONE)
-                x = 0
-                y++
+                    x = 1
+                    y++
+                } else if (n > 0)
+                    walk(Turn.NONE)
             }
-            'R' ->
-                walk(Turn.RIGHT)
-            'L' ->
-                walk(Turn.LEFT)
+            'R' -> walk(Turn.RIGHT)
+            'L' -> walk(Turn.LEFT)
             in '0'..'9' ->
                 n = n * 10 + c.digitToInt()
         }
@@ -103,12 +68,7 @@ internal fun parse(input: String): Parsed {
     return Parsed(
         Map(
             tiles,
-            Rect(
-                1,
-                1,
-                maxX - 1, // the newline
-                y - 3, // final newline, directions, blank
-            ),
+            Rect(1, 1, maxX - 1, y - 1), // newlines
             Vec2(startX, 1),
         ),
         steps
@@ -121,7 +81,7 @@ private fun walk(parsed: Parsed) =
             var curr = state
             for (i in 0 until n) {
                 var next = curr.move()
-                if (!map.contains(next.pos))
+                if (!map.contains(next.pos)) // stepped off the map
                     next = map.crossEdge(curr)
                 if (map[next.pos] == WALL)
                     break
