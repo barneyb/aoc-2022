@@ -46,15 +46,14 @@ private const val SHAPE_LONG = """   111222333
 
 class MapTest {
 
-    private fun makeMap(raw: String): Map {
-        return parse(
+    private fun makeMap(raw: String) =
+        parse(
             (raw.replace(Regex("[0-9a-f]"), ".")
                 .lines()
                 .filter(String::isNotBlank) +
                     listOf("", "movement", ""))
                 .joinToString("\n")
-        )
-    }
+        ).map
 
     @Suppress("unused")
     private fun printEdgePairs(map: Map) {

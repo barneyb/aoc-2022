@@ -15,8 +15,7 @@ private operator fun IntProgression.get(i: Int) =
 internal class Map(
     val tiles: HashMap<Vec2, Tile>,
     val bounds: Rect,
-    val topLeft: Vec2,
-    val steps: List<Step>,
+    val start: Vec2,
 ) {
 
     val width = bounds.width
@@ -24,7 +23,7 @@ internal class Map(
     val leg = sqrt(tiles.size / 6.0).toInt().also {
         assert(it * it * 6 == tiles.size) { "$it doesn't multiply out to tile count" }
         assert(height % it == 0) { "$it doesn't divide height $height evenly" }
-        assert(topLeft.x % it == 1) { "$it leaves $topLeft not in a corner" }
+        assert(start.x % it == 1) { "$it leaves $start not in corner of a square" }
     }
 
     /**

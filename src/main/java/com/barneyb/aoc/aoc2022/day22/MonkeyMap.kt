@@ -56,7 +56,12 @@ internal data class State(
         State(pos.move(facing), facing)
 }
 
-internal fun parse(input: String): Map {
+internal data class Parsed(
+    val map: Map,
+    val steps: List<Step>,
+)
+
+internal fun parse(input: String): Parsed {
     var y = 1 // one-indexed
     var x = 0
     var startX = 0
@@ -95,39 +100,43 @@ internal fun parse(input: String): Map {
                 n = n * 10 + c.digitToInt()
         }
     }
-    return Map(
-        tiles,
-        Rect(
-            1,
-            1,
-            maxX - 1, // the newline
-            y - 3, // final newline, directions, blank
+    return Parsed(
+        Map(
+            tiles,
+            Rect(
+                1,
+                1,
+                maxX - 1, // the newline
+                y - 3, // final newline, directions, blank
+            ),
+            Vec2(startX, 1),
         ),
-        Vec2(startX, 1),
         steps
     )
 }
 
-private fun walk(map: Map) =
-    map.steps.fold(State(map.topLeft, EAST)) { state, (n, turn) ->
-        var curr = state
-        for (i in 0 until n) {
-            var next = curr.move()
-            if (!map.contains(next.pos))
-                next = map.crossEdge(curr)
-            if (map[next.pos] == WALL)
-                break
-            curr = next
+private fun walk(parsed: Parsed) =
+    parsed.let { (map, steps) ->
+        steps.fold(State(map.start, EAST)) { state, (n, turn) ->
+            var curr = state
+            for (i in 0 until n) {
+                var next = curr.move()
+                if (!map.contains(next.pos))
+                    next = map.crossEdge(curr)
+                if (map[next.pos] == WALL)
+                    break
+                curr = next
+            }
+            State(curr.pos, turn.execute(curr.facing))
         }
-        State(curr.pos, turn.execute(curr.facing))
     }
 
-internal fun finalPasswordTorus(map: Map): Int {
-    map.foldIntoTorus()
-    return walk(map).password
+internal fun finalPasswordTorus(parsed: Parsed): Int {
+    parsed.map.foldIntoTorus()
+    return walk(parsed).password
 }
 
-internal fun finalPasswordCube(map: Map): Int {
-    map.foldIntoCube()
-    return walk(map).password
+internal fun finalPasswordCube(parsed: Parsed): Int {
+    parsed.map.foldIntoCube()
+    return walk(parsed).password
 }

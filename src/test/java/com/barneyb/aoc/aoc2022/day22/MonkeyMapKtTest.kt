@@ -26,8 +26,8 @@ class MonkeyMapKtTest {
 
     @Test
     fun parsing() {
-        val map = parse(EXAMPLE_ONE)
-        assertEquals(Vec2(9, 1), map.topLeft)
+        val (map, steps) = parse(EXAMPLE_ONE)
+        assertEquals(Vec2(9, 1), map.start)
         assertEquals(
             Rect(
                 1..16,
@@ -36,7 +36,7 @@ class MonkeyMapKtTest {
             map.bounds
         )
         assertEquals(96, map.tiles.size)
-        assertEquals(7, map.steps.size)
+        assertEquals(7, steps.size)
     }
 
     @Test
