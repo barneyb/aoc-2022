@@ -22,9 +22,6 @@ internal data class Team(
     override val valve
         get() = valves[idx]
 
-    override fun isOpen(v: Valve) =
-        open.contains(v)
-
     override fun moveAndOpen(v: Valve, dist: Int) =
         copy(
             minutesLefts = minutesLefts.copyOf().apply {

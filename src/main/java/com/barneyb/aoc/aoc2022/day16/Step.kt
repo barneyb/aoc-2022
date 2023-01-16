@@ -2,7 +2,9 @@ package com.barneyb.aoc.aoc2022.day16
 
 internal interface Step {
     fun moveAndOpen(v: Valve, dist: Int): Step
-    fun isOpen(v: Valve): Boolean
+
+    fun isOpen(v: Valve) =
+        open.contains(v)
 
     val minutesLeft: Int
     val valve: Valve

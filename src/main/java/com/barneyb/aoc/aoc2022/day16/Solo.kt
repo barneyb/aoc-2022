@@ -8,9 +8,6 @@ internal data class Solo(
     override val rate: Int = 0,
 ) : Step {
 
-    override fun isOpen(v: Valve) =
-        open.contains(v)
-
     override fun moveAndOpen(v: Valve, dist: Int) =
         copy(
             minutesLeft = minutesLeft - dist - 1,
