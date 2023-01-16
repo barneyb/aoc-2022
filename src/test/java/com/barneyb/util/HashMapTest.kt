@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-
 class HashMapTest {
 
     @Test
@@ -150,7 +149,9 @@ class HashMapTest {
         assertEquals(java.result.count, barney.result.count)
         assertEquals(java.result.total, barney.result.total)
         assertEquals(java.result.size, barney.result.size)
-        assertTrue(barney.elapsed < java.elapsed * 2)
+        assertTrue(barney.elapsed <= java.elapsed * 2) {
+            "Mine took ${barney.elapsed}, >2x Java's ${java.elapsed}"
+        }
     }
 
 }
