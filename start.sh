@@ -13,7 +13,7 @@ SRC_ROOT="src/main/java"
 TEST_ROOT="src/test/java"
 RESOURCE_ROOT="src/main/resources"
 
-if [ "$(git status --porcelain src | wc -l)" != "0" ]; then
+if ! git diff -q --exit-code src; then
     (
         echo "= Working copy is dirty; clean it up. ================================"
         echo
@@ -100,27 +100,8 @@ class ${CAMEL}KtTest {
 }
 EOF
 
-INPUT_FILE=$RESOURCE_ROOT/$DIR/${CAMEL}.txt
-mkdir -p "$(dirname "$INPUT_FILE")"
-cat > "$INPUT_FILE" << EOF
-                                Dec $DAY, $YEAR
-
-You look fabulous, by the way. Very healthy.
-
-  -- barney
-
-EOF
-
-COOKIE_FILE=.cookie.txt
-if [ -f "$COOKIE_FILE" ]; then
-    curl --request GET -sL \
-         --url "https://adventofcode.com/${YEAR}/day/${BARE_DAY}/input" \
-         --cookie "$COOKIE_FILE" \
-         --output "$INPUT_FILE"
-fi
-
 git add .
-idea --line 12 "$SRC_FILE" "$INPUT_FILE" --line 14 "$TEST_FILE"
+idea --line 12 "$SRC_FILE" --line 14 "$TEST_FILE"
 
 if [[ $SCRIPT = .* ]]; then
   rm "$SCRIPT"

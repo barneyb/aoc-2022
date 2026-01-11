@@ -11,12 +11,15 @@ great context to experiment with.
 
 https://github.com/barneyb/aoc2017 has an index, if you want my details.
 
-There are a few tests which use my real input; they can be excluded by adding
+## Running
+
+The code uses [advent-of-code-data](https://github.com/wimglenn/advent-of-code-data)
+to manage inputs. So install that, configure your token (see the second section
+of its readme), and you should be able to get _your_ answers with _my_ solvers.
+
+There are a few tests written against my inputs; they can be excluded by adding
 `CI=true` to your environment before running.
 
 ## Start Script
 
-The `start.sh` script can be used to bootstrap a day's puzzle. Create
-`.cookie.txt` w/ your cookie to auto-download input files (via cURL):
-
-    Set-Cookie: session=123...def
+The `start.sh` script can be used to bootstrap a day's puzzle.

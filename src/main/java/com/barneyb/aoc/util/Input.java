@@ -13,34 +13,7 @@ public final class Input {
     }
 
     public static String forProblem(Class<?> clazz) {
-        var res = clazz.getResource("input.txt");
-        if (res == null) {
-            var name = clazz.getName();
-            var pkg = clazz.getPackageName();
-            if (!pkg.isEmpty()) {
-                name = name.substring(pkg.length() + 1); // for period
-            }
-            res = clazz.getResource(name + ".txt");
-            if (res == null) {
-                val idx = name.indexOf('$');
-                if (idx >= 0) {
-                    name = name.substring(0, idx);
-                    res = clazz.getResource(name + ".txt");
-                    if (res == null && name.endsWith("Test")) {
-                        name = name.substring(0, name.length() - 4);
-                        res = clazz.getResource(name + ".txt");
-                    }
-                    if (res == null && name.endsWith("Kt")) {
-                        name = name.substring(0, name.length() - 2);
-                        res = clazz.getResource(name + ".txt");
-                    }
-                }
-            }
-        }
-        if (res == null) {
-            throw new RuntimeException("No input for '" + clazz.getName() + "' was found");
-        }
-        return asString(res);
+        return new AocdInputSupplier().apply(clazz);
     }
 
     public static String forProblem(KCallable<?> fun) {
