@@ -12,6 +12,7 @@ BASE_PACKAGE="com.barneyb.aoc"
 SRC_ROOT="src/main/java"
 TEST_ROOT="src/test/java"
 RESOURCE_ROOT="src/main/resources"
+SOLVERS_FILE="util/solvers.txt"
 
 if ! git diff -q --exit-code src; then
     (
@@ -99,6 +100,8 @@ class ${CAMEL}KtTest {
 
 }
 EOF
+
+echo "${YEAR} ${DAY} ${CAMEL}.kt" >> "$SOLVERS_FILE"
 
 git add .
 idea --line 12 "$SRC_FILE" --line 14 "$TEST_FILE"

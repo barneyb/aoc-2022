@@ -8,6 +8,7 @@ if [[ $SCRIPT != .* ]]; then
   exec "./.$SCRIPT" "$@"
 fi
 
+./mvnw -q compile
 time (
     find src/main/java -name '*.java' -print0 \
         | xargs -0 grep -l 'void main(' \

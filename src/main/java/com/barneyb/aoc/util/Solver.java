@@ -79,8 +79,11 @@ public final class Solver {
                     printResult("Part Two", partTwo.apply(parsed));
             }
             return null;
-        }).humanize();
-        printResult("Total Time", result.toDurationString());
+        });
+        printResult("Total Time",
+                    System.getProperties().containsKey("time_in_nanos")
+                            ? result.getElapsed()
+                            : result.humanize().toDurationString());
     }
 
     private static void printResult(String label, Object v) {

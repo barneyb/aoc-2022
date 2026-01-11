@@ -20,3 +20,5 @@
 
 # put your session cookie here for cURL to auto-download input files
 /.cookie.txt
+
+*.egg-info/
