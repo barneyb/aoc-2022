@@ -11,6 +11,9 @@ great context to experiment with.
 
 https://github.com/barneyb/aoc2017 has an index, if you want my details.
 
+There are a few tests which use my real input; they can be excluded by adding
+`CI=true` to your environment before running.
+
 ## Start Script
 
 The `start.sh` script can be used to bootstrap a day's puzzle. Create

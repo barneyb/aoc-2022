@@ -43,7 +43,6 @@ public final class Input {
         return asString(res);
     }
 
-    @SuppressWarnings("unused") // useful for playing w/o Solver
     public static String forProblem(KCallable<?> fun) {
         return forProblem(fun.getClass());
     }

@@ -1,6 +1,7 @@
 package com.barneyb.aoc.aoc2022.day16
 
 import com.barneyb.aoc.util.Input
+import com.barneyb.aoc.NotInCI
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -52,6 +53,7 @@ class ProboscideaVolcaniumKtTest {
     }
 
     @Test
+    @NotInCI
     fun theRealDeal() {
         val parsed = parse(Input.forProblem(::parse))
         assertEquals(1880, maximumPressureRelease(parsed))

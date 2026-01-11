@@ -2,6 +2,7 @@ package com.barneyb.aoc.aoc2022.day15
 
 import com.barneyb.aoc.util.Input
 import com.barneyb.util.HashSet
+import com.barneyb.aoc.NotInCI
 import com.barneyb.util.Timing
 import com.barneyb.util.Vec2
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -97,6 +98,7 @@ class BeaconExclusionZoneKtTest {
     }
 
     @Test
+    @NotInCI
     fun perf() {
         val model = parse(Input.forProblem(::parse))
         val r1 = Timing.benchmark(100) { countNonBeaconPositionsOnRow(model) }
