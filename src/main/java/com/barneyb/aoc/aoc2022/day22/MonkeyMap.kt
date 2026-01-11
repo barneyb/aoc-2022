@@ -56,8 +56,7 @@ internal fun parse(input: String): Parsed {
                     maxX = maxX.coerceAtLeast(x)
                     x = 1
                     y++
-                } else if (n > 0)
-                    walk(Turn.NONE)
+                }
             }
             'R' -> walk(Turn.RIGHT)
             'L' -> walk(Turn.LEFT)
@@ -65,13 +64,15 @@ internal fun parse(input: String): Parsed {
                 n = n * 10 + c.digitToInt()
         }
     }
+    if (n > 0)
+        walk(Turn.NONE)
     return Parsed(
         Map(
             tiles,
             Rect(1, 1, maxX - 1, y - 1), // newlines
             Vec2(startX, 1),
         ),
-        steps
+        steps,
     )
 }
 
