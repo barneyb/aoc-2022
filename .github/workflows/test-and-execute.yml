@@ -11,6 +11,6 @@ jobs:
           java-version: '11'
           cache: 'maven'
       - name: Build and Test
-        run: mvn -B package
+        run: ./mvnw -B package
       - name: Run Solvers
         run: bash ./run_all.sh

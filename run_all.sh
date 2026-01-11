@@ -21,7 +21,7 @@ time (
     | grep '.aoc.' \
     | sort \
     | sed -e 's/\(.*\)/-Dexec.mainClass="\1"/' \
-    | xargs -n 1 mvn -q -B -Dbenchmark=false exec:java
+    | xargs -n 1 ./mvnw -q -B -Dbenchmark=false exec:java
 
 if [[ $SCRIPT = .* ]]; then
   rm "$SCRIPT"
