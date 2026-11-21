@@ -2,7 +2,6 @@ package com.barneyb.aoc.aoc2022.day16
 
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
-import com.barneyb.util.HashMap
 import com.barneyb.util.Queue
 import com.barneyb.util.Stack
 
@@ -136,7 +135,7 @@ private fun walk(adjacent: Graph, start: Step): Int {
         else if (step.projected + remaining * (maxRate - step.rate) <= best)
             continue
         for ((v, d) in adjacent[step.valve])
-            if (remaining - 1 > d && !step.isOpen(v))
+            if (remaining - 1 >= d && !step.isOpen(v))
                 queue.add(step.moveAndOpen(v, d))
     }
     return best
