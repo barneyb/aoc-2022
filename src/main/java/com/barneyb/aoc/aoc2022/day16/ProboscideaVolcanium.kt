@@ -2,6 +2,7 @@ package com.barneyb.aoc.aoc2022.day16
 
 import com.barneyb.aoc.util.Solver
 import com.barneyb.aoc.util.toSlice
+import com.barneyb.util.HashMap
 import com.barneyb.util.Queue
 import com.barneyb.util.Stack
 
